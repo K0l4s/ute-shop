@@ -28,7 +28,7 @@ const Navbar = (props: Props) => {
             </li>
             <li>
               <a href="#" className="text-white">Login</a>
-            </li>
+            </li>  
             <li>
               <a href="#" className="text-white">Admin</a>
             </li>
