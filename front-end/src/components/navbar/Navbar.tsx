@@ -1,8 +1,6 @@
-import React from 'react'
 
-type Props = {}
 
-const Navbar = (props: Props) => {
+const Navbar = () => {
   return (
     // navbar using tailwindcss
     <nav className="bg-gray-800 p-4 sticky top-0 ">
