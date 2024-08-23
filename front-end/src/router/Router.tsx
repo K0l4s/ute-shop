@@ -1,11 +1,10 @@
-import React from 'react'
+
 import { Route, Routes } from 'react-router-dom'
 import Navbar from '../components/navbar/Navbar'
 import Homepage from '../pages/homepage/Homepage'
 
-type Props = {}
 
-const Router = (props: Props) => {
+const Router = () => {
   return (
     <>
     <Navbar />
