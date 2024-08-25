@@ -9,7 +9,7 @@ const Navbar = () => {
         <div>
           <ul className="flex space-x-4">
             <li>
-              <a href="#" className="text-white">Home</a>
+              <a href="#" className="text-white">Trang chủ</a>
             </li>
             <li>
               <a href="#" className="text-white">About</a>
