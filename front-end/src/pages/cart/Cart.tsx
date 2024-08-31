@@ -1,4 +1,3 @@
-import { it } from "node:test"
 import CartItems from "../../components/cart/cartItems/CartItems"
 
 const Cart = () => {
