@@ -1,16 +1,38 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../config/configdb.js";
+'use strict';
+const {
+  Model
+} = require('sequelize');
 
-const User = sequelize.define("User", {
-  username: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: true,
-  },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-});
+const Role = require('../enums/role.js');
 
-export default User;
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
+  }
+  User.init({
+    fullname: DataTypes.STRING,
+    address: DataTypes.STRING,
+    birthday: DataTypes.DATE,
+    avatar_url: DataTypes.STRING,
+    phone: DataTypes.STRING,
+    email: DataTypes.STRING,
+    password: DataTypes.STRING,
+    is_active: DataTypes.BOOLEAN,
+    role: {
+      type: DataTypes.ENUM(Role.CUSTOMER, Role.ADMIN),
+      allowNull: false,
+      defaultValue: Role.CUSTOMER
+    }
+  }, {
+    sequelize,
+    modelName: 'User',
+  });
+  return User;
+};
