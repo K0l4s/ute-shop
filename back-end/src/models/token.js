@@ -21,10 +21,21 @@ Token.init({
     defaultValue: TokenType.BEARER
   },
   revoked: DataTypes.BOOLEAN,
-  expired: DataTypes.BOOLEAN
+  expired: DataTypes.BOOLEAN,
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references: {
+      model: 'Users', // References the Users table
+      key: 'id'
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE'
+  }
 }, {
   sequelize,
   modelName: 'Token',
+  timestamps: false
 });
 
 export default Token;
