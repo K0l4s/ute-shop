@@ -43,6 +43,16 @@ export const loginUser = async ({email, password}) => {
       throw new Error("User not active");
     }
 
+    // Find and update old tokens
+    await Token.update(
+      { revoked: true, expired: true },
+      { 
+        where: { 
+          userId: user.id 
+        } 
+      }
+    );
+
     // Generate a JWT token
     const token = jwt.sign(
       { id: user.id, email: user.email }, 
