@@ -4,6 +4,7 @@ import Homepage from '../pages/homepage/Homepage'
 import Cart from '../pages/cart/Cart'
 import Product from '../pages/products/Product'
 import Order from '../pages/order/Order'
+import OrderDetail from '../pages/order/orderDetails/OrderDetail'
 
 
 const Router = () => {
@@ -23,8 +24,8 @@ const Router = () => {
             <Route path="/profile/edit" element={<Cart/>} />
 
             {/* Orders */}
-            <Route path="/orders" element={<Cart/>} />
-            <Route path="/orders/:id" element={<Cart/>} />
+            <Route path="/orders" element={<Order/>} />
+            <Route path="/orders/:id" element={<OrderDetail/>} />
 
             {/* Admin */}
             <Route path="/admin" element={<Cart/>} />
