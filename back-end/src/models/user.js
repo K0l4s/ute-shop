@@ -17,6 +17,7 @@ User.init({
   email: DataTypes.STRING,
   password: DataTypes.STRING,
   is_active: DataTypes.BOOLEAN,
+  code: DataTypes.INTEGER,
   role: {
     type: DataTypes.ENUM(Role.CUSTOMER, Role.ADMIN),
     allowNull: false,

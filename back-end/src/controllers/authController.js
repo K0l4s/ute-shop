@@ -1,4 +1,4 @@
-import { registerUser, loginUser } from '../services/authService.js';
+import { registerUser, loginUser, confirmRegister } from '../services/authService.js';
 
 export const register = async (req, res) => {
   const { fullname, address, birthday, avatar_url, phone, email, password, is_active, role } = req.body;
@@ -21,3 +21,14 @@ export const login = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const confirm = async (req, res) => {
+  const { email, code } = req.body;
+
+  try {
+    const response = await confirmRegister({ email, code });
+    res.status(200).json(response);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}

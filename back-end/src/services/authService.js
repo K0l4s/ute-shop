@@ -2,11 +2,20 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import Token from '../models/token.js';
 import User from '../models/user.js';
+import { sendEmail, generateVerificationCode } from './emailService.js';
 
 // Register a new user
 export const registerUser = async ({ fullname, address, birthday, avatar_url, phone, email, password, is_active, role }) => {
   try {
+    // check if the email already exists
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      throw new Error("Email already exists");
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+    const verificationCode = await generateVerificationCode();
+
     const newUser = await User.create({
       fullname,
       address,
@@ -15,10 +24,17 @@ export const registerUser = async ({ fullname, address, birthday, avatar_url, ph
       phone,
       email,
       password: hashedPassword,
-      is_active,
+      is_active: false,
+      code: verificationCode,
       role
     });
-    return { message: "User registered successfully", user: newUser };
+
+
+    const emailSubject = "Email verification";
+    const emailText = `Your verification code is: ${verificationCode}`;
+    await sendEmail(email, emailSubject, emailText);
+
+    return { message: "User registered successfully" };
   } catch (err) {
     throw new Error("Error registering user" + err);
   }
@@ -71,5 +87,30 @@ export const loginUser = async ({email, password}) => {
     return { message: "Login successful", token, user };
   } catch (err) {
     throw new Error("Error logging in: " + err.message);
+  }
+}
+
+// Confirm register
+export const confirmRegister = async ({ email, code }) => {
+  try {
+    const user = await User.findOne({ Where: { email } });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (user.code !== code) {
+      throw new Error("Invalid code");
+    }
+
+    await User.update(
+      { is_active: true, code: null },
+      { where: {email} }
+    );
+
+    return { message: "Verification successfully" };
+  }
+  catch (err) {
+    throw new Error("Error confirming user: " + err.message);
   }
 }
