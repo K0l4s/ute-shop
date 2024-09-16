@@ -5,9 +5,19 @@ import Cart from '../pages/cart/Cart'
 import Product from '../pages/products/Product'
 import Order from '../pages/order/Order'
 import OrderDetail from '../pages/order/orderDetails/OrderDetail'
+import ProductDetail from '../pages/productDetail/ProductDetail'
 
 
 const Router = () => {
+  const infor = {
+    title: "Dế mèn phiêu lưu ký",
+  author: "Tô Hoài",
+  publisher: "Dân trí",
+  price: 80000,
+  discountPrice: 30000,
+  image: "https://lh4.googleusercontent.com/proxy/EBAyH1uGo9-ZhCvcsFiKFa4AixalbCWbR39f4S2yR68MYzf16ZdapZAbcibeYnYrsLU7HTL-kTIOGFTexFw_u2Xmk3W7Iibz",
+  stock: 20
+  }
   return (
     <>
     
@@ -25,7 +35,7 @@ const Router = () => {
 
             {/* Orders */}
             <Route path="/orders" element={<Order/>} />
-            <Route path="/orders/:id" element={<OrderDetail/>} />
+            <Route path="/orders/:id" element={<ProductDetail {...infor}/>} />
 
             {/* Admin */}
             <Route path="/admin" element={<Cart/>} />
