@@ -12,14 +12,20 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      fullname: {
+      firstname: {
+        type: Sequelize.STRING
+      },
+      lastname: {
         type: Sequelize.STRING
       },
       address: {
         type: Sequelize.STRING
       },
       birthday: {
-        type: Sequelize.DATE
+        type: Sequelize.DATEONLY
+      },
+      gender: {
+        type: Sequelize.BOOLEAN
       },
       avatar_url: {
         type: Sequelize.STRING

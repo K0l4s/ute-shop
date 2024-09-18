@@ -1,6 +1,7 @@
 import express from "express";
 import sequelize from "./config/configdb.js";
 import authRoutes from "./routes/authRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import cors from "cors";
 
 const port = process.env.PORT || 8080;
@@ -18,6 +19,8 @@ app.use(cors(corsOptions));
 
 // JWT authentication routes
 app.use('/api/v1/auth', authRoutes);
+
+app.use('/api/v1/user', userRoutes);
 
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);

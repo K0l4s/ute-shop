@@ -9,9 +9,11 @@ class User extends Model {
 }
 
 User.init({
-  fullname: DataTypes.STRING,
+  firstname: DataTypes.STRING,
+  lastname: DataTypes.STRING,
   address: DataTypes.STRING,
-  birthday: DataTypes.DATE,
+  birthday: DataTypes.DATEONLY,
+  gender: DataTypes.BOOLEAN,
   avatar_url: DataTypes.STRING,
   phone: DataTypes.STRING,
   email: DataTypes.STRING,
