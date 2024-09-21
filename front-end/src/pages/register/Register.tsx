@@ -1,39 +1,47 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-interface LoginProps {}
 
-const Login: React.FC<LoginProps> = () => {
+interface RegisterProps {}
+
+const Register: React.FC<RegisterProps> = () => {
+  const [firstname, setFirstname] = useState('');
+  const [lastname, setLastname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      alert('Mật khẩu và xác nhận mật khẩu không khớp!');
+      return;
+    }
+
     try {
-      const response = await fetch('http://localhost:8080/api/v1/auth/login', {
+      const response = await fetch('http://localhost:8080/api/v1/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          firstname,
+          lastname,
           email,
           password,
         }),
       });
-  
-      const data = await response.json();
+
       if (response.ok) {
-        localStorage.setItem('token', data.token);
-        alert('Đăng nhập thành công!');
-        navigate('/');
+        alert('Đăng ký thành công!');
+        navigate('/login');
       } else {
-        alert('Đăng nhập thất bại!');
+        alert('Đăng ký thất bại!');
       }
-    }
-    catch (err) {
+    } catch (err) {
       console.error('Có lỗi xảy ra: ', err);
     }
-    
   };
 
   return (
@@ -52,6 +60,24 @@ const Login: React.FC<LoginProps> = () => {
             <input
               type="text"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder="First Name"
+              value={firstname}
+              onChange={(e) => setFirstname(e.target.value)}
+            />
+          </div>
+          <div className="mb-4">
+            <input
+              type="text"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder="Last Name"
+              value={lastname}
+              onChange={(e) => setLastname(e.target.value)}
+            />
+          </div>
+          <div className="mb-4">
+            <input
+              type="email"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -66,22 +92,30 @@ const Login: React.FC<LoginProps> = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
           </div>
+          <div className="mb-4">
+            <input
+              type="password"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
+          </div>
           <div className="flex justify-center">
             <button
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-24 rounded focus:outline-none focus:shadow-outline"
             >
-              Sign in
+              Register
             </button>
           </div>
         </form>
         <p className="text-center text-xs text-gray-500 mt-4">
-          Don't have an account? <a href="/register" className="text-blue-500">Sign up</a> <br />
-          Forgot your password?
+          Already have an account? <a href="/login" className="text-blue-500">Sign in</a>
         </p>
       </div>
     </div>
   );
 };
 
-export default Login;
+export default Register;
