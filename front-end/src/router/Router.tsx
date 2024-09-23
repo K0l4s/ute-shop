@@ -6,7 +6,9 @@ import Product from '../pages/products/Product'
 import Order from '../pages/order/Order'
 import OrderDetail from '../pages/order/orderDetails/OrderDetail'
 import ProductDetail from '../pages/productDetail/ProductDetail'
-import Login from '../pages/login/Login';
+import Login from '../pages/login/Login'
+import Register from '../pages/register/Register'
+
 
 
 const Router = () => {
@@ -30,7 +32,7 @@ const Router = () => {
             <Route path="/products/:id" element={<Product/>} />
             {/* User */}
             <Route path="/login" element={<Login/>} />
-            <Route path="/register" element={<Cart/>} />
+            <Route path="/register" element={<Register/>} />
             <Route path="/profile" element={<Cart/>} />
             <Route path="/profile/edit" element={<Cart/>} />
 
