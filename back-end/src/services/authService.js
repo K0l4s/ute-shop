@@ -99,8 +99,8 @@ export const confirmRegister = async ({ email, code }) => {
       throw new Error("User not found");
     }
 
-    if (user.code !== code) {
-      throw new Error("Invalid code");
+    if (user.code != code) {
+      throw new Error("Invalid code"+user.code);
     }
 
     await User.update(

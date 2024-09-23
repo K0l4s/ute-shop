@@ -4,9 +4,8 @@ import Homepage from '../pages/homepage/Homepage'
 import Cart from '../pages/cart/Cart'
 import Product from '../pages/products/Product'
 import Order from '../pages/order/Order'
-import OrderDetail from '../pages/order/orderDetails/OrderDetail'
 import ProductDetail from '../pages/productDetail/ProductDetail'
-import Login from '../pages/login/login'
+import Login from '../pages/login/Login'
 
 
 const Router = () => {
