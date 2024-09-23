@@ -1,36 +1,17 @@
 import jwt from 'jsonwebtoken';
-import Token from '../models/token.js';
 
 export const authenticateJWT = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const token = req.cookies.token; // Lấy token từ cookie
 
-  if (authHeader) {
-    const token = authHeader.split(" ")[1];
-    
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      // Check if the token is revoked or expired
-      const tokenRecord = await Token.findOne({
-        where: {
-          token,
-          revoked: false,
-          expired: false
-        }
-      });
-
-      if (!tokenRecord) {
-        res.sendStatus(403); // Forbidden
+  if (token) {
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) {
+        return res.sendStatus(403); // Forbidden
       }
-
-      req.user = decoded;
+      req.user = user;
       next();
-    }
-    catch (err) {
-      return res.sendStatus(403); //Forbidden
-    }
-  }
-  else {
+    });
+  } else {
     res.sendStatus(401); // Unauthorized
   }
 };
