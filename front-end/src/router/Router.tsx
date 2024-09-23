@@ -1,6 +1,5 @@
 
 import { Navigate, Route, Routes } from 'react-router-dom'
-import Homepage from '../pages/homepage/Homepage'
 import Cart from '../pages/cart/Cart'
 import Product from '../pages/products/Product'
 import Order from '../pages/order/Order'
@@ -9,6 +8,7 @@ import Login from '../pages/login/Login'
 import Register from '../pages/register/Register'
 import ForgotPassword from '../pages/forgotPassword/ForgotPassword'
 import ResetPassword from '../pages/resetPassword/ResetPassword'
+import LandingPage from '../pages/landingPage/LandingPage'
 
 
 
@@ -26,7 +26,7 @@ const Router = () => {
     <>
     
         <Routes>
-            <Route path="/" element={<Homepage />} />
+            <Route path="/" element={<LandingPage />} />
             <Route path="/cart" element={<Cart/>} />
             {/* Products Route */}
             <Route path="/products" element={<Product/>} />
