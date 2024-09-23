@@ -114,3 +114,53 @@ export const confirmRegister = async ({ email, code }) => {
     throw new Error("Error confirming user: " + err.message);
   }
 }
+// forgot Password by sending verification code
+export const forgotPassword = async ({ email }) => {
+  try {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const verificationCode = await generateVerificationCode();
+
+    await User.update(
+      { code: verificationCode },
+      { where: { email } }
+    );
+
+    const emailSubject = "Reset password";
+    const emailText = `Your verification code is: ${verificationCode}`;
+    await sendEmail(email, emailSubject, emailText);
+
+    return { message: "Verification code sent" };
+  } catch (err) {
+    throw new Error("Error sending verification code: " + err.message);
+  }
+}
+// reset password
+export const resetPassword = async ({ email, code, password }) => {
+  try {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (user.code != code) {
+      throw new Error("Invalid code");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await User.update(
+      { password: hashedPassword, code: null },
+      { where: { email } }
+    );
+
+    return { message: "Password reset successfully" };
+  } catch (err) {
+    throw new Error("Error resetting password: " + err.message);
+  }
+}

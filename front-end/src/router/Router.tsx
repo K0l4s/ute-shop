@@ -7,6 +7,8 @@ import Order from '../pages/order/Order'
 import ProductDetail from '../pages/productDetail/ProductDetail'
 import Login from '../pages/login/Login'
 import Register from '../pages/register/Register'
+import ForgotPassword from '../pages/forgotPassword/ForgotPassword'
+import ResetPassword from '../pages/resetPassword/ResetPassword'
 
 
 
@@ -29,9 +31,12 @@ const Router = () => {
             {/* Products Route */}
             <Route path="/products" element={<Product/>} />
             <Route path="/products/:id" element={<Product/>} />
-            {/* User */}
+            {/* auth */}
             <Route path="/login" element={<Login/>} />
             <Route path="/register" element={<Register/>} />
+            <Route path="/forgot" element={<ForgotPassword/>} />
+            <Route path="/reset/password" element={<ResetPassword/>} />
+            {/* User */}
             <Route path="/profile" element={<Cart/>} />
             <Route path="/profile/edit" element={<Cart/>} />
 
