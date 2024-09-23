@@ -61,8 +61,11 @@ const LandingPage = () => {
                   <div key={i} className="bg-white p-4 shadow rounded-lg">
                     <div className="bg-green-200 h-48 mb-4"></div>
                     <h3 className="font-semibold">Dế Mèn Phiêu Lưu Ký</h3>
-                    <p className="text-sm text-gray-500">34.000VND</p>
-                    <p className="text-xs text-gray-400">Nhà xuất bản: Giáo dục</p>
+                    <div className="">
+                    <p className="text-xl text-red-500 font-semibold">34.000VND</p>
+                    <p className="text-decoration-line: line-through text-gray-500">50.000VND</p>
+                    </div>
+                    <p className="text-l text-gray-400">Nhà xuất bản: Giáo dục</p>
                   </div>
                 ))}
               </div>
