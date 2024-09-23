@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logo from '../../assets/images/logo.png'
 import { TbLockAccess, TbLockAccessOff } from 'react-icons/tb'
 import { SiAwssecretsmanager } from "react-icons/si";
@@ -12,11 +12,17 @@ import { RootState } from '../../redux/store';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/reducers/authSlice';
 import { useNavigate, Link } from 'react-router-dom';
+import Menu from '../menu/Menu';
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
+  const [activeCategory, setActiveCategory] = useState<string>('');
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const handleCategoryClick = (category: string) => {
+    setActiveCategory(category);
+    setIsVisible(!isVisible); // Toggle visibility when clicking on the category
+  };
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const isAdmin = true;
 
@@ -43,11 +49,12 @@ const Navbar = () => {
 
   return (
     // navbar using tailwindcss
-    <nav className="bg-gray-800 p-4 sticky top-0 ">
+    <>
+    <nav className="bg-gray-800 p-4 sticky top-0 z-80">
       <div className="justify-between mx-auto flex items-center">
         <div className='justify-between flex items-center'>
           <img className='h-10 mr-20' src={logo} alt="" />
-          <BsMenuButtonWideFill size={30} className='mr-2' color='white' />
+          <BsMenuButtonWideFill onClick={() => handleCategoryClick('Sách trong nước')} size={30} className='mr-2' color='white' />
           {/* searchBox */}
           <div className="flex items-center w-100">
             <input type="text" placeholder="Search" className="bg-gray-900 p-1 h-8 rounded-l-lg w-80" />
@@ -91,7 +98,11 @@ const Navbar = () => {
           )}
         </div>
       </div>
+      <Menu activeCategory={activeCategory} isVisible={isVisible} />
     </nav>
+    
+
+    </>
   )
 }
 
