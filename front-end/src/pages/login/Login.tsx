@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login, setUser } from '../../redux/reducers/authSlice';
+import { useDispatch } from 'react-redux';
 interface LoginProps {}
 
 const Login: React.FC<LoginProps> = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,6 +18,7 @@ const Login: React.FC<LoginProps> = () => {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           email,
           password,
@@ -23,8 +27,11 @@ const Login: React.FC<LoginProps> = () => {
   
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('token', data.token);
         alert('Đăng nhập thành công!');
+
+         // Lưu thông tin người dùng vào Redux
+        dispatch(login());
+        dispatch(setUser(data.user)); // Sử dụng data.user
         navigate('/');
       } else {
         alert('Đăng nhập thất bại!');
