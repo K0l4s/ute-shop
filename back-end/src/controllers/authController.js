@@ -16,11 +16,25 @@ export const login = async (req, res) => {
 
   try {
     const response = await loginUser({ email, password});
+
+    // Thiết lập cookie với JWT
+    const token = response.token;
+    res.cookie('token', token, {
+      httpOnly: true, // Cookie không thể truy cập từ JavaScript
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 8 * 60 * 60 * 1000 // 8h
+    });
+
     res.status(201).json(response);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const logout = (req, res) => {
+  res.clearCookie('token'); // Xóa cookie
+  res.status(200).json({ message: 'Logged out successfully' });
+}
 
 export const confirm = async (req, res) => {
   const { email, code } = req.body;
@@ -32,3 +46,11 @@ export const confirm = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 }
+
+export const checkAuth = (req, res) => {
+  if (req.user) {
+    res.status(200).json({ authenticated: true, user: req.user });
+  } else {
+    res.status(401).json({ authenticated: false });
+  }
+};
