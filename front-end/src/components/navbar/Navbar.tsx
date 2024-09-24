@@ -73,18 +73,48 @@ const Navbar = () => {
           {isAuthenticated ? (
             <div>
             <ul className="flex space-x-4">
-              <li><Link to="/cart" className="text-white"><IoMdNotificationsOutline size={30}/></Link></li>
-              <li><Link to="/cart" className="text-white"><FiShoppingCart size={30}/></Link></li>
-              <li><Link to="/account" className="text-white"><FaRegUserCircle size={30}/></Link></li>
+              <li>
+                <Link to="/cart" className="text-white">
+                  <div className="py-2">
+                    <IoMdNotificationsOutline size={34}/>
+                  </div>
+                </Link>
+              </li>
+              <li>
+                <Link to="/cart" className="text-white">
+                  <div className="py-2">
+                    <FiShoppingCart size={34}/>
+                  </div>
+                </Link>
+              </li>
+              {/* User icon with dropdown menu */}
+              <li className="relative group">
+                <Link to="/account">
+                  <div className="py-2">
+                    <FaRegUserCircle size={34} className="text-white cursor-pointer" />
+                  </div>
+                </Link>
+                
+                {/* Dropdown menu */}
+                <div className="absolute right-0 w-48 bg-white rounded-lg shadow-lg hidden group-hover:block">
+                  <Link to="/account" className="block px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-t-lg">
+                    Tài khoản của tôi
+                  </Link>
+                  <Link to="/account/orders" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                    Đơn hàng của tôi
+                  </Link>
+                  <Link to="/account/favorites" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                    Sách yêu thích
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="block w-full text-left px-4 py-2 text-rose-600 font-bold hover:bg-gray-200 rounded-md"
+                  >
+                    Đăng xuất
+                  </button>
+                </div>
+              </li>
             </ul>
-            <div>
-              <button
-                className="bg-red-500 text-white px-4 py-2 rounded"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
-            </div>
             </div>
           ) : (
             <div className="flex space-x-4">

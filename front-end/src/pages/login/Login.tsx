@@ -31,7 +31,15 @@ const Login: React.FC<LoginProps> = () => {
 
          // Lưu thông tin người dùng vào Redux
         dispatch(login());
-        dispatch(setUser(data.user)); // Sử dụng data.user
+        dispatch(setUser({
+          firstName: data.user["firstname"],
+          lastName: data.user["lastname"],
+          phone: data.user["phone"],
+          email: data.user["email"],
+          gender: data.user["gender"],
+          birthDate: data.user["birthday"],
+          profilePicture: data.user["avatar_url"],
+        }));
         navigate('/');
       } else {
         alert('Đăng nhập thất bại!');

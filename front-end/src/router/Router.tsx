@@ -4,11 +4,17 @@ import Cart from '../pages/cart/Cart'
 import Product from '../pages/products/Product'
 import Order from '../pages/order/Order'
 import ProductDetail from '../pages/productDetail/ProductDetail'
+
+import Login from '../pages/login/Login';
+import Account from '../pages/account/Account'
+import AccountPage from '../pages/account/AccountPage'
+
 import Login from '../pages/login/Login'
 import Register from '../pages/register/Register'
 import ForgotPassword from '../pages/forgotPassword/ForgotPassword'
 import ResetPassword from '../pages/resetPassword/ResetPassword'
 import LandingPage from '../pages/landingPage/LandingPage'
+
 
 
 
@@ -33,11 +39,16 @@ const Router = () => {
             <Route path="/products/:id" element={<Product/>} />
             {/* auth */}
             <Route path="/login" element={<Login/>} />
+
+            <Route path="/register" element={<Cart/>} />
+            <Route path="/account" element={<AccountPage/>} />
+
             <Route path="/register" element={<Register/>} />
             <Route path="/forgot" element={<ForgotPassword/>} />
             <Route path="/reset/password" element={<ResetPassword/>} />
             {/* User */}
             <Route path="/profile" element={<Cart/>} />
+
             <Route path="/profile/edit" element={<Cart/>} />
 
             {/* Orders */}
