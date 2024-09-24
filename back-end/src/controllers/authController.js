@@ -1,4 +1,4 @@
-import { registerUser, loginUser, confirmRegister } from '../services/authService.js';
+import { registerUser, loginUser, confirmRegister, forgotPassword, resetPassword } from '../services/authService.js';
 
 export const register = async (req, res) => {
   const { fullname, address, birthday, avatar_url, phone, email, password, is_active, role } = req.body;
@@ -54,3 +54,23 @@ export const checkAuth = (req, res) => {
     res.status(401).json({ authenticated: false });
   }
 };
+
+export const forgotPsswd = async(req, res) => {
+  const { email } = req.body;
+  try{
+    const response = await forgotPassword({ email });
+    res.status(200).json(response);
+  }catch(err){
+    res.status(500).json({ error: err.message });
+  }
+};
+
+export const resetPsswd = async(req, res) => {
+  const { email, code, password } = req.body;
+  try{
+    const response = await resetPassword({ email, code, password });
+    res.status(200).json(response);
+  }catch(err){
+    res.status(500).json({ error: err.message });
+  }
+}
