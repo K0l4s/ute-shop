@@ -1,7 +1,17 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+interface User {
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  gender: string;
+  birthDate: string;
+  profilePicture: string;  // Add profile picture field if needed
+}
+
 interface AuthState {
-  user: string | null;
+  user: User | null;
   isAuthenticated: boolean;
 }
 
@@ -19,6 +29,7 @@ const authSlice = createSlice({
     },
     logout: (state) => {
       state.isAuthenticated = false;
+      state.user = null; // Clear user info on logout
     },
     checkAuthStatus(state, action) {
       state.isAuthenticated = action.payload;
