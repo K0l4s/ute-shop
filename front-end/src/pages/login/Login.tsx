@@ -43,6 +43,9 @@ const Login: React.FC<LoginProps> = () => {
         navigate('/');
       } else {
         alert('Đăng nhập thất bại!');
+        if(data.error === "Error logging in: User not active"){
+          navigate('/active');
+        }
       }
     }
     catch (err) {

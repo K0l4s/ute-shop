@@ -5,7 +5,10 @@ import User from '../models/user.js';
 import { sendEmail, generateVerificationCode } from './emailService.js';
 
 // Register a new user
-export const registerUser = async ({ fullname, address, birthday, avatar_url, phone, email, password, is_active, role }) => {
+export const registerUser = async ({ firstname,lastname, address, birthday, phone, email, password, repeat_psswd }) => {
+  if(password !== repeat_psswd) {
+    throw new Error("Passwords do not match");
+  }
   try {
     // check if the email already exists
     const existingUser = await User.findOne({ where: { email } });
@@ -17,16 +20,17 @@ export const registerUser = async ({ fullname, address, birthday, avatar_url, ph
     const verificationCode = await generateVerificationCode();
 
     const newUser = await User.create({
-      fullname,
+      firstname,
+      lastname,
       address,
       birthday,
-      avatar_url,
+      avatar_url:null,
       phone,
       email,
       password: hashedPassword,
       is_active: false,
       code: verificationCode,
-      role
+      // role
     });
 
 
@@ -98,7 +102,9 @@ export const confirmRegister = async ({ email, code }) => {
     if (!user) {
       throw new Error("User not found");
     }
-
+    if (user.is_active) {
+      throw new Error("User already active");
+    }
     if (user.code != code) {
       throw new Error("Invalid code"+user.code);
     }
@@ -147,7 +153,12 @@ export const resetPassword = async ({ email, code, password }) => {
     if (!user) {
       throw new Error("User not found");
     }
-
+    if(!user.code) {
+      throw new Error("No code sent");
+    }
+    if(!user.is_active) {
+      throw new Error("Active this account first");
+    }
     if (user.code != code) {
       throw new Error("Invalid code");
     }

@@ -8,13 +8,16 @@ const Register: React.FC<RegisterProps> = () => {
   const [lastname, setLastname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [birthday, setBirthday] = useState('');
+  const [address, setAddress] = useState('');
+  const [repeat_psswd, setRepeat_psswd] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
+    if (password !== repeat_psswd) {
       alert('Mật khẩu và xác nhận mật khẩu không khớp!');
       return;
     }
@@ -30,6 +33,10 @@ const Register: React.FC<RegisterProps> = () => {
           lastname,
           email,
           password,
+          phone,
+          birthday,
+          address,
+          repeat_psswd,
         }),
       });
 
@@ -41,12 +48,13 @@ const Register: React.FC<RegisterProps> = () => {
       }
     } catch (err) {
       console.error('Có lỗi xảy ra: ', err);
+      alert('Đăng ký thất bại!');
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white shadow-md rounded px-12 pt-6 pb-8 mb-4 flex flex-col items-center">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 ">
+      <div className="bg-white shadow-md rounded px-12 pt-6 pb-8 mb-4 flex flex-row items-center justify-between ">
         <div className="text-center">
           <img
             src="./logo.svg"
@@ -55,20 +63,19 @@ const Register: React.FC<RegisterProps> = () => {
           />
           <p className="text-sm text-gray-600 font-bold pt-4 pb-4">Mua sắm thoải mái - Tính tiền hết hồn!</p>
         </div>
+        <div>
         <form className="w-full max-w-sm" onSubmit={handleSubmit}>
-          <div className="mb-4">
+          <div className="mb-4 flex justify-between">
             <input
               type="text"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded w-4/12 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="First Name"
               value={firstname}
               onChange={(e) => setFirstname(e.target.value)}
             />
-          </div>
-          <div className="mb-4">
             <input
               type="text"
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              className="shadow appearance-none border rounded w-7/12 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Last Name"
               value={lastname}
               onChange={(e) => setLastname(e.target.value)}
@@ -85,6 +92,33 @@ const Register: React.FC<RegisterProps> = () => {
           </div>
           <div className="mb-4">
             <input
+              type="text"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder="Phone number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </div>
+          <div className="mb-4">
+            <input
+              type="date"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder="Date of Birth"
+              value={birthday}
+              onChange={(e) => setBirthday(e.target.value)}
+            />
+          </div>
+          <div className="mb-4">
+            <input
+              type="text"
+              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              placeholder="Address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+            />
+          </div>
+          <div className="mb-4">
+            <input
               type="password"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Password"
@@ -97,8 +131,8 @@ const Register: React.FC<RegisterProps> = () => {
               type="password"
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              value={repeat_psswd}
+              onChange={(e) => setRepeat_psswd(e.target.value)}
             />
           </div>
           <div className="flex justify-center">
@@ -113,6 +147,7 @@ const Register: React.FC<RegisterProps> = () => {
         <p className="text-center text-xs text-gray-500 mt-4">
           Already have an account? <a href="/login" className="text-blue-500">Sign in</a>
         </p>
+        </div>
       </div>
     </div>
   );

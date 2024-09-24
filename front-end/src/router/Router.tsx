@@ -1,19 +1,18 @@
 
-import { Navigate, Route, Routes } from 'react-router-dom'
+import {  Route, Routes } from 'react-router-dom'
 import Cart from '../pages/cart/Cart'
 import Product from '../pages/products/Product'
 import Order from '../pages/order/Order'
 import ProductDetail from '../pages/productDetail/ProductDetail'
 
 import Login from '../pages/login/Login';
-import Account from '../pages/account/Account'
+// import Account from '../pages/account/Account'
 import AccountPage from '../pages/account/AccountPage'
-
-import Login from '../pages/login/Login'
 import Register from '../pages/register/Register'
 import ForgotPassword from '../pages/forgotPassword/ForgotPassword'
 import ResetPassword from '../pages/resetPassword/ResetPassword'
 import LandingPage from '../pages/landingPage/LandingPage'
+import ActiveAccount from '../pages/activeAccount/ActiveAccount'
 
 
 
@@ -28,6 +27,8 @@ const Router = () => {
   image: "https://lh4.googleusercontent.com/proxy/EBAyH1uGo9-ZhCvcsFiKFa4AixalbCWbR39f4S2yR68MYzf16ZdapZAbcibeYnYrsLU7HTL-kTIOGFTexFw_u2Xmk3W7Iibz",
   stock: 20
   }
+  
+  
   return (
     <>
     
@@ -40,10 +41,10 @@ const Router = () => {
             {/* auth */}
             <Route path="/login" element={<Login/>} />
 
-            <Route path="/register" element={<Cart/>} />
             <Route path="/account" element={<AccountPage/>} />
 
             <Route path="/register" element={<Register/>} />
+            <Route path="/active" element={<ActiveAccount/>} />
             <Route path="/forgot" element={<ForgotPassword/>} />
             <Route path="/reset/password" element={<ResetPassword/>} />
             {/* User */}
