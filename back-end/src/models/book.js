@@ -2,13 +2,13 @@
 import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class Book extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
+      // Many-to-Many với Genre
+      Book.belongsToMany(models.Genre, {
+        through: 'BookGenre', // Bảng trung gian
+        foreignKey: 'bookId',
+        as: 'genres'
+      });
     }
   }
   Book.init({
