@@ -29,13 +29,14 @@ function App() {
           const userData = await userResponse.json();
           if (userResponse.ok) {
             dispatch(setUser({
-              firstName: userData.data["firstname"],
-              lastName: userData.data["lastname"],
+              firstname: userData.data["firstname"],
+              lastname: userData.data["lastname"],
               phone: userData.data["phone"],
               email: userData.data["email"],
+              address: userData.data["address"],
               gender: userData.data["gender"],
-              birthDate: userData.data["birthday"],
-              profilePicture: userData.data["avatar_url"],
+              birthday: userData.data["birthday"],
+              avatar_url: userData.data["avatar_url"],
             }));
           }
         } else {
