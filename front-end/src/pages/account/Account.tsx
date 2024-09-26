@@ -4,6 +4,7 @@ import { RootState } from '../../redux/store';
 import { setUser } from '../../redux/reducers/authSlice';
 import { FiSave, FiUpload } from 'react-icons/fi';
 import { updateProfileApis } from '../../apis/user';
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
 const Account = () => {
   const dispatch = useDispatch();
@@ -24,6 +25,9 @@ const Account = () => {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
+
+  // Loading state
+  const [loading, setLoading] = useState(false);
 
   // Update local state when user data changes
   useEffect(() => {
@@ -54,7 +58,8 @@ const Account = () => {
 
   const handleSaveChanges = async (event: React.FormEvent) => {
     event.preventDefault()
-    
+    setLoading(true);
+
     const updatedUser = {
       firstname,
       lastname,
@@ -73,12 +78,14 @@ const Account = () => {
       updatedUser.phone,
       updatedUser.gender,
       new Date(updatedUser.birthday),
-      avatar,
+      avatar ? avatar : null,
     );
 
+    setAvatar(null);
+    setLoading(false);
+
     if (response) {
-      dispatch(setUser({ ...updatedUser, avatar_url: response.avatar_url || updatedUser.avatarUrl }));
-      alert('Changes saved successfully!');
+      dispatch(setUser({ ...updatedUser, avatar_url: response.data.avatar_url || updatedUser.avatarUrl }));
     } else {
       alert('Error saving changes: ' + (response?.message || 'Unknown error'));
     }
@@ -101,8 +108,16 @@ const Account = () => {
   };
 
   return (
-    <div className="flex justify-center">
-      <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-5xl">
+    <div className="flex justify-center relative">
+      {/* Loading overlay */}
+      {loading && (
+        <div className="absolute inset-0 z-50 rounded flex items-center justify-center bg-black bg-opacity-50">
+          <AiOutlineLoading3Quarters className="animate-spin mr-2 text-2xl text-white" />
+          <div className="text-white font-bold text-2xl">Đang lưu thay đổi...</div>
+        </div>
+      )}
+
+      <div className={`bg-white shadow-md rounded-lg p-8 w-full max-w-5xl ${loading ? 'opacity-50' : ''}`}>
         <h2 className="text-lg text-purple-700 font-bold mb-6">THÔNG TIN TÀI KHOẢN</h2>
 
         <div className="flex flex-col items-center mb-8">
@@ -139,6 +154,7 @@ const Account = () => {
                 onChange={(e) => setLastname(e.target.value)}
                 className="w-full p-2 border rounded"
                 placeholder='Nhập họ của bạn'
+                required
               />
             </div>
             <div>
@@ -149,6 +165,7 @@ const Account = () => {
                 onChange={(e) => setFirstname(e.target.value)}
                 className="w-full p-2 border rounded"
                 placeholder='Nhập tên của bạn'
+                required
               />
             </div>
             <div>
@@ -158,6 +175,7 @@ const Account = () => {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full p-2 border rounded"
+                required
               />
             </div>
             <div>
@@ -268,8 +286,17 @@ const Account = () => {
             type="submit"
             className="bg-red-600 text-white px-4 py-2 m-auto rounded flex items-center space-x-2 hover:bg-red-500"
           >
-            <FiSave />
-            <span className='font-bold'>Lưu thay đổi</span>
+            {loading ? (
+              <>
+                <AiOutlineLoading3Quarters className="animate-spin mr-2" />
+                Đang lưu...
+              </>
+            ) : (
+              <>
+                <FiSave className="mr-2" />
+                Lưu thay đổi
+              </>
+            )}
           </button>
         </form>
       </div>
