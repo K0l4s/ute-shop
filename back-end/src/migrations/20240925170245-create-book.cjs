@@ -40,14 +40,22 @@ module.exports = {
           key: 'id'
         }
       },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+      author_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Authors',
+          key: 'id'
+        }
       },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
+      category_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Categories',
+          key: 'id'
+        }
       }
+      
+      
     });
   },
   async down(queryInterface, Sequelize) {

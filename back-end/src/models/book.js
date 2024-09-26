@@ -10,13 +10,23 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      // define association here 
       Book.belongsTo(models.Publisher, {
         foreignKey: 'publisher_id'
       });
       Book.hasMany(models.Review, {
         foreignKey: 'book_id'
       });
+      Book.belongsTo(models.Author, {
+        foreignKey: 'author_id'
+      });
+      Book.belongsTo(models.Category, {
+        foreignKey: 'category_id'
+      });
+      Book.hasMany(models.Collection_book, {
+        foreignKey: 'book_id'
+      });
+      
     }
   }
   Book.init({
@@ -34,7 +44,22 @@ module.exports = (sequelize, DataTypes) => {
         model: 'Publisher',
         key: 'id'
       }
-    }
+    },
+    author_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Author',
+        key: 'id'
+      }
+    },
+    category_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Category',
+        key: 'id'
+      }
+    },
+    
   }, {
     sequelize,
     modelName: 'Book',
