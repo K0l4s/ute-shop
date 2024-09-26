@@ -37,7 +37,7 @@ const Router = () => {
             <Route path="/cart" element={<Cart/>} />
             {/* Products Route */}
             <Route path="/products" element={<Product/>} />
-            <Route path="/products/:id" element={<Product/>} />
+            <Route path="/products/:id" element={<ProductDetail/>} />
             {/* auth */}
             <Route path="/login" element={<Login/>} />
 
@@ -54,7 +54,7 @@ const Router = () => {
 
             {/* Orders */}
             <Route path="/orders" element={<Order/>} />
-            <Route path="/orders/:id" element={<ProductDetail {...infor}/>} />
+            <Route path="/orders/:id" element={<ProductDetail/>} />
 
             {/* Admin */}
             <Route path="/admin" element={<Cart/>} />
