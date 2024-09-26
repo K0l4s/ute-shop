@@ -45,7 +45,7 @@ export const registerUser = async ({ firstname,lastname, address, birthday, phon
 };
 
 // Login
-export const loginUser = async ({email, password}) => {
+export const loginUser = async ({email, password, res}) => {
   try {
     const user = await User.findOne({ where: { email } });
     
@@ -88,7 +88,23 @@ export const loginUser = async ({email, password}) => {
       userId: user.id  
     });
 
-    return { message: "Login successful", token, user };
+    res.cookie('token', token, {
+      httpOnly: true, // Cookie không thể truy cập từ JavaScript
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 8 * 60 * 60 * 1000 // 8h
+    });
+
+    const returnData = {
+      firstname: user.firstname,
+      lastname: user.lastname,
+      address: user.address,
+      birthday: user.birthday,
+      gender: user.gender,
+      avatar_url: user.avatar_url,
+      phone: user.phone,
+      email: user.email,
+    }
+    return { message: "Login successful", data: returnData};
   } catch (err) {
     throw new Error("Error logging in: " + err.message);
   }

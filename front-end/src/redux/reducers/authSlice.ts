@@ -1,13 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 interface User {
-  firstName: string;
-  lastName: string;
+  firstname: string;
+  lastname: string;
   phone: string;
   email: string;
-  gender: string;
-  birthDate: string;
-  profilePicture: string;  // Add profile picture field if needed
+  address: string;
+  gender: boolean;
+  birthday: Date;
+  avatar_url: string;
 }
 
 interface AuthState {
@@ -35,7 +36,8 @@ const authSlice = createSlice({
       state.isAuthenticated = action.payload;
     },
     setUser(state, action) {
-      state.user = action.payload;
+      // state.user = action.payload;
+      state.user = { ...state.user, ...action.payload };
     },
   },
 });

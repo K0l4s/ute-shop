@@ -15,16 +15,8 @@ export const login = async (req, res) => {
   const { email, password} = req.body;
 
   try {
-    const response = await loginUser({ email, password});
-
-    // Thiết lập cookie với JWT
-    const token = response.token;
-    res.cookie('token', token, {
-      httpOnly: true, // Cookie không thể truy cập từ JavaScript
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 8 * 60 * 60 * 1000 // 8h
-    });
-
+    const response = await loginUser({ email, password, res});
+    console.log(response);
     res.status(201).json(response);
   } catch (err) {
     res.status(500).json({ error: err.message });

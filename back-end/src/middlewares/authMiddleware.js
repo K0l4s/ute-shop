@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 
 export const authenticateJWT = async (req, res, next) => {
-  const token = req.cookies.token; // Lấy token từ cookie
+  // Lấy token từ cookie hoặc từ header Authorization
+  const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
 
   if (token) {
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
