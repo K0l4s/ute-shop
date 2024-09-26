@@ -1,4 +1,4 @@
-import upload from "../config/multerConfig.js";
+import { uploadAvatarService } from "../services/uploadService.js";
 import { getUserById, updateUserById } from "../services/userService.js";
 
 export const getUserProfile = async (req, res) => {
@@ -23,34 +23,31 @@ export const getUserProfile = async (req, res) => {
 export const updateUserProfile = async (req, res) => {
   const userId = req.user.id;
 
-  upload.single('avatar_url')(req, res, async function (err) {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-
-    // Get fields from req.body and the uploaded file from req.file
+  try {
     const { firstname, lastname, address, birthday, gender, phone } = req.body;
-    let avatar_url = req.file ? req.file.path : null;
 
-    try {
-      const updatedUser = await updateUserById(userId, { 
-        firstname, 
-        lastname, 
-        address, 
-        birthday, 
-        gender, 
-        avatar_url, 
-        phone 
-      });
+    // Kiểm tra và upload avatar nếu có
+    let avatar_url = null;
+    if (req.file) {
+      avatar_url = await uploadAvatarService(req, res); // Nhận URL từ Cloudinary
+    }
 
-      res.status(201).json({
-        message: "Success",
-        data: updatedUser
-      });
-    }
-    catch (err) {
-      res.status(500).json({ error: err.message });
-    }
-  });
-  
+    const updatedUser = await updateUserById(userId, { 
+      firstname, 
+      lastname, 
+      address, 
+      birthday, 
+      gender, 
+      avatar_url, 
+      phone 
+    });
+
+    res.status(201).json({
+      message: "Success",
+      data: updatedUser
+    });
+  }
+  catch (err) {
+    res.status(500).json({ error: err.message });
+  };
 }

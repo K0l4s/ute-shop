@@ -9,7 +9,6 @@ import Login from '../pages/login/Login';
 import Account from '../pages/account/Account'
 import AccountPage from '../pages/account/AccountPage'
 
-import Login from '../pages/login/Login'
 import Register from '../pages/register/Register'
 import ForgotPassword from '../pages/forgotPassword/ForgotPassword'
 import ResetPassword from '../pages/resetPassword/ResetPassword'
@@ -41,7 +40,7 @@ const Router = () => {
             <Route path="/login" element={<Login/>} />
 
             <Route path="/register" element={<Cart/>} />
-            <Route path="/account" element={<AccountPage/>} />
+            <Route path="/account/profile" element={<AccountPage/>} />
 
             <Route path="/register" element={<Register/>} />
             <Route path="/forgot" element={<ForgotPassword/>} />

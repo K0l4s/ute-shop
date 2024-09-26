@@ -89,7 +89,7 @@ const Navbar = () => {
               </li>
               {/* User icon with dropdown menu */}
               <li className="relative group">
-                <Link to="/account">
+                <Link to="/account/profile">
                   <div className="py-2">
                     <FaRegUserCircle size={34} className="text-white cursor-pointer" />
                   </div>
@@ -97,7 +97,7 @@ const Navbar = () => {
                 
                 {/* Dropdown menu */}
                 <div className="absolute right-0 w-48 bg-white rounded-lg shadow-lg hidden group-hover:block">
-                  <Link to="/account" className="block px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-t-lg">
+                  <Link to="/account/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-t-lg">
                     Tài khoản của tôi
                   </Link>
                   <Link to="/account/orders" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">

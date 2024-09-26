@@ -32,13 +32,14 @@ const Login: React.FC<LoginProps> = () => {
          // Lưu thông tin người dùng vào Redux
         dispatch(login());
         dispatch(setUser({
-          firstName: data.user["firstname"],
-          lastName: data.user["lastname"],
-          phone: data.user["phone"],
-          email: data.user["email"],
-          gender: data.user["gender"],
-          birthDate: data.user["birthday"],
-          profilePicture: data.user["avatar_url"],
+          firstname: data.data.firstname,
+          lastname: data.data.lastname,
+          phone: data.data.phone,
+          email: data.data.email,
+          address: data.data.address,
+          gender: data.data.gender,
+          birthday: data.data.birthday,
+          avatar_url: data.data.avatar_url,
         }));
         navigate('/');
       } else {
