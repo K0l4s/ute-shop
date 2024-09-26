@@ -5,6 +5,7 @@ import Role from '../enums/role.js';
 class User extends Model {
   static associate(models) {
     User.hasMany(models.Token, { foreignKey: 'userId', as: 'tokens' });
+    User.hasMany(models.Review, { foreignKey: 'userId', as: 'reviews' });
   }
 }
 

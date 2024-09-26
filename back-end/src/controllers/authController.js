@@ -1,10 +1,10 @@
 import { registerUser, loginUser, confirmRegister, forgotPassword, resetPassword } from '../services/authService.js';
 
 export const register = async (req, res) => {
-  const { fullname, address, birthday, avatar_url, phone, email, password, is_active, role } = req.body;
+  const { firstname,lastname, address, birthday, phone, email, password, repeat_psswd } = req.body;
 
   try {
-    const response = await registerUser({ fullname, address, birthday, avatar_url, phone, email, password, is_active, role });
+    const response = await registerUser({ firstname,lastname, address, birthday, phone, email, password, repeat_psswd });
     res.status(201).json(response);
   } catch (err) {
     res.status(500).json({ error: err.message });
