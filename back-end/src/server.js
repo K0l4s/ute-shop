@@ -2,6 +2,7 @@ import express from "express";
 import sequelize from "./config/configdb.js";
 import authRoutes from "./routes/authRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import bookRoutes from "./routes/bookRoutes.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
@@ -23,6 +24,8 @@ app.use(cors(corsOptions));
 app.use('/api/v1/auth', authRoutes);
 
 app.use('/api/v1/user', userRoutes);
+
+app.use('/api/v1/book', bookRoutes);
 
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);

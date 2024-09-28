@@ -1,26 +1,28 @@
 'use strict';
 import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
-  class Category extends Model {
+  class Genre extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
-      Category.hasMany(models.Book, {
-        foreignKey: 'category_id',
-        as: 'books'
-      });
+      // Nhiều-nhiều giữa Genre và Book qua bảng book_genre
+      Genre.belongsToMany(models.Book, {
+        through: models.book_genre, // Bảng trung gian
+        foreignKey: 'genreId',
+        otherKey: 'bookId',
+      })
     }
   }
-  Category.init({
+  Genre.init({
     name: DataTypes.STRING,
     desc: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'Category',
+    modelName: 'Genre',
+    timestamps: false,
   });
-  return Category;
+  return Genre;
 };

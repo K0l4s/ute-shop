@@ -1,7 +1,7 @@
 'use strict';
 import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
-  class Category extends Model {
+  class Book_Genre extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -9,18 +9,15 @@ export default (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Category.hasMany(models.Book, {
-        foreignKey: 'category_id',
-        as: 'books'
-      });
     }
   }
-  Category.init({
-    name: DataTypes.STRING,
-    desc: DataTypes.STRING
+  Book_Genre.init({
+    bookId: DataTypes.INTEGER,
+    genreId: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'Category',
+    modelName: 'Book_Genre',
+    timestamps: false,
   });
-  return Category;
+  return Book_Genre;
 };

@@ -1,8 +1,6 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
+import { Model } from 'sequelize';
+export default (sequelize, DataTypes) => {
   class Book extends Model {
     /**
      * Helper method for defining associations.
@@ -27,6 +25,14 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'book_id'
       });
       
+      // Nhiều-nhiều giữa Book và Genre qua bảng book_genre
+      Book.belongsToMany(models.genre, {
+        through: models.book_genre, // Bảng trung gian
+        foreignKey: 'bookId',
+        otherKey: 'genreId',
+        as: 'genres'
+      });
+
     }
   }
   Book.init({
@@ -63,6 +69,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Book',
+    timestamps: false,
   });
   return Book;
 };
