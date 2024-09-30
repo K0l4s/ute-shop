@@ -41,8 +41,6 @@ const Router = () => {
             {/* auth */}
             <Route path="/login" element={<Login/>} />
 
-
-            <Route path="/register" element={<Cart/>} />
             <Route path="/account/profile" element={<AccountPage/>} />
 
 
