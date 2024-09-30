@@ -1,4 +1,4 @@
-import multer from 'multer';
+const multer = require('multer');
 
 const limitFileSize = 10000000; // 10MB
 
@@ -25,4 +25,4 @@ function checkFileType(file, cb) {
   }
 }
 
-export default upload;
+module.exports = upload;

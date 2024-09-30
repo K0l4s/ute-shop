@@ -1,7 +1,7 @@
-import express from "express";
-import { authenticateJWT } from "../middlewares/authMiddleware.js";
-import { getUserProfile, updateUserProfile } from "../controllers/userController.js";
-import upload from "../config/multerConfig.js";
+const express = require("express");
+const { authenticateJWT } = require("../middlewares/authMiddleware");
+const { getUserProfile, updateUserProfile } = require("../controllers/userController");
+const upload = require("../config/multerConfig");
 
 const router = express.Router();
 
@@ -11,4 +11,4 @@ router.get('/profile', authenticateJWT, getUserProfile);
 // Cập nhật hồ sơ người dùng
 router.put('/profile/edit', authenticateJWT, upload.single('avatar_url'), updateUserProfile);
 
-export default router;
+module.exports = router;

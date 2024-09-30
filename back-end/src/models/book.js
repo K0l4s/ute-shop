@@ -1,9 +1,8 @@
-'use strict';
-import { Model } from 'sequelize';
-export default (sequelize, DataTypes) => {
+const { Model, DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   class Book extends Model {
     static associate(models) {
-      // define association here 
       Book.belongsTo(models.Publisher, {
         foreignKey: 'publisher_id'
       });
@@ -16,20 +15,19 @@ export default (sequelize, DataTypes) => {
       Book.belongsTo(models.Category, {
         foreignKey: 'category_id'
       });
-      Book.hasMany(models.Collection_book, {
+      Book.hasMany(models.Collection_Book, {
         foreignKey: 'book_id'
       });
-      
-      // Nhiều-nhiều giữa Book và Genre qua bảng book_genre
-      Book.belongsToMany(models.genre, {
-        through: models.book_genre, // Bảng trung gian
+
+      Book.belongsToMany(models.Genre, {
+        through: models.Book_Genre,
         foreignKey: 'bookId',
         otherKey: 'genreId',
         as: 'genres'
       });
-
     }
   }
+
   Book.init({
     ISBN: DataTypes.STRING,
     title: DataTypes.STRING,
@@ -42,29 +40,29 @@ export default (sequelize, DataTypes) => {
     publisher_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'Publisher',
+        model: 'Publishers',
         key: 'id'
       }
     },
     author_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'Author',
+        model: 'Authors',
         key: 'id'
       }
     },
     category_id: {
       type: DataTypes.INTEGER,
       references: {
-        model: 'Category',
+        model: 'Categories',
         key: 'id'
       }
-    },
-    
+    }
   }, {
     sequelize,
     modelName: 'Book',
-    timestamps: false,
+    timestamps: false
   });
+
   return Book;
 };

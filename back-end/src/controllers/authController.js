@@ -1,21 +1,23 @@
-import { registerUser, loginUser, confirmRegister, forgotPassword, resetPassword } from '../services/authService.js';
+const { registerUser, loginUser, confirmRegister, forgotPassword, resetPassword } = require('../services/authService.js');
 
-export const register = async (req, res) => {
-  const { firstname,lastname, address, birthday, phone, email, password, repeat_psswd } = req.body;
+// Đăng ký người dùng
+const register = async (req, res) => {
+  const { firstname, lastname, address, birthday, phone, email, password, repeat_psswd } = req.body;
 
   try {
-    const response = await registerUser({ firstname,lastname, address, birthday, phone, email, password, repeat_psswd });
+    const response = await registerUser({ firstname, lastname, address, birthday, phone, email, password, repeat_psswd });
     res.status(201).json(response);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-export const login = async (req, res) => {
-  const { email, password} = req.body;
+// Đăng nhập
+const login = async (req, res) => {
+  const { email, password } = req.body;
 
   try {
-    const response = await loginUser({ email, password, res});
+    const response = await loginUser({ email, password, res });
     console.log(response);
     res.status(201).json(response);
   } catch (err) {
@@ -23,12 +25,14 @@ export const login = async (req, res) => {
   }
 };
 
-export const logout = (req, res) => {
+// Đăng xuất
+const logout = (req, res) => {
   res.clearCookie('token'); // Xóa cookie
   res.status(200).json({ message: 'Logged out successfully' });
-}
+};
 
-export const confirm = async (req, res) => {
+// Xác nhận đăng ký
+const confirm = async (req, res) => {
   const { email, code } = req.body;
 
   try {
@@ -37,9 +41,10 @@ export const confirm = async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-}
+};
 
-export const checkAuth = (req, res) => {
+// Kiểm tra xác thực
+const checkAuth = (req, res) => {
   if (req.user) {
     res.status(200).json({ authenticated: true, user: req.user });
   } else {
@@ -47,22 +52,34 @@ export const checkAuth = (req, res) => {
   }
 };
 
-export const forgotPsswd = async(req, res) => {
+// Quên mật khẩu
+const forgotPsswd = async (req, res) => {
   const { email } = req.body;
-  try{
+  try {
     const response = await forgotPassword({ email });
     res.status(200).json(response);
-  }catch(err){
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
-export const resetPsswd = async(req, res) => {
+// Đặt lại mật khẩu
+const resetPsswd = async (req, res) => {
   const { email, code, password } = req.body;
-  try{
+  try {
     const response = await resetPassword({ email, code, password });
     res.status(200).json(response);
-  }catch(err){
+  } catch (err) {
     res.status(500).json({ error: err.message });
   }
-}
+};
+
+module.exports = {
+  register,
+  login,
+  logout,
+  confirm,
+  checkAuth,
+  forgotPsswd,
+  resetPsswd
+};

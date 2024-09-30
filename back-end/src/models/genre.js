@@ -1,28 +1,25 @@
-'use strict';
-import { Model } from 'sequelize';
-export default (sequelize, DataTypes) => {
+const { Model, DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   class Genre extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // Nhiều-nhiều giữa Genre và Book qua bảng book_genre
       Genre.belongsToMany(models.Book, {
-        through: models.book_genre, // Bảng trung gian
+        through: models.Book_Genre,
         foreignKey: 'genreId',
         otherKey: 'bookId',
-      })
+        as: 'books'
+      });
     }
   }
+
   Genre.init({
     name: DataTypes.STRING,
     desc: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Genre',
-    timestamps: false,
+    timestamps: false
   });
+
   return Genre;
 };

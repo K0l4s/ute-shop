@@ -1,8 +1,7 @@
-import { searchBooksByTitle } from "../services/bookService.js";
-
+const { searchBooksByTitle } = require("../services/bookService.js");
 
 // Controller tìm kiếm sách theo tiêu đề
-export const searchBooksByTitleController = async (req, res) => {
+const searchBooksByTitleController = async (req, res) => {
   const { title } = req.query;
   try {
     const books = await searchBooksByTitle(title);
@@ -19,4 +18,8 @@ export const searchBooksByTitleController = async (req, res) => {
     console.error(error);
     return res.status(500).json({ message: "Internal server error", error: error.message });
   }
+};
+
+module.exports = {
+  searchBooksByTitleController
 };

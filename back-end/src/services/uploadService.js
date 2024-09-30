@@ -1,7 +1,7 @@
-import cloudinary from "../config/cloudinaryConfig.js";
+const cloudinary = require("../config/cloudinaryConfig.js");
 
 // handler cho avatar upload
-export const uploadAvatarService = (req, res) => {
+const uploadAvatarService = (req, res) => {
   return new Promise((resolve, reject) => {
     if (!req.file) {
       return reject(new Error('No file provided'));
@@ -23,14 +23,19 @@ export const uploadAvatarService = (req, res) => {
 };
 
 // handler cho image upload
-export const uploadImageService = (req, res) => {
+const uploadImageService = (req, res) => {
   return new Promise((resolve, reject) => {
     uploadImage.single('image')(req, res, function (err) {
       if (err) {
         reject({ message: 'Image upload failed', error: err });
       } else {
-        resolve(req.file.path); 
+        resolve(req.file.path);
       }
     });
   });
+};
+
+module.exports = {
+  uploadAvatarService,
+  uploadImageService
 };

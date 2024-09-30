@@ -1,16 +1,16 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import Token from '../models/token.js';
-import User from '../models/user.js';
-import { sendEmail, generateVerificationCode } from './emailService.js';
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const db = require('../models');
+const Token = db.Token;
+const User = db.User;
+const { sendEmail, generateVerificationCode } = require('./emailService.js');
 
 // Register a new user
-export const registerUser = async ({ firstname,lastname, address, birthday, phone, email, password, repeat_psswd }) => {
-  if(password !== repeat_psswd) {
+const registerUser = async ({ firstname, lastname, address, birthday, phone, email, password, repeat_psswd }) => {
+  if (password !== repeat_psswd) {
     throw new Error("Passwords do not match");
   }
   try {
-    // check if the email already exists
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
       throw new Error("Email already exists");
@@ -24,15 +24,13 @@ export const registerUser = async ({ firstname,lastname, address, birthday, phon
       lastname,
       address,
       birthday,
-      avatar_url:null,
+      avatar_url: null,
       phone,
       email,
       password: hashedPassword,
       is_active: false,
       code: verificationCode,
-      // role
     });
-
 
     const emailSubject = "Email verification";
     const emailText = `Your verification code is: ${verificationCode}`;
@@ -40,58 +38,49 @@ export const registerUser = async ({ firstname,lastname, address, birthday, phon
 
     return { message: "User registered successfully" };
   } catch (err) {
-    throw new Error("Error registering user" + err);
+    throw new Error("Error registering user: " + err);
   }
 };
 
 // Login
-export const loginUser = async ({email, password, res}) => {
+const loginUser = async ({ email, password, res }) => {
   try {
     const user = await User.findOne({ where: { email } });
-    
     if (!user) {
       throw new Error('User not found');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
-
     if (!isPasswordValid) {
       throw new Error('Invalid password');
     }
-    
+
     if (!user.is_active) {
       throw new Error("User not active");
     }
 
-    // Find and update old tokens
     await Token.update(
       { revoked: true, expired: true },
-      { 
-        where: { 
-          userId: user.id 
-        } 
-      }
+      { where: { userId: user.id } }
     );
 
-    // Generate a JWT token
     const token = jwt.sign(
-      { id: user.id, email: user.email }, 
-      process.env.JWT_SECRET,  
-      { expiresIn: '8h' }  
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '8h' }
     );
 
-    // Save the token in the Token model
     await Token.create({
       token,
       revoked: false,
       expired: false,
-      userId: user.id  
+      userId: user.id
     });
 
     res.cookie('token', token, {
-      httpOnly: true, // Cookie không thể truy cập từ JavaScript
+      httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      maxAge: 8 * 60 * 60 * 1000 // 8h
+      maxAge: 8 * 60 * 60 * 1000
     });
 
     const returnData = {
@@ -103,17 +92,17 @@ export const loginUser = async ({email, password, res}) => {
       avatar_url: user.avatar_url,
       phone: user.phone,
       email: user.email,
-    }
-    return { message: "Login successful", data: returnData};
+    };
+    return { message: "Login successful", data: returnData };
   } catch (err) {
     throw new Error("Error logging in: " + err.message);
   }
-}
+};
 
 // Confirm register
-export const confirmRegister = async ({ email, code }) => {
+const confirmRegister = async ({ email, code }) => {
   try {
-    const user = await User.findOne({ Where: { email } });
+    const user = await User.findOne({ where: { email } });
 
     if (!user) {
       throw new Error("User not found");
@@ -121,26 +110,25 @@ export const confirmRegister = async ({ email, code }) => {
     if (user.is_active) {
       throw new Error("User already active");
     }
-    if (user.code != code) {
-      throw new Error("Invalid code"+user.code);
+    if (user.code !== code) {
+      throw new Error("Invalid code");
     }
 
     await User.update(
       { is_active: true, code: null },
-      { where: {email} }
+      { where: { email } }
     );
 
     return { message: "Verification successfully" };
-  }
-  catch (err) {
+  } catch (err) {
     throw new Error("Error confirming user: " + err.message);
   }
-}
-// forgot Password by sending verification code
-export const forgotPassword = async ({ email }) => {
+};
+
+// Forgot Password by sending verification code
+const forgotPassword = async ({ email }) => {
   try {
     const user = await User.findOne({ where: { email } });
-
     if (!user) {
       throw new Error("User not found");
     }
@@ -160,22 +148,23 @@ export const forgotPassword = async ({ email }) => {
   } catch (err) {
     throw new Error("Error sending verification code: " + err.message);
   }
-}
-// reset password
-export const resetPassword = async ({ email, code, password }) => {
+};
+
+// Reset password
+const resetPassword = async ({ email, code, password }) => {
   try {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
       throw new Error("User not found");
     }
-    if(!user.code) {
+    if (!user.code) {
       throw new Error("No code sent");
     }
-    if(!user.is_active) {
+    if (!user.is_active) {
       throw new Error("Active this account first");
     }
-    if (user.code != code) {
+    if (user.code !== code) {
       throw new Error("Invalid code");
     }
 
@@ -190,4 +179,12 @@ export const resetPassword = async ({ email, code, password }) => {
   } catch (err) {
     throw new Error("Error resetting password: " + err.message);
   }
-}
+};
+
+module.exports = {
+  registerUser,
+  loginUser,
+  confirmRegister,
+  forgotPassword,
+  resetPassword
+};

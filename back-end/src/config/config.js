@@ -1,7 +1,7 @@
-import dotenv from "dotenv";
+const dotenv = require('dotenv');
 dotenv.config();
 
-export default {
+const config = {
   development: {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
@@ -12,15 +12,17 @@ export default {
   test: {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
-    database: "database_test",
+    database: 'database_test',
     host: process.env.DB_HOST,
     dialect: process.env.DB_DIALECT
   },
   production: {
     username: process.env.DB_USERNAME,
     password: process.env.DB_PASSWORD,
-    database: "database_production",
+    database: 'database_production',
     host: process.env.DB_HOST,
     dialect: process.env.DB_DIALECT
   }
 };
+
+module.exports = config;

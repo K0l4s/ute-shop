@@ -1,16 +1,17 @@
-import book from "../models/book.js";
-import Genre from "../models/genre.js";
-import { Op } from "sequelize";
+const db = require("../models");
+const Book = db.Book;
+const Genre = db.Genre;
+const { Op } = require("sequelize");
 
 // Hàm tìm kiếm sách theo tiêu đề
-export const searchBooksByTitle = async (title) => {
+const searchBooksByTitle = async (title) => {
   try {
     // Kiểm tra nếu không có tiêu đề
     if (!title) {
       throw new Error("Title is required");
     }
     // Tìm sách theo tiêu đề
-    const books = await book.findAll({
+    const books = await Book.findAll({
       where: {
         title: {
           [Op.like]: `%${title}%`  // Tìm kiếm tiêu đề chứa từ khóa
@@ -33,4 +34,8 @@ export const searchBooksByTitle = async (title) => {
   } catch (error) {
     throw error;
   }
+};
+
+module.exports = {
+  searchBooksByTitle
 };

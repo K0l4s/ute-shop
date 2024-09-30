@@ -1,7 +1,8 @@
-import { uploadAvatarService } from "../services/uploadService.js";
-import { getUserById, updateUserById } from "../services/userService.js";
+const { uploadAvatarService } = require("../services/uploadService.js");
+const { getUserById, updateUserById } = require("../services/userService.js");
 
-export const getUserProfile = async (req, res) => {
+// Lấy thông tin người dùng
+const getUserProfile = async (req, res) => {
   const userId = req.user.id;
   const user = await getUserById(userId);
 
@@ -18,9 +19,10 @@ export const getUserProfile = async (req, res) => {
       birthday: user.birthday,
     }
   });
-}
+};
 
-export const updateUserProfile = async (req, res) => {
+// Cập nhật thông tin người dùng
+const updateUserProfile = async (req, res) => {
   const userId = req.user.id;
 
   try {
@@ -32,14 +34,14 @@ export const updateUserProfile = async (req, res) => {
       avatar_url = await uploadAvatarService(req, res); // Nhận URL từ Cloudinary
     }
 
-    const updatedUser = await updateUserById(userId, { 
-      firstname, 
-      lastname, 
-      address, 
-      birthday, 
-      gender, 
-      avatar_url, 
-      phone 
+    const updatedUser = await updateUserById(userId, {
+      firstname,
+      lastname,
+      address,
+      birthday,
+      gender,
+      avatar_url,
+      phone
     });
 
     res.status(201).json({
@@ -49,5 +51,10 @@ export const updateUserProfile = async (req, res) => {
   }
   catch (err) {
     res.status(500).json({ error: err.message });
-  };
-}
+  }
+};
+
+module.exports = {
+  getUserProfile,
+  updateUserProfile
+};

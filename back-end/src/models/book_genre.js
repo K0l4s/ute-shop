@@ -1,23 +1,32 @@
-'use strict';
-import { Model } from 'sequelize';
-export default (sequelize, DataTypes) => {
+const { Model, DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
   class Book_Genre extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
+      // Define associations here if needed
     }
   }
+
   Book_Genre.init({
-    bookId: DataTypes.INTEGER,
-    genreId: DataTypes.INTEGER
+    bookId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Books',
+        key: 'id'
+      }
+    },
+    genreId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Genres',
+        key: 'id'
+      }
+    }
   }, {
     sequelize,
     modelName: 'Book_Genre',
-    timestamps: false,
+    timestamps: false
   });
+
   return Book_Genre;
 };
