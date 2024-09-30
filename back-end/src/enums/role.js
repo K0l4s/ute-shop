@@ -4,3 +4,4 @@ const Role = {
 };
 
 module.exports = Role;
+

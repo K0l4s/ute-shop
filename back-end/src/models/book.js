@@ -18,7 +18,9 @@ module.exports = (sequelize) => {
       Book.hasMany(models.Collection_Book, {
         foreignKey: 'book_id'
       });
-
+      Book.hasMany(models.Image, {
+        foreignKey: 'book_id'
+      });
       Book.belongsToMany(models.Genre, {
         through: models.Book_Genre,
         foreignKey: 'bookId',
@@ -26,6 +28,7 @@ module.exports = (sequelize) => {
         as: 'genres'
       });
     }
+   
   }
 
   Book.init({
