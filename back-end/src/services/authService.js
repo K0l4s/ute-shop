@@ -110,7 +110,7 @@ const confirmRegister = async ({ email, code }) => {
     if (user.is_active) {
       throw new Error("User already active");
     }
-    if (user.code !== code) {
+    if (user.code != code) {
       throw new Error("Invalid code");
     }
 
