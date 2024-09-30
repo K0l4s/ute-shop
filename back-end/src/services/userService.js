@@ -1,9 +1,13 @@
-import User from "../models/user.js";
-export const getUserById = async (id) => {
-  return await User.findByPk(id);
-}
+const db = require("../models");
+const User = db.User;
 
-export const updateUserById = async (id, { firstname, lastname, address, birthday, gender, avatar_url, phone }) => {
+// Lấy người dùng theo ID
+const getUserById = async (id) => {
+  return await User.findByPk(id);
+};
+
+// Cập nhật thông tin người dùng theo ID
+const updateUserById = async (id, { firstname, lastname, address, birthday, gender, avatar_url, phone }) => {
   const user = await User.findByPk(id);
   if (!user) {
     throw new Error("User not found");
@@ -33,4 +37,9 @@ export const updateUserById = async (id, { firstname, lastname, address, birthda
     avatar_url: user.avatar_url,
     phone: user.phone,
   };
-}
+};
+
+module.exports = {
+  getUserById,
+  updateUserById
+};

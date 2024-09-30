@@ -1,6 +1,6 @@
-import nodemailer from 'nodemailer';
+const nodemailer = require('nodemailer');
 
-// create a transporter to send email
+// Tạo một transporter để gửi email
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
@@ -9,8 +9,8 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// func send email
-export const sendEmail = async (to, subject, text) => {
+// Hàm gửi email
+const sendEmail = async (to, subject, text) => {
   const mailOptions = {
     from: process.env.EMAIL,
     to,
@@ -27,7 +27,12 @@ export const sendEmail = async (to, subject, text) => {
   }
 };
 
-// Random 6 digits code
-export const generateVerificationCode = () => {
+// Hàm tạo mã xác thực ngẫu nhiên gồm 6 chữ số
+const generateVerificationCode = () => {
   return Math.floor(100000 + Math.random() * 900000);
+};
+
+module.exports = {
+  sendEmail,
+  generateVerificationCode
 };

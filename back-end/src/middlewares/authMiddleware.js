@@ -1,6 +1,6 @@
-import jwt from 'jsonwebtoken';
+const jwt = require('jsonwebtoken');
 
-export const authenticateJWT = async (req, res, next) => {
+const authenticateJWT = async (req, res, next) => {
   // Lấy token từ cookie hoặc từ header Authorization
   const token = req.cookies.token || req.headers.authorization?.split(' ')[1];
 
@@ -15,4 +15,8 @@ export const authenticateJWT = async (req, res, next) => {
   } else {
     res.sendStatus(401); // Unauthorized
   }
+};
+
+module.exports = {
+  authenticateJWT
 };

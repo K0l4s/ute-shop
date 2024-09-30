@@ -1,6 +1,6 @@
-import express from "express";
-import { register, login, confirm, logout, checkAuth,forgotPsswd,resetPsswd } from "../controllers/authController.js";
-import { authenticateJWT } from "../middlewares/authMiddleware.js";
+const express = require("express");
+const { register, login, confirm, logout, checkAuth, forgotPsswd, resetPsswd } = require("../controllers/authController");
+const { authenticateJWT } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
 
@@ -15,4 +15,4 @@ router.get('/protected', authenticateJWT, (req, res) => {
   res.json({ message: 'This is a protected route', user: req.user });
 });
 
-export default router;
+module.exports = router;

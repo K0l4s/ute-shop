@@ -2,23 +2,22 @@
 const { Model, DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  class Category extends Model {
+  class Author extends Model {
     static associate(models) {
-      Category.hasMany(models.Book, {
-        foreignKey: 'category_id',
+      Author.hasMany(models.Book, {
+        foreignKey: 'author_id',
         as: 'books'
       });
     }
   }
 
-  Category.init({
-    name: DataTypes.STRING,
-    desc: DataTypes.STRING
+  Author.init({
+    name: DataTypes.STRING
   }, {
     sequelize,
-    modelName: 'Category',
+    modelName: 'Author',
     timestamps: false
   });
 
-  return Category;
+  return Author;
 };

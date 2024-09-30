@@ -1,9 +1,10 @@
-import express from "express";
-import sequelize from "./config/configdb.js";
-import authRoutes from "./routes/authRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
-import cors from "cors";
-import cookieParser from "cookie-parser";
+const express = require('express');
+const db = require('./models/index.js');
+const authRoutes = require('./routes/authRoutes.js');
+const userRoutes = require('./routes/userRoutes.js');
+const bookRoutes = require('./routes/bookRoutes.js');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const port = process.env.PORT || 8080;
 
@@ -24,10 +25,12 @@ app.use('/api/v1/auth', authRoutes);
 
 app.use('/api/v1/user', userRoutes);
 
+app.use('/api/v1/book', bookRoutes);
+
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);
   try {
-    await sequelize.sync(); // Sync models with the database
+    await db.sequelize.sync(); // Sync models with the database
     console.log('Database connected successfully');
   } catch (error) {
     console.error('Unable to connect to the database:', error);

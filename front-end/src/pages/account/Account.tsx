@@ -206,6 +206,7 @@ const Account = () => {
                 value={birthday}
                 onChange={(e) => setBirthday(e.target.value)}
                 className="w-full p-2 border rounded"
+                required
               />
             </div>
             <div>
