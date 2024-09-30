@@ -105,12 +105,17 @@ const ProductDetail: React.FC = () => {
               </div>
               <p>Nhà xuất bản: {book.Publisher.name}</p>
               <p>Năm xuất bản: {book.year || "----"}</p>
+              <p>Tình trạng: {book.stock>0? 'Còn hàng': 'Hết hàng'}</p>
               <div className="flex items-center space-x-2">
                 <span className="text-yellow-500">★★★★☆</span>
                 <span>({book.Reviews.length} reviews)</span>
               </div>
-              <button className="bg-red-500 text-white px-4 py-2 rounded-lg mr-5">Mua ngay</button>
+              {book.stock>0? 
+              <>
+              <button className="bg-red-500 text-white px-4 py-2 rounded-lg mr-5 ">Mua ngay</button>
               <button className="bg-gray-300 text-black px-4 py-2 rounded-lg">Thêm vào giỏ hàng</button>
+              </>
+              : <button className="bg-gray-300 text-black px-4 py-2 rounded-lg mr-5">Hết hàng</button>}
             </div>
             <div className="mt-8">
               <p>Thông tin vận chuyển: <Link to="/account/profile" className='text-blue-800 underline'>Giao hàng đến: TP. Hồ Chí Minh.</Link></p>
@@ -137,7 +142,7 @@ const ProductDetail: React.FC = () => {
               slidesPerView={3}
               navigation
               pagination={{ clickable: true }}
-              // scrollbar={{ draggable: true }}
+              scrollbar={{ draggable: true }}
             >
         {book.Reviews.map((review, index) => (
           <SwiperSlide key={index}>
