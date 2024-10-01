@@ -19,6 +19,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const handleCategoryClick = (category: string) => {
     setActiveCategory(category);
     setIsVisible(!isVisible); // Toggle visibility when clicking on the category
@@ -47,6 +48,18 @@ const Navbar = () => {
     }
   };
 
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      navigate(`/search?query=${searchQuery.trim()}`);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  }
+  
   return (
     // navbar using tailwindcss
     <>
@@ -57,8 +70,14 @@ const Navbar = () => {
           <BsMenuButtonWideFill onClick={() => handleCategoryClick('Sách trong nước')} size={30} className='mr-2' color='white' />
           {/* searchBox */}
           <div className="flex items-center w-100">
-            <input type="text" placeholder="Search" className="bg-gray-900 p-1 h-8 rounded-l-lg w-80" />
-            <button className="bg-gray-900 text-white p-1 h-8 rounded-r-lg"><BiSearch /></button>
+            <input 
+              type="text" 
+              placeholder="Search" 
+              className="bg-white p-1 h-8 rounded-l-lg w-80" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleKeyDown}/>
+            <button onClick={handleSearch} className="bg-white p-1 h-8 rounded-r-lg"><BiSearch size={24} /></button>
           </div>
         </div>
         <div className="flex items-center">

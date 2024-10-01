@@ -13,6 +13,7 @@ import ForgotPassword from '../pages/forgotPassword/ForgotPassword'
 import ResetPassword from '../pages/resetPassword/ResetPassword'
 import LandingPage from '../pages/landingPage/LandingPage'
 import ActiveAccount from '../pages/activeAccount/ActiveAccount'
+import SearchResults from '../pages/search/SearchResult'
 
 
 
@@ -58,6 +59,9 @@ const Router = () => {
             {/* Orders */}
             <Route path="/orders" element={<Order/>} />
             <Route path="/orders/:id" element={<ProductDetail/>} />
+
+            {/* Route cho trang tìm kiếm */}
+            <Route path="/search" element={<SearchResults />} />
 
             {/* Admin */}
             <Route path="/admin" element={<Cart/>} />
