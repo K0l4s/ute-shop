@@ -5,6 +5,8 @@ import { setUser } from '../../redux/reducers/authSlice';
 import { FiSave, FiUpload } from 'react-icons/fi';
 import { updateProfileApis } from '../../apis/user';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
+import { BsKey } from 'react-icons/bs';
+import ChangePassword from '../../components/modals/ChangePassword';
 
 const Account = () => {
   const dispatch = useDispatch();
@@ -21,10 +23,7 @@ const Account = () => {
   const [birthday, setBirthday] = useState(user?.birthday ? new Date(user.birthday).toISOString().split('T')[0] : '');
   const [avatar, setAvatar] = useState<File | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-  const [changePassword, setChangePassword] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   // Loading state
   const [loading, setLoading] = useState(false);
@@ -238,49 +237,15 @@ const Account = () => {
             </div>
           </div>
 
-          {/* Change Password */}
-          <div className="mb-4">
-            <label className="flex items-center space-x-2 font-bold text-red-600 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={changePassword}
-                onChange={() => setChangePassword(!changePassword)}
-                className="form-checkbox cursor-pointer"
-              />
-              <span>Đổi mật khẩu</span>
-            </label>
+          <div onClick={() => setShowPasswordModal(true)} 
+              className='flex px-4 py-2 bg-red-600 text-white rounded w-fit 
+                items-center cursor-pointer hover:bg-red-500'>
+            <BsKey size={24} className='mr-2' 
+          />
+            Đổi mật khẩu
           </div>
-
-          {changePassword && (
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">Mật khẩu hiện tại *</label>
-                <input
-                  type="password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">Mật khẩu mới *</label>
-                <input
-                  type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-semibold mb-2">Nhập lại mật khẩu mới *</label>
-                <input
-                  type="password"
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-            </div>
+          {showPasswordModal && (
+            <ChangePassword onClose={() => setShowPasswordModal(false)} />
           )}
 
           <button
