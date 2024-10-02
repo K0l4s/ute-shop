@@ -3,6 +3,8 @@ import BookCard from '../../components/productInfo/BookCard';
 import SearchFilter from '../../components/filter/SeachFilter';
 import SortFilter from '../../components/filter/SortFilter';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
+import { useDispatch } from 'react-redux';
+import { addItem } from '../../redux/reducers/cartSlice';
 
 type Book = {
   id: number;
@@ -54,8 +56,24 @@ const SearchResults: React.FC = () => {
   const indexOfLastBook = currentPage * booksPerPage;
   const indexOfFirstBook = indexOfLastBook - booksPerPage;
   const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
-  const handleAddToCart = (id: number) => {
-    console.log(`Book ${id} added to cart`);
+
+  const dispatch = useDispatch();
+
+  const handleAddToCart = (book: Book) => {
+    const cartItem = {
+      id: book.id,
+      title: book.title,
+      price: book.price,
+      salePrice: book.salePrice,
+      image: book.image,
+      stars: book.stars,
+      age: book.age,
+      publisher: book.publisher,
+      quantity: 1, // Mặc định thêm 1 sản phẩm vào giỏ
+      checked: true, // Mặc định là đã chọn sản phẩm
+    };
+    dispatch(addItem(cartItem));
+    alert(`Book ${book.id} added to cart`);
   };
 
   const handleBuyNow = (id: number) => {
@@ -98,7 +116,7 @@ const SearchResults: React.FC = () => {
               salePrice={book.salePrice}
               stars={book.stars}
               image={book.image}
-              onAddToCart={() => handleAddToCart(book.id)}
+              onAddToCart={() => handleAddToCart(book)}
               onBuyNow={() => handleBuyNow(book.id)}
             />
           ))}
