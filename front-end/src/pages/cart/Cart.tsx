@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import CartItems from "../../components/cart/cartItems/CartItems"
-import DiscountCode from "../../components/cart/cartItems/DiscountCode";
+import DiscountCode from "../../components/voucher/DiscountCode";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { useDispatch } from "react-redux";
 import { removeItem, updateQuantity, toggleCheck, toggleSelectAll } from "../../redux/reducers/cartSlice";
+import { Link } from "react-router-dom";
 
 const Cart: React.FC = () => {
   // Lấy item từ store
@@ -96,9 +97,11 @@ const Cart: React.FC = () => {
               <span className="font-semibold">Tổng số tiền</span>
               <span className="font-bold text-red-500">{totalPrice.toLocaleString()} đ</span>
             </div>
-            <button className="w-full bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700">
-              THANH TOÁN
-            </button>
+            <Link to="/checkout">
+              <button className="w-full bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700">
+                THANH TOÁN
+              </button>
+            </Link>
             <p className="text-sm text-red-500 mt-2">Giá tiền chưa tính phí vận chuyển</p>
           </div>
         </div>
