@@ -1,0 +1,85 @@
+import React from 'react';
+
+type SearchFilterProps = {
+  onFilterChange: (filter: string) => void;
+};
+
+const SearchFilter: React.FC<SearchFilterProps> = ({ onFilterChange }) => {
+  return (
+    <div className="p-4 border rounded shadow-sm w-full bg-white">
+      
+      <div className='mb-4'>
+        <h2 className="font-bold text-xl mb-2">Lọc sách</h2>
+        <div className="bg-violet-700 w-full h-0.5"></div>
+      </div>
+      
+
+      {/* Lọc theo giá */}
+      <div className="mb-4">
+        <h3 className="font-semibold">Giá:</h3>
+        <div className="flex flex-col gap-2">
+          <label className="flex items-center">
+            <input type="radio" name="price" value="all" onChange={(e) => onFilterChange(e.target.value)} />
+            <span className="ml-2 cursor-pointer">Tất cả</span>
+          </label>
+          <label className="flex items-center">
+            <input type="radio" name="price" value="under50" onChange={(e) => onFilterChange(e.target.value)} />
+            <span className="ml-2 cursor-pointer">Dưới 50$</span>
+          </label>
+          <label className="flex items-center">
+            <input type="radio" name="price" value="50to100" onChange={(e) => onFilterChange(e.target.value)} />
+            <span className="ml-2 cursor-pointer">50$ - 100$</span>
+          </label>
+          <label className="flex items-center">
+            <input type="radio" name="price" value="over100" onChange={(e) => onFilterChange(e.target.value)} />
+            <span className="ml-2 cursor-pointer">Trên 100$</span>
+          </label>
+        </div>
+      </div>
+
+      {/* Lọc theo nhà xuất bản */}
+      <div className="mb-4">
+        <h3 className="font-semibold">Nhà xuất bản:</h3>
+        <div className="flex flex-col gap-2">
+          <label className="flex items-center">
+            <input type="radio" name="publisher" value="Publisher A" onChange={(e) => onFilterChange(e.target.value)} />
+            <span className="ml-2 cursor-pointer">Publisher A</span>
+          </label>
+          <label className="flex items-center">
+            <input type="radio" name="publisher" value="Publisher B" onChange={(e) => onFilterChange(e.target.value)} />
+            <span className="ml-2 cursor-pointer">Publisher B</span>
+          </label>
+          <label className="flex items-center">
+            <input type="radio" name="publisher" value="Publisher C" onChange={(e) => onFilterChange(e.target.value)} />
+            <span className="ml-2 cursor-pointer">Publisher C</span>
+          </label>
+        </div>
+      </div>
+
+      {/* Lọc theo độ tuổi */}
+      <div className="mb-4">
+        <h3 className="font-semibold">Độ tuổi:</h3>
+        <div className="flex flex-col gap-2">
+          <label className="flex items-center">
+            <input type="radio" name="age" value="Kids" onChange={(e) => onFilterChange(e.target.value)} />
+            <span className="ml-2 cursor-pointer">1 - 6</span>
+          </label>
+          <label className="flex items-center">
+            <input type="radio" name="age" value="Teen" onChange={(e) => onFilterChange(e.target.value)} />
+            <span className="ml-2 cursor-pointer">6 - 12</span>
+          </label>
+          <label className="flex items-center">
+            <input type="radio" name="age" value="Adult" onChange={(e) => onFilterChange(e.target.value)} />
+            <span className="ml-2 cursor-pointer">12 - 16</span>
+          </label>
+          <label className="flex items-center">
+            <input type="radio" name="age" value="Elder" onChange={(e) => onFilterChange(e.target.value)} />
+            <span className="ml-2 cursor-pointer">16+</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SearchFilter;
