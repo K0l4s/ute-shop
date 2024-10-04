@@ -5,6 +5,7 @@ const Author = db.Author;
 const Publisher = db.Publisher;
 const Review = db.Review;
 const Image = db.Image;
+const User = db.User;
 const { Op } = require("sequelize");
 
 // Hàm tìm kiếm sách theo tiêu đề
@@ -61,7 +62,13 @@ const getBookDetailById = async (id) => {
           model: Publisher
         },
         {
-          model: Review
+          model: Review,
+          include: [
+            {
+              model: User, 
+              attributes: ['firstname', 'lastname', 'avatar_url'],  
+            }
+          ]
         },
         {
           model: Image,
