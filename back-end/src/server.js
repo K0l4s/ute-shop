@@ -3,6 +3,7 @@ const db = require('./models/index.js');
 const authRoutes = require('./routes/authRoutes.js');
 const userRoutes = require('./routes/userRoutes.js');
 const bookRoutes = require('./routes/bookRoutes.js');
+const reviewRoutes = require('./routes/reviewRoutes.js');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
@@ -26,6 +27,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/user', userRoutes);
 
 app.use('/api/v1/book', bookRoutes);
+app.use('/api/v1/review', reviewRoutes);
 
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);
