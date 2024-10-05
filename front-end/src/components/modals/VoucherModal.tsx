@@ -1,8 +1,8 @@
 // components/VoucherModal.tsx
-import React, { useState } from 'react';
+import React from 'react';
 import Modal from 'react-modal';
 import { IoClose } from 'react-icons/io5';
-import { IoIosArrowDown } from 'react-icons/io';
+// import { IoIosArrowDown } from 'react-icons/io';
 import VoucherItem from '../voucher/VoucherItem';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
