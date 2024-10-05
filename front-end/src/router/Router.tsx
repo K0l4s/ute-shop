@@ -14,6 +14,7 @@ import ResetPassword from '../pages/resetPassword/ResetPassword'
 import LandingPage from '../pages/landingPage/LandingPage'
 import ActiveAccount from '../pages/activeAccount/ActiveAccount'
 import SearchResults from '../pages/search/SearchResult'
+import Checkout from '../pages/checkout/Checkout'
 
 
 
@@ -36,6 +37,7 @@ const Router = () => {
         <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/cart" element={<Cart/>} />
+            <Route path="/checkout" element={<Checkout />} />
             {/* Products Route */}
             <Route path="/products" element={<Product/>} />
             <Route path="/products/:id" element={<ProductDetail/>} />
