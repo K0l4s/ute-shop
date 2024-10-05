@@ -13,6 +13,7 @@ interface VoucherItemProps {
 }
 
 const VoucherItem: React.FC<VoucherItemProps> = ({ id, title, desc, type, isSelected, onViewDetail, onApply, onDeselect }) => {
+  console.log(id);
   return (
     <div className={`p-4 rounded ${type === 'discount' ? 'bg-yellow-100' : 'bg-green-200'}`}>
       <div className="flex justify-between items-center">
