@@ -10,8 +10,8 @@ const DiscountCode: React.FC = () => {
 
   return (
     <div className='rounded bg-white p-4 shadow-lg'>
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-violet-700">KHUYẾN MÃI (đã chọn)</h2>
+      <div className="flex items-center justify-between border-b border-black">
+        <h2 className="text-lg mb-2 font-bold text-violet-700">KHUYẾN MÃI (đã chọn)</h2>
         <div onClick={handleOpenModal} className="flex items-center text-violet-700 cursor-pointer hover:text-violet-500">
           <h3 className='text-sm font-semibold'>Xem thêm</h3>
           <IoIosArrowForward />
