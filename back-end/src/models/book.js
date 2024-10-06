@@ -37,7 +37,9 @@ module.exports = (sequelize) => {
     desc: DataTypes.STRING,
     price: DataTypes.DECIMAL,
     salePrice: DataTypes.DECIMAL,
-    year: DataTypes.DATE,
+    year: DataTypes.DATEONLY,
+    age: DataTypes.INTEGER,
+    sold: DataTypes.INTEGER,
     stock: DataTypes.INTEGER,
     cover_img_url: DataTypes.STRING,
     publisher_id: {

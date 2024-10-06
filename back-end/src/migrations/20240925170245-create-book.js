@@ -25,9 +25,15 @@ module.exports = {
         type: Sequelize.DECIMAL
       },
       year: {
-        type: Sequelize.DATE
+        type: Sequelize.DATEONLY
+      },
+      age: {
+        type: Sequelize.INTEGER
       },
       stock: {
+        type: Sequelize.INTEGER
+      },
+      sold: {
         type: Sequelize.INTEGER
       },
       cover_img_url: {
