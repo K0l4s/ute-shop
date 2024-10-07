@@ -21,9 +21,9 @@ const { getBooks } = require("../services/bookService.js");
 // };
 // Controller tìm kiếm và lọc sách với phân trang
 const getBooksController = async (req, res) => {
-  const { title, minPrice, maxPrice, publisher, age, sortByPrice, page, limit } = req.query;
+  const { title, minPrice, maxPrice, publisher, minAge, maxAge, sortByPrice, page, limit } = req.query;
   try {
-    const filters = { title, minPrice, maxPrice, publisher, age, sortByPrice };
+    const filters = { title, minPrice, maxPrice, publisher, minAge, maxAge, sortByPrice };
     const currentPage = parseInt(page, 10) || 1;
     const booksPerPage = parseInt(limit, 10) || 16;
 
