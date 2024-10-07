@@ -105,6 +105,47 @@ const getBooks = async (filters, page = 1, limit = 16) => {
   }
 };
 
+const getBookDetailById = async (id) => {
+  try {
+    // Kiểm tra nếu không có id
+    if (!id) {
+      throw new Error("Id is required");
+    }
+    // Tìm sách theo id
+    const book = await Book.findByPk(id, {
+      include: [
+        {
+          model: Genre,
+          as: 'genres',
+          attributes: ['name'],  // Lấy thông tin thể loại
+          through: { attributes: [] }  // Không lấy dữ liệu bảng trung gian
+        },
+        {
+          model: Author
+        },
+        {
+          model: Publisher
+        },
+        // {
+        //   model: Review
+        // },
+        {
+          model: Image,
+          attributes: ['url'],
+        }
+      ]
+    });
+    // Kiểm tra nếu không tìm thấy sách
+    if (!book) {
+      return null;
+    }
+    return book;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   getBooks,
+  getBookDetailById
 };
