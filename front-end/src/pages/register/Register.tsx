@@ -42,7 +42,7 @@ const Register: React.FC<RegisterProps> = () => {
 
       if (response.ok) {
         alert('Đăng ký thành công!');
-        navigate('/login');
+        navigate('/active');
       } else {
         alert('Đăng ký thất bại!');
       }

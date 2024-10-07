@@ -27,6 +27,10 @@ module.exports = (sequelize) => {
         otherKey: 'genreId',
         as: 'genres'
       });
+      Book.hasMany(models.Order, {
+        foreignKey: 'book_id',
+        sourceKey: 'id'
+      });
     }
    
   }
