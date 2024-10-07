@@ -55,6 +55,7 @@ const ProductDetail: React.FC = () => {
     };
 
     fetchBook();
+    // add cover to Images
     setTotalRating(book?.Reviews.reduce((acc, review) => acc + review.star, 0) || 0);
   }, [id]);
 
@@ -104,7 +105,7 @@ const ProductDetail: React.FC = () => {
       <main className="container mx-auto mt-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left side (Image and Gallery) */}
-          <div>
+          <div className='shadow rounded-xl'>
             <Swiper modules={[Navigation, Pagination, Scrollbar, A11y]}
               spaceBetween={50}
               slidesPerView={1}
@@ -112,8 +113,11 @@ const ProductDetail: React.FC = () => {
               pagination={{ clickable: true }}
               scrollbar={{ draggable: true }}
             >
+              <SwiperSlide key={0}>
+              <img src={book.cover_img_url} alt="Product" className="w-7/12 m-auto" />
+              </SwiperSlide>
               {book.Images.map((image, index) => (
-                <SwiperSlide key={index}>
+                <SwiperSlide key={index+1}>
                   <img src={image.url} alt="Product" className="w-7/12 m-auto" />
                 </SwiperSlide>
               ))}
