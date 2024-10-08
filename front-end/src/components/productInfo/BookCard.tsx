@@ -38,8 +38,9 @@ const BookCard: React.FC<BookCardProps> = ({ id, title, desc, price, salePrice, 
 
   return (
     <>
-      <Link to={`/products/${id}`}>
       <div className="border p-4 rounded shadow-lg w-full self-start cursor-pointer">
+        <Link to={`/products/${id}`}>
+        
         <img src={image} alt={title} className="w-full h-56 object-contain mb-2 rounded hover:opacity-90" />
         <h3 className="text-base font-semibold line-clamp-2 h-[50px]">{title}</h3>
         <p className="text-gray-600">{desc}</p>
@@ -54,6 +55,7 @@ const BookCard: React.FC<BookCardProps> = ({ id, title, desc, price, salePrice, 
             <span key={index} className="text-yellow-500">{star}</span>
           ))}
         </div>
+        </Link>
         <div className="flex justify-evenly">
           <button onClick={handleAddToCart} className="bg-violet-600 hover:bg-violet-700 text-white px-6 py-2 rounded mr-2">Thêm giỏ</button>
           <button onClick={handleBuyNow} className="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2 rounded">Mua ngay</button>
@@ -61,7 +63,7 @@ const BookCard: React.FC<BookCardProps> = ({ id, title, desc, price, salePrice, 
 
       </div>
       {showLoginRequired && <LoginRequired onClose={() => setShowLoginRequired(false)} />}
-      </Link>
+      
     </>
   );
 };
