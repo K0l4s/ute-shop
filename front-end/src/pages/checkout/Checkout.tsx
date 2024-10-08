@@ -110,7 +110,7 @@ const Checkout: React.FC = () => {
           </div>
           <div className="flex justify-between font-bold">
             <span>Thành tiền:</span>
-            <span>{(total - 80_000).toLocaleString()} đ</span>
+            <span>{(total - 60_000).toLocaleString()} đ</span>
           </div>
         </div>
       </div>

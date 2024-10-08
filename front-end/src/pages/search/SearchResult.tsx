@@ -166,6 +166,7 @@ const SearchResults: React.FC = () => {
           {books.map((book) => (
             <BookCard
               key={book.id}
+              id={book.id}
               title={book.title}
               desc={''}
               price={book.price}
