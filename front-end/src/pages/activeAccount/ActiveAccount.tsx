@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { activeAccountApis } from '../../apis/auth';
 import { useNavigate } from 'react-router-dom';
 
@@ -6,11 +6,26 @@ const ActiveAccount = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [code, setCode] = useState(Array(6).fill(''));
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]); // Sử dụng HTMLInputElement | null để phù hợp với giá trị trả về của ref
 
   const handleCodeChange = (index: number, value: string) => {
     const updatedCode = [...code];
-    updatedCode[index] = value;
-    setCode(updatedCode);
+    if (value.length <= 1) {
+      updatedCode[index] = value;
+      setCode(updatedCode);
+
+      // Chuyển focus sang ô tiếp theo nếu có
+      if (value && index < 5) {
+        inputRefs.current[index + 1]?.focus(); // Sử dụng optional chaining để kiểm tra null
+      }
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === 'Backspace' && code[index] === '' && index > 0) {
+      // Khi nhấn phím Backspace, chuyển focus về ô trước đó nếu rỗng
+      inputRefs.current[index - 1]?.focus(); // Sử dụng optional chaining để kiểm tra null
+    }
   };
 
   const handleSubmit = async () => {
@@ -20,15 +35,13 @@ const ActiveAccount = () => {
       if (response.ok) {
         alert('Vertify complete!');
         navigate("/login");
-      }
-      else {
+      } else {
         const msg = await response.json();
         alert('Error:' + msg.error);
       }
     } catch (err) {
       console.error('Có lỗi xảy ra: ', err);
     }
-
   };
 
   return (
@@ -37,7 +50,7 @@ const ActiveAccount = () => {
         {/* Left Side - Illustration */}
         <div className="mr-10">
           <img
-            src="https://img.freepik.com/free-vector/store-shopping-concept-illustration_114360-1088.jpg" // You can replace with the actual image
+            src="https://img.freepik.com/free-vector/store-shopping-concept-illustration_114360-1088.jpg"
             alt="Shop Illustration"
             className="h-64"
           />
@@ -47,7 +60,7 @@ const ActiveAccount = () => {
 
         {/* Right Side - Form */}
         <div>
-          <h2 className="text-3xl font-bold mb-6">Reset your password</h2>
+          <h2 className="text-3xl font-bold mb-6">Verify your email</h2>
 
           {/* Email Input */}
           <div className="mb-4">
@@ -74,11 +87,12 @@ const ActiveAccount = () => {
                   className="w-12 h-12 text-center border rounded-lg focus:outline-none focus:border-blue-500"
                   value={digit}
                   onChange={(e) => handleCodeChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, index)}
+                  ref={(el) => (inputRefs.current[index] = el)} // Lưu ref của từng ô input
                 />
               ))}
             </div>
           </div>
-
 
           {/* Confirm Button */}
           <button
