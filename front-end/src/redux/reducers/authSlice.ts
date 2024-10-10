@@ -5,6 +5,9 @@ interface User {
   lastname: string;
   phone: string;
   email: string;
+  province: string;
+  district: string;
+  ward: string;
   address: string;
   gender: boolean;
   birthday: Date;

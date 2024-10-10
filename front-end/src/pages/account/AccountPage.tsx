@@ -46,12 +46,14 @@ const AccountPage = () => {
               </Link>
             </li>
             <li>
-              <button
-                onClick={() => setSelectedSection('address')}
-                className={`w-full text-left py-2 px-4 ${selectedSection === 'address' ? 'bg-gray-300 font-bold' : ''}`}
-              >
-                Sổ địa chỉ
-              </button>
+              <Link to='/account/address'>
+                <button
+                  onClick={() => setSelectedSection('address')}
+                  className={`w-full text-left py-2 px-4 ${selectedSection === 'address' ? 'bg-gray-300 font-bold' : ''}`}
+                >
+                  Địa chỉ của tôi
+                </button>
+              </Link>
             </li>
             <li>
               <button
