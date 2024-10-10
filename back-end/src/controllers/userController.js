@@ -11,6 +11,9 @@ const getUserProfile = async (req, res) => {
     data: {
       firstname: user.firstname,
       lastname: user.lastname,
+      province: user.province,
+      district: user.district,
+      ward: user.ward,
       address: user.address,
       gender: user.gender,
       avatar_url: user.avatar_url,
@@ -26,7 +29,7 @@ const updateUserProfile = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const { firstname, lastname, address, birthday, gender, phone } = req.body;
+    const { firstname, lastname, birthday, gender, phone } = req.body;
 
     // Kiểm tra và upload avatar nếu có
     let avatar_url = null;
@@ -37,7 +40,6 @@ const updateUserProfile = async (req, res) => {
     const updatedUser = await updateUserById(userId, {
       firstname,
       lastname,
-      address,
       birthday,
       gender,
       avatar_url,

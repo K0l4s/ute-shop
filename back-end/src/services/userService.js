@@ -31,7 +31,6 @@ const updateUserById = async (id, { firstname, lastname, address, birthday, gend
   return {
     firstname: user.firstname,
     lastname: user.lastname,
-    address: user.address,
     birthday: user.birthday,
     gender: user.gender,
     avatar_url: user.avatar_url,

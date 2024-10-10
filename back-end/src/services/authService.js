@@ -86,6 +86,9 @@ const loginUser = async ({ email, password, res }) => {
     const returnData = {
       firstname: user.firstname,
       lastname: user.lastname,
+      province: user.province,
+      district: user.district,
+      ward: user.ward,
       address: user.address,
       birthday: user.birthday,
       gender: user.gender,

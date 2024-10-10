@@ -14,6 +14,9 @@ module.exports = (sequelize) => {
   User.init({
     firstname: DataTypes.STRING,
     lastname: DataTypes.STRING,
+    province: DataTypes.STRING, // tỉnh thành / phố
+    district: DataTypes.STRING, // quận / huyện
+    ward: DataTypes.STRING, // xã / phường
     address: DataTypes.STRING,
     birthday: DataTypes.DATEONLY,
     gender: DataTypes.BOOLEAN,
