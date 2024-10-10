@@ -26,12 +26,15 @@ function App() {
             lastname: userData.data["lastname"],
             phone: userData.data["phone"],
             email: userData.data["email"],
+            province: userData.data["province"],
+            district: userData.data["district"],
+            ward: userData.data["ward"],
             address: userData.data["address"],
             gender: userData.data["gender"],
             birthday: userData.data["birthday"],
             avatar_url: userData.data["avatar_url"],
           }));
-          
+
         } else {
           dispatch(checkAuthStatus(false));
         }

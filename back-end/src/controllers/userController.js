@@ -1,5 +1,5 @@
 const { uploadAvatarService } = require("../services/uploadService.js");
-const { getUserById, updateUserById } = require("../services/userService.js");
+const { getUserById, updateUserById, updateUserLocationById } = require("../services/userService.js");
 
 // Lấy thông tin người dùng
 const getUserProfile = async (req, res) => {
@@ -56,7 +56,29 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+const updateUserLocation = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    const { province, district, ward, address } = req.body;
+    const updatedUser = await updateUserLocationById(userId, {
+      province,
+      district,
+      ward,
+      address
+    });
+
+    res.status(201).json({
+      message: "Success",
+      data: updatedUser
+    });
+  }
+  catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
 module.exports = {
   getUserProfile,
-  updateUserProfile
+  updateUserProfile,
+  updateUserLocation
 };

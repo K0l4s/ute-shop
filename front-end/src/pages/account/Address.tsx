@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { getProvinces, getDistrictsByProvince, getWardsByDistrict } from "../../apis/user";
+import { getProvinces, getDistrictsByProvince, getWardsByDistrict, updateLocationApis } from "../../apis/user";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../redux/reducers/authSlice";
+
 interface Province {
   code: number;
   name: string;
@@ -16,6 +21,10 @@ interface Ward {
 }
 
 const Address: React.FC = () => {
+  const dispatch = useDispatch();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const shipping_address = user?.address + ", " + user?.ward + ", " + user?.district + ", " + user?.province;
+ 
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
@@ -70,28 +79,47 @@ const Address: React.FC = () => {
     fetchWards();
   }, [selectedDistrict]);
 
-  const handleSaveChanges = (event: React.FormEvent) => {
+  const handleSaveChanges = async (event: React.FormEvent) => {
     event.preventDefault();
-    // Implement your logic to handle the form submission
-    const address = {
-      province: provinces.find((prov) => prov.code === selectedProvince)?.name,
-      district: districts.find((dist) => dist.code === selectedDistrict)?.name,
-      ward: wards.find((ward) => ward.code === selectedWard)?.name,
-      specificAddress,
-    };
-    console.log("Address:", address);
+
+    const province = provinces.find((prov) => prov.code === selectedProvince)?.name || "";
+    const district = districts.find((dist) => dist.code === selectedDistrict)?.name || "";
+    const ward = wards.find((ward) => ward.code === selectedWard)?.name || "";
+
+    try {
+      const response = await updateLocationApis(province, district, ward, specificAddress);
+      console.log(response);
+
+      dispatch(setUser({
+        province: province,
+        district: district,
+        ward: ward,
+        address: specificAddress
+      }));
+
+      alert("Địa chỉ đã được cập nhật thành công!");
+    } catch (err) {
+      console.error("Error updating location:", err);
+      alert("Có lỗi xảy ra khi cập nhật địa chỉ!");
+    }
   };
 
   return (
     <div className="flex justify-center relative">
       <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-5xl">
         <h2 className="text-lg text-purple-700 font-bold mb-6">SỔ ĐỊA CHỈ</h2>
-        <h4 className="text-lg font-semibold mb-4">Địa chỉ nhận hàng</h4>
+        <div className="border border-black rounded mb-4">
+          <div className="relative">
+            <label className="text-base font-semibold mb-4 absolute -top-4 left-2 bg-white px-2">Địa chỉ nhận hàng</label>
+          </div>
+          <h4 className="italic p-4">{shipping_address}</h4>
+        </div>
+        <span className="text-sm text-red-600">Bạn có thể thay đổi địa chỉ nhận hàng bên dưới.</span>
         {/* Form Fields */}
         <form onSubmit={handleSaveChanges}>
           {/* Province Select */}
           <div className="mb-4">
-            <label className="block font-medium mb-2">Tỉnh/TP *</label>
+            <label className="block font-medium mb-2">Tỉnh/Thành phố *</label>
             <select
               value={selectedProvince ?? ""}
               onChange={(e) => setSelectedProvince(Number(e.target.value))}
@@ -128,7 +156,7 @@ const Address: React.FC = () => {
 
           {/* Ward Select */}
           <div className="mb-4">
-            <label className="block font-medium mb-2">Xã/Phường *</label>
+            <label className="block font-medium mb-2">Phường/Xã *</label>
             <select
               value={selectedWard ?? ""}
               onChange={(e) => setSelectedWard(Number(e.target.value))}

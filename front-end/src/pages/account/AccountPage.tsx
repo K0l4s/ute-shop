@@ -1,12 +1,14 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Account from './Account';
 import Address from './Address';
 import Orders from './Order';
 import FavoriteBooks from './FavoriteBooks';
 import PurchasedBooks from './PurchasedBooks';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const AccountPage = () => {
+  const location = useLocation();
+
   // State to keep track of which section is selected
   const [selectedSection, setSelectedSection] = useState('account'); // Default section
 
@@ -27,6 +29,21 @@ const AccountPage = () => {
         return <Account />;
     }
   };
+
+  // Đồng bộ `selectedSection` với URL khi component được render hoặc URL thay đổi
+  useEffect(() => {
+    if (location.pathname.includes("/account/address")) {
+      setSelectedSection("address");
+    } else if (location.pathname.includes("/account/profile")) {
+      setSelectedSection("account");
+    } else if (location.pathname.includes("/account/orders")) {
+      setSelectedSection("orders");
+    } else if (location.pathname.includes("/account/favoriteBooks")) {
+      setSelectedSection("favoriteBooks");
+    } else if (location.pathname.includes("/account/purchasedBooks")) {
+      setSelectedSection("purchasedBooks");
+    }
+  }, [location.pathname]);
 
   return (
     <div className="flex min-h-screen bg-gray-100">

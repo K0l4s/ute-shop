@@ -55,6 +55,26 @@ export const updateProfileApis = async (
   }
 };
 
+// Function to update user location
+export const updateLocationApis = async (
+  province: string,
+  district: string,
+  ward: string,
+  address: string
+) => {
+  try {
+    const response = await axios.put(
+      BASE_URL + '/user/profile/location/edit', 
+      { province, district, ward, address },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (err) {
+    console.error('Error updating location:', err);
+    throw err;
+  }
+}
+
 // Function to fetch provinces, districts, and wards data //
 export const getProvinces = async () => {
   try {
