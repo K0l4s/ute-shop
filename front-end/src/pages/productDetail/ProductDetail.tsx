@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import { IoCreateOutline } from 'react-icons/io5';
 import { useDispatch } from 'react-redux';
 import { addItem } from '../../redux/reducers/cartSlice';
+import internal from 'stream';
 interface Book {
   id: number;
   title: string;
@@ -20,6 +21,7 @@ interface Book {
   salePrice?: number;
   year: string;
   stock: number;
+  sold: number;
   cover_img_url: string;
   Author: { name: string };
   Publisher: { name: string };
@@ -41,6 +43,8 @@ const ProductDetail: React.FC = () => {
   const [book, setBook] = useState<Book | null>(null); // Use 'Book' type or null for initial state
   const [error, setError] = useState<string | null>(null);
   const [totalRating, setTotalRating] = useState<number>(0);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     const fetchBook = async () => {
       try {
@@ -81,7 +85,6 @@ const ProductDetail: React.FC = () => {
     }
     return stars;
   }
-  const dispatch = useDispatch();
   const handleAddToCart = () => {
     const cartItem = {
       id: book.id,
@@ -132,7 +135,7 @@ const ProductDetail: React.FC = () => {
               <p>Tình trạng: {book.stock > 0 ? 'Còn hàng' : 'Hết hàng'}</p>
               <div className="flex items-center space-x-2">
                 <span className="text-yellow-500">★★★★☆</span>
-                <span>({book.Reviews.length} reviews)</span>
+                {/* <span>({book.Reviews.length} reviews)</span> */}
                 <IoCreateOutline className="text-2xl cursor-pointer hover:text-cyan-900" />
               </div>
               {book.stock > 0 ?
@@ -155,7 +158,7 @@ const ProductDetail: React.FC = () => {
           <div className="mt-4 flex items-center space-x-4">
             <span className="text-4xl font-bold">{totalRating}/5</span>
             <span className="text-yellow-500">{formatStar(totalRating)}</span>
-            <span>({book.Reviews.length} reviews)</span>
+            {/* <span>({book.Reviews.length} reviews)</span> */}
           </div>
         </div>
         {/* Review Section */}
@@ -173,7 +176,7 @@ const ProductDetail: React.FC = () => {
             pagination={{ clickable: true }}
             scrollbar={{ draggable: true }}
           >
-            {book.Reviews.map((review, index) => (
+            {/* {book.Reviews.map((review, index) => (
               <SwiperSlide key={index}>
                 <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 m-auto w-full bg-gray-100 rounded-lg">
                   <div className="p-4 ">
@@ -183,7 +186,7 @@ const ProductDetail: React.FC = () => {
                   </div>
                 </div>
               </SwiperSlide>
-            ))}
+            ))} */}
           </Swiper>
         </div>
       </main>

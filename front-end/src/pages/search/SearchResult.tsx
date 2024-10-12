@@ -1,10 +1,19 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import BookCard from '../../components/productInfo/BookCard';
 import SearchFilter from '../../components/filter/SeachFilter';
 import SortFilter from '../../components/filter/SortFilter';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import { useDispatch } from 'react-redux';
 import { addItem } from '../../redux/reducers/cartSlice';
+import { useLocation } from 'react-router-dom';
+import { searchBooks } from '../../apis/book';
+import { getPublisher } from '../../apis/publisher';
+
+type Publisher = {
+  id: number;
+  name: string;
+  address: string;
+};
 
 type Book = {
   id: number;
@@ -12,50 +21,87 @@ type Book = {
   price: number;
   salePrice?: number;
   stars: number;
-  image: string;
+  cover_img_url: string;
   publisher: string;
   age: string;
 };
 
 const SearchResults: React.FC = () => {
-  const [books, setBooks] = useState<Book[]>([
-    { id: 1, title: 'Dế mèn phiêu lưu ký - Tô Hoài edition - Phiên bản giới hạn - Limited Edition', price: 600000, salePrice: 500000, stars: 4, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Adult' },
-    { id: 2, title: 'Book B', price: 80, stars: 5, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher B', age: 'Teen' },
-    { id: 3, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 4, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 5, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 6, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 7, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 8, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 9, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 10, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 11, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 12, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 13, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 14, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 15, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 16, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 17, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 18, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 19, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 20, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 21, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 22, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 23, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    { id: 24, title: 'Book C', price: 40, stars: 3, image: 'https://cdn.lisaangel.co.uk/image/cache/data/product-images/ss23/af/vintage-novel-birthday-card-443a7400-620x620.jpeg', publisher: 'Publisher A', age: 'Kids' },
-    // Thêm sách khác tại đây
-  ]);
+  const [books, setBooks] = useState<Book[]>([]);
+  const [publishers, setPublishers] = useState<Publisher[]>([]);
 
+  const location = useLocation();
+  
+  // Extract search query from the URL
+  const searchParams = new URLSearchParams(location.search);
+  const query = searchParams.get('query') || '';
+  type Filters = {
+    [key: string]: string | undefined;
+    price?: string;
+    publisher?: string;
+  };
+
+  const [filters, setFilters] = useState<Filters>({});
   const [currentPage, setCurrentPage] = useState(1);
-  const booksPerPage = 16;
+  const [totalPages, setTotalPages] = useState(1);
 
-  // Tính toán số trang
-  const totalPages = Math.ceil(books.length / booksPerPage);
+  useEffect(() => {
+    const fetchBooks = async () => {
+      try {
+        let minPrice, maxPrice;
+        switch (filters.price) {
+          case '< 50.000':
+            minPrice = 0;
+            maxPrice = 50000;
+            break;
+          case '50.000 - 100.000':
+            minPrice = 50000;
+            maxPrice = 100000;
+            break;
+          case '> 100.000':
+            minPrice = 100000;
+            maxPrice = undefined; // Giá trị lớn hơn 100000
+            break;
+          default:
+            minPrice = undefined;
+            maxPrice = undefined;
+        }
 
-  // Chia sách theo từng trang
-  const indexOfLastBook = currentPage * booksPerPage;
-  const indexOfFirstBook = indexOfLastBook - booksPerPage;
-  const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
+        const params = {
+          ...filters,
+          title: query,
+          page: currentPage,
+          limit: 16,
+          minPrice: minPrice,
+          maxPrice: maxPrice,
+        };
+
+        const response = await searchBooks(params);
+
+        // Cập nhật state với dữ liệu từ API
+        setBooks(response.data);
+        setCurrentPage(response.currentPage);
+        setTotalPages(response.totalPages);
+      } catch (error) {
+        console.error('Failed to fetch books:', error);
+      }
+    };
+
+    if (query) fetchBooks();
+  }, [query, currentPage, filters]); // Gọi API mỗi khi query hoặc currentPage thay đổi
+
+  useEffect(() => {
+    const fetchPublishers = async () => {
+      try {
+        const response = await getPublisher();
+        setPublishers(response.data);
+      } catch (error) {
+        console.error('Failed to fetch publishers:', error);
+      }
+    };
+
+    fetchPublishers();
+  }, []);
 
   const dispatch = useDispatch();
 
@@ -65,7 +111,7 @@ const SearchResults: React.FC = () => {
       title: book.title,
       price: book.price,
       salePrice: book.salePrice,
-      image: book.image,
+      image: book.cover_img_url,
       stars: book.stars,
       age: book.age,
       publisher: book.publisher,
@@ -80,8 +126,15 @@ const SearchResults: React.FC = () => {
     console.log(`Book ${id} bought now`);
   };
 
-  const handleFilterChange = (filter: string) => {
-    console.log('Selected filter:', filter);
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters((prevFilters) => {
+      if (prevFilters[key] === value) {
+        // Nếu filter hiện tại đã chọn, bỏ chọn filter đó
+        const { [key]: removed, ...rest } = prevFilters;
+        return rest;
+      }
+      return { ...prevFilters, [key]: value };
+    });
   };
 
   const handleSortChange = (sort: string) => {
@@ -97,25 +150,29 @@ const SearchResults: React.FC = () => {
   return (
     <div className="container mx-auto p-4 flex gap-4">
       <div className="w-1/5">
-        <SearchFilter onFilterChange={handleFilterChange} />
+        <SearchFilter onFilterChange={handleFilterChange} publishers = {publishers} selectedFilters={filters}/>
       </div>
       <div className="w-4/5">
         <div className="flex border rounded mb-4 items-center">
-          <span className='w-2/3 pl-4 font-bold'>KẾT QUẢ TÌM KIẾM (99)</span>
+          <span className='w-2/3 pl-4 font-bold'>
+            KẾT QUẢ TÌM KIẾM
+            ({books.length})
+          </span>
           <div className="w-1/3">
             <SortFilter onSortChange={handleSortChange} />
           </div>
         </div>
         <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {currentBooks.map((book) => (
+          {books.map((book) => (
             <BookCard
               key={book.id}
+              id={book.id}
               title={book.title}
               desc={''}
               price={book.price}
               salePrice={book.salePrice}
               stars={book.stars}
-              image={book.image}
+              image={book.cover_img_url}
               onAddToCart={() => handleAddToCart(book)}
               onBuyNow={() => handleBuyNow(book.id)}
             />

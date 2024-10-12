@@ -21,7 +21,7 @@ const DiscountCode: React.FC = () => {
       
       <ul className="space-y-2 mt-2">
         <li className="flex justify-between items-center p-2 rounded font-semibold">
-          <span>MÃ GIẢM GIÁ 30K - ĐƠN HÀNG TỪ 200K</span>
+          <span>MÃ GIẢM GIÁ 20K - ĐƠN HÀNG TỪ 200K</span>
         </li>
         {/* Additional Discount Codes */}
       </ul>

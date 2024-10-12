@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login, setUser } from '../../redux/reducers/authSlice';
 import { useDispatch } from 'react-redux';
+import { loginApi } from '../../apis/auth';
 interface LoginProps {}
 
 const Login: React.FC<LoginProps> = () => {
@@ -13,44 +14,30 @@ const Login: React.FC<LoginProps> = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:8080/api/v1/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
-  
-      const data = await response.json();
-      if (response.ok) {
-        alert('Đăng nhập thành công!');
-
-         // Lưu thông tin người dùng vào Redux
-        dispatch(login());
-        dispatch(setUser({
-          firstname: data.data.firstname,
-          lastname: data.data.lastname,
-          phone: data.data.phone,
-          email: data.data.email,
-          address: data.data.address,
-          gender: data.data.gender,
-          birthday: data.data.birthday,
-          avatar_url: data.data.avatar_url,
-        }));
-        navigate('/');
-      } else {
-        alert('Đăng nhập thất bại!');
-        if(data.error === "Error logging in: User not active"){
-          navigate('/active');
-        }
-      }
-    }
-    catch (err) {
-      console.error('Có lỗi xảy ra: ', err);
+      const data = await loginApi(email, password);
+      alert('Đăng nhập thành công!');
+      
+      // Lưu thông tin người dùng vào Redux
+      dispatch(login());
+      dispatch(setUser({
+        firstname: data.data.firstname,
+        lastname: data.data.lastname,
+        phone: data.data.phone,
+        email: data.data.email,
+        province: data.data.province,
+        district: data.data.district,
+        ward: data.data.ward,
+        address: data.data.address,
+        gender: data.data.gender,
+        birthday: data.data.birthday,
+        avatar_url: data.data.avatar_url,
+      }));
+      navigate('/');
+    } catch (err) {
+      alert('Đăng nhập thất bại!');
+      // if (data?.error === "Error logging in: User not active") {
+      //   navigate('/active');
+      // }
     }
     
   };

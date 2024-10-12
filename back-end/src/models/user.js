@@ -6,12 +6,17 @@ module.exports = (sequelize) => {
     static associate(models) {
       User.hasMany(models.Token, { foreignKey: 'userId', as: 'tokens' });
       User.hasMany(models.Review, { foreignKey: 'userId', as: 'reviews' });
+      User.hasMany(models.Cart, { foreignKey: 'user_id', as: 'carts' });
+      User.hasMany(models.Order, { foreignKey: 'user_id', as: 'orders' });
     }
   }
 
   User.init({
     firstname: DataTypes.STRING,
     lastname: DataTypes.STRING,
+    province: DataTypes.STRING, // tỉnh thành / phố
+    district: DataTypes.STRING, // quận / huyện
+    ward: DataTypes.STRING, // xã / phường
     address: DataTypes.STRING,
     birthday: DataTypes.DATEONLY,
     gender: DataTypes.BOOLEAN,
