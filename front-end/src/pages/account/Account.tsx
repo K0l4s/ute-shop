@@ -18,7 +18,6 @@ const Account = () => {
   const [lastname, setLastname] = useState(user?.lastname || '');
   const [phone, setPhone] = useState(user?.phone || '');
   const [email, setEmail] = useState(user?.email || '');
-  const [address, setAddress] = useState(user?.address || '');
   const [gender, setGender] = useState(user?.gender === true ? 'male' : 'female');
   const [birthday, setBirthday] = useState(user?.birthday ? new Date(user.birthday).toISOString().split('T')[0] : '');
   const [avatar, setAvatar] = useState<File | null>(null);
@@ -33,7 +32,6 @@ const Account = () => {
     if (user) {
       setFirstname(user.firstname || '');
       setLastname(user.lastname || '');
-      setAddress(user.address || '');
       setPhone(user.phone || '');
       setEmail(user.email || '');
       setGender(user.gender === true ? 'male' : 'female');
@@ -64,7 +62,6 @@ const Account = () => {
       lastname,
       phone,
       email,
-      address,
       gender: gender === 'male' ? true : false,
       birthday: birthday,
       avatarUrl
@@ -73,7 +70,6 @@ const Account = () => {
     const response = await updateProfileApis(
       updatedUser.firstname,
       updatedUser.lastname,
-      updatedUser.address,
       updatedUser.phone,
       updatedUser.gender,
       new Date(updatedUser.birthday),
@@ -185,17 +181,6 @@ const Account = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full p-2 border rounded"
                 disabled
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 font-semibold mb-2">Địa chỉ *</label>
-              <input
-                type="text"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="w-full p-2 border rounded"
-                placeholder='Nhập địa chỉ của bạn'
-                required
               />
             </div>
             <div>

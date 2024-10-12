@@ -1,10 +1,13 @@
 import React from 'react';
 
 type SearchFilterProps = {
-  onFilterChange: (filter: string) => void;
+  onFilterChange: (key: string, value: string) => void;
+  publishers: { id: number; name: string; address: string }[];
+  selectedFilters: { price?: string; publisher?: string };
 };
 
-const SearchFilter: React.FC<SearchFilterProps> = ({ onFilterChange }) => {
+const SearchFilter: React.FC<SearchFilterProps> = ({ onFilterChange, publishers, selectedFilters }) => {
+  console.log(publishers);
   return (
     <div className="p-4 border rounded shadow-sm w-full bg-white">
       
@@ -18,22 +21,16 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onFilterChange }) => {
       <div className="mb-4">
         <h3 className="font-semibold">Giá:</h3>
         <div className="flex flex-col gap-2">
-          <label className="flex items-center">
-            <input type="radio" name="price" value="all" onChange={(e) => onFilterChange(e.target.value)} />
-            <span className="ml-2 cursor-pointer">Tất cả</span>
-          </label>
-          <label className="flex items-center">
-            <input type="radio" name="price" value="under50" onChange={(e) => onFilterChange(e.target.value)} />
-            <span className="ml-2 cursor-pointer">Dưới 50$</span>
-          </label>
-          <label className="flex items-center">
-            <input type="radio" name="price" value="50to100" onChange={(e) => onFilterChange(e.target.value)} />
-            <span className="ml-2 cursor-pointer">50$ - 100$</span>
-          </label>
-          <label className="flex items-center">
-            <input type="radio" name="price" value="over100" onChange={(e) => onFilterChange(e.target.value)} />
-            <span className="ml-2 cursor-pointer">Trên 100$</span>
-          </label>
+          {['< 50.000', '50.000 - 100.000', '> 100.000'].map((price) => (
+            <label key={price} className="flex items-center">
+              <input
+                type="checkbox"
+                checked={selectedFilters.price === price}
+                onChange={() => onFilterChange('price', price)}
+              />
+              <span className="ml-2 cursor-pointer">{price}</span>
+            </label>
+          ))}
         </div>
       </div>
 
@@ -41,23 +38,21 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onFilterChange }) => {
       <div className="mb-4">
         <h3 className="font-semibold">Nhà xuất bản:</h3>
         <div className="flex flex-col gap-2">
-          <label className="flex items-center">
-            <input type="radio" name="publisher" value="Publisher A" onChange={(e) => onFilterChange(e.target.value)} />
-            <span className="ml-2 cursor-pointer">Publisher A</span>
-          </label>
-          <label className="flex items-center">
-            <input type="radio" name="publisher" value="Publisher B" onChange={(e) => onFilterChange(e.target.value)} />
-            <span className="ml-2 cursor-pointer">Publisher B</span>
-          </label>
-          <label className="flex items-center">
-            <input type="radio" name="publisher" value="Publisher C" onChange={(e) => onFilterChange(e.target.value)} />
-            <span className="ml-2 cursor-pointer">Publisher C</span>
-          </label>
+          {publishers.map((publisher) => (
+            <label key={publisher.id} className="flex items-center">
+              <input
+                type="checkbox"
+                checked={selectedFilters.publisher === publisher.name}
+                onChange={() => onFilterChange('publisher', publisher.name)}
+              />
+              <span className="ml-2 cursor-pointer">{publisher.name}</span>
+            </label>
+          ))}
         </div>
       </div>
 
       {/* Lọc theo độ tuổi */}
-      <div className="mb-4">
+      {/* <div className="mb-4">
         <h3 className="font-semibold">Độ tuổi:</h3>
         <div className="flex flex-col gap-2">
           <label className="flex items-center">
@@ -77,7 +72,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({ onFilterChange }) => {
             <span className="ml-2 cursor-pointer">16+</span>
           </label>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

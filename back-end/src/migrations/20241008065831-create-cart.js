@@ -2,38 +2,41 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Reviews', {
+    await queryInterface.createTable('Carts', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      content: {
-        type: Sequelize.STRING
-      },
-      star: {
-        type: Sequelize.INTEGER
+      user_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Users',
+          key: 'id'
+        },
+        allowNull: false,
+        onDelete: 'CASCADE'
       },
       book_id: {
         type: Sequelize.INTEGER,
         references: {
           model: 'Books',
           key: 'id'
-        }
+        },
+        allowNull: false,
+        onDelete: 'CASCADE' 
       },
-      user_id: {
+      quantity: {
         type: Sequelize.INTEGER,
-        references: {
-          model: 'Users',
-          key: 'id'
-        }
-      },
+        allowNull: false,
+        defaultValue: 1
+      }
     }, {
       timestamps: false
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Reviews');
+    await queryInterface.dropTable('Carts');
   }
 };

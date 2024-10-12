@@ -45,6 +45,7 @@ const Router = () => {
             <Route path="/login" element={<Login/>} />
 
             <Route path="/account/profile" element={<AccountPage/>} />
+            <Route path="/account/address" element={<AccountPage/>} />
 
 
             <Route path="/register" element={<Register/>} />
