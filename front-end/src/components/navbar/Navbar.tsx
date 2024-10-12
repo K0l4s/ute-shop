@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import logo from '../../assets/images/logo.png'
 import { TbLockAccess, TbLockAccessOff } from 'react-icons/tb'
-import { SiAwssecretsmanager } from "react-icons/si";
+// import { SiAwssecretsmanager } from "react-icons/si";
 import { BiSearch } from 'react-icons/bi';
 import { BsMenuButtonWideFill } from 'react-icons/bs';
 import { FaRegUserCircle } from 'react-icons/fa';
@@ -25,7 +25,7 @@ const Navbar = () => {
     setIsVisible(!isVisible); // Toggle visibility when clicking on the category
   };
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
-  const isAdmin = true;
+  // const isAdmin = true;
 
   const handleLogout = async () => {
     try {

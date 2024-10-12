@@ -1,4 +1,41 @@
-// auth.tsx
+import axios from "axios";
+import { BASE_URL } from "./base";
+
+// Function to login
+export const loginApi = async (email: string, password: string) => {
+  try {
+    const response = await axios.post(
+      BASE_URL + `/auth/login`,
+      { 
+        email, 
+        password 
+      },
+      { headers: 
+        { 'Content-Type': 'application/json' }, 
+        withCredentials: true 
+      }
+    );
+    
+    return response.data;
+  } catch (err) {
+    console.error('Có lỗi xảy ra: ', err);
+    throw err;
+  }
+};
+
+// Function to check authentication status
+export const checkAuthStatusApi = async () => {
+  try {
+    const response = await axios.get(
+      BASE_URL + '/auth/check', 
+      { withCredentials: true });
+
+    return response.data;
+  } catch (err) {
+    console.error('Error checking login status:', err);
+    throw err;
+  }
+};
 
 export const forgotPasswordApis = async (email: String) => {
     // Call API to send reset password email

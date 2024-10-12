@@ -27,9 +27,11 @@ module.exports = (sequelize) => {
         otherKey: 'genreId',
         as: 'genres'
       });
-      Book.hasMany(models.Order, {
-        foreignKey: 'book_id',
-        sourceKey: 'id'
+      Book.hasMany(models.Cart, { 
+        foreignKey: 'book_id', as: 'carts' 
+      });
+      Book.hasMany(models.Detail_Order, { 
+        foreignKey: 'book_id', as: 'orderDetails' 
       });
     }
    
@@ -41,7 +43,9 @@ module.exports = (sequelize) => {
     desc: DataTypes.STRING,
     price: DataTypes.DECIMAL,
     salePrice: DataTypes.DECIMAL,
-    year: DataTypes.DATE,
+    year: DataTypes.DATEONLY,
+    age: DataTypes.INTEGER,
+    sold: DataTypes.INTEGER,
     stock: DataTypes.INTEGER,
     cover_img_url: DataTypes.STRING,
     publisher_id: {

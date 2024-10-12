@@ -31,7 +31,6 @@ const updateUserById = async (id, { firstname, lastname, address, birthday, gend
   return {
     firstname: user.firstname,
     lastname: user.lastname,
-    address: user.address,
     birthday: user.birthday,
     gender: user.gender,
     avatar_url: user.avatar_url,
@@ -39,7 +38,25 @@ const updateUserById = async (id, { firstname, lastname, address, birthday, gend
   };
 };
 
+const updateUserLocationById = async (id, { province, district, ward, address }) => {
+  const user = await User.findByPk(id);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  await user.update({ province, district, ward, address });
+
+  return {
+    province: user.province,
+    district: user.district,
+    ward: user.ward,
+    address: user.address,
+  }
+};
+
 module.exports = {
   getUserById,
-  updateUserById
+  updateUserById,
+  updateUserLocationById
 };

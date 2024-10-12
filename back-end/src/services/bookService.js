@@ -1,47 +1,107 @@
 const db = require("../models");
 const Book = db.Book;
 const Genre = db.Genre;
-const Author = db.Author;
 const Publisher = db.Publisher;
-const Review = db.Review;
-const Image = db.Image;
-const User = db.User;
 const Order = db.Order;
 const sequelize = db.sequelize;
 const { Op } = require("sequelize");
 
-// Hàm tìm kiếm sách theo tiêu đề
-const searchBooksByTitle = async (title) => {
+// Hàm tìm kiếm và lọc sách với phân trang
+const getBooks = async (filters, page = 1, limit = 16) => {
   try {
-    // Kiểm tra nếu không có tiêu đề
-    if (!title) {
-      throw new Error("Title is required");
+    const { title, minPrice, maxPrice, publisher, minAge, maxAge, sortByPrice } = filters;
+
+    // Thiết lập điều kiện tìm kiếm
+    const whereClause = {};
+
+    // Tìm kiếm theo tiêu đề nếu có
+    if (title) {
+      whereClause.title = { [Op.like]: `%${title}%` };
     }
-    // Tìm sách theo tiêu đề
+
+    // Lọc theo khoảng giá nếu có
+    if (minPrice || maxPrice) {
+      whereClause.price = {
+        ...(minPrice ? { [Op.gte]: minPrice } : {}),
+        ...(maxPrice ? { [Op.lte]: maxPrice } : {}),
+      };
+    }
+
+    // Lọc theo khoảng độ tuổi nếu có
+    if (minAge || maxAge) {
+
+      whereClause.age = {
+        ...(minAge ? { [Op.gte]: minAge } : {}),
+        ...(maxAge ? { [Op.lte]: maxAge } : {}),
+      };
+    }
+
+    // Thiết lập sắp xếp
+    let order = [];
+    if (sortByPrice) {
+      order.push(['price', sortByPrice === 'asc' ? 'ASC' : 'DESC']);
+    }
+
+    // Sử dụng include với where để áp dụng điều kiện lọc publisher
+    const includePublisher = {
+      model: Publisher,
+      attributes: ['name'],
+      ...(publisher ? { where: { name: { [Op.eq]: publisher } } } : {}),
+    };
+
+    // Lấy tổng số lượng sách thỏa mãn điều kiện
+    const totalBooks = await Book.count({ where: whereClause, include: [includePublisher] });
+
+    // Tính toán phân trang
+    const totalPages = Math.ceil(totalBooks / limit);
+    const offset = (page - 1) * limit;
+
+    // Tìm sách với điều kiện lọc, phân trang và sắp xếp
     const books = await Book.findAll({
-      where: {
-        title: {
-          [Op.like]: `%${title}%`  // Tìm kiếm tiêu đề chứa từ khóa
-        }
-      },
+      where: whereClause,
       include: [
         {
           model: Genre,
           as: 'genres',
-          attributes: ['name'],  // Lấy thông tin thể loại
-          through: { attributes: [] }  // Không lấy dữ liệu bảng trung gian
-        }
-      ]
+          attributes: ['name'],
+          through: { attributes: [] },
+        },
+        includePublisher,
+      ],
+      order: order,
+      offset: offset,
+      limit: limit,
     });
-    // Kiểm tra nếu không tìm thấy sách nào
-    if (books.length === 0) {
-      return null;
-    }
-    return books;
+
+    // Định dạng lại dữ liệu trước khi trả về
+    const formattedBooks = books.map((book) => {
+      return {
+        id: book.id,
+        ISBN: book.ISBN,
+        title: book.title,
+        desc: book.desc,
+        price: book.price,
+        salePrice: book.salePrice,
+        year: book.year,
+        age: book.age,
+        sold: book.sold,
+        stock: book.stock,
+        cover_img_url: book.cover_img_url,
+        genres: book.genres.map((genre) => genre.name),
+        publisher: book.Publisher?.name || null,
+      };
+    });
+
+    return {
+      books: formattedBooks,
+      currentPage: page,
+      totalPages,
+    };
   } catch (error) {
     throw error;
   }
 };
+
 const getBookDetailById = async (id) => {
   try {
     // Kiểm tra nếu không có id
@@ -63,15 +123,9 @@ const getBookDetailById = async (id) => {
         {
           model: Publisher
         },
-        {
-          model: Review,
-          include: [
-            {
-              model: User, 
-              attributes: ['firstname', 'lastname', 'avatar_url'],  
-            }
-          ]
-        },
+        // {
+        //   model: Review
+        // },
         {
           model: Image,
           attributes: ['url'],
@@ -87,64 +141,8 @@ const getBookDetailById = async (id) => {
     throw error;
   }
 };
-
-// const getTop10BooksByOrderQuantity = async () => {
-//   try {
-//     // Tìm 10 sách được mua nhiều nhất biết rằng book có quan hệ với order thông qua bảng Order. Một order có 1 sách, 1 sách có nhiều order
-//     const books = await Book.findAll({
-//       include: [
-//         {
-//           model: Order,
-//           attributes: [[db.sequelize.fn('SUM', db.sequelize.col('quantity')), 'total_quantity']],  // Tính tổng số lượng sách đã mua
-//           group: ['Order.book_id'],  // Nhóm theo book_id
-//           order: [[db.sequelize.fn('SUM', db.sequelize.col('quantity')), 'DESC']],  // Sắp xếp giảm dần theo tổng số lượng sách đã mua
-//           limit: 10
-//         }
-//       ]
-//     });
-//     return books;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
-const getTop10BooksByOrderQuantity = async () => {
-  try{
-  const topBooksQuery = `
-      SELECT 
-        Books.id, 
-        Books.ISBN, 
-        Books.title, 
-        Books.desc, 
-        Books.price, 
-        Books.salePrice, 
-        Books.year, 
-        Books.stock, 
-        Books.cover_img_url, 
-        Books.publisher_id, 
-        Books.author_id, 
-        Books.category_id, 
-        SUM(Orders.quantity) AS totalSell 
-      FROM Books 
-      LEFT JOIN Orders ON Books.id = Orders.book_id 
-      GROUP BY Books.id 
-      ORDER BY totalSell DESC 
-      LIMIT 10;
-    `;
-
-    const [topBooks, metadata] = await sequelize.query(topBooksQuery);
-    if (topBooks.length === 0) {
-      throw new Error('Cant find any book');
-    }
-    return topBooks;
-  } catch (error) {
-    console.error('Error fetching top 10 books by order quantity:', error);
-    throw error; // Rethrow error after logging
-  }
-}
-
-
 module.exports = {
   searchBooksByTitle,
-  getBookDetailById,
-  getTop10BooksByOrderQuantity
+  getBookDetailById
 };
+

@@ -18,6 +18,15 @@ module.exports = {
       lastname: {
         type: Sequelize.STRING
       },
+      province: {
+        type: Sequelize.STRING
+      },
+      district: {
+        type: Sequelize.STRING
+      },
+      ward: {
+        type: Sequelize.STRING
+      },
       address: {
         type: Sequelize.STRING
       },
