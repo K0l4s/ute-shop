@@ -30,6 +30,8 @@ module.exports = {
       transaction_id: {
         type: Sequelize.INTEGER
       }
+    }, {
+      timestamps: false
     });
   },
   async down(queryInterface, Sequelize) {
