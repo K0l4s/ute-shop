@@ -6,8 +6,8 @@ const placeOrder = async (req, res) => {
 
   try {
     // Gọi service để tạo đơn hàng mới
-    const newOrder = await orderService.createOrder(userId, orderData);
-    res.status(201).json({ message: 'Order created successfully', order: newOrder });
+    const { newOrder, newPayment } = await orderService.createOrder(userId, orderData);
+    res.status(201).json({ message: 'Order created successfully', order: newOrder, payment: newPayment });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

@@ -31,6 +31,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      shipping_method: {
+        type: Sequelize.ENUM('STANDARD', 'EXPRESS'),
+        allowNull: false,
+        defaultValue: 'STANDARD'
+      },
       status: {
         type: Sequelize.ENUM('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'),
         allowNull: false,
