@@ -3,6 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { calculateTotal } from '../../redux/reducers/cartSlice';
 import DiscountCode from '../../components/voucher/DiscountCode';
+import { IoWarning } from 'react-icons/io5';
+import { Link } from 'react-router-dom';
 
 const Checkout: React.FC = () => {
   const dispatch = useDispatch();
@@ -10,6 +12,9 @@ const Checkout: React.FC = () => {
   // Lấy thông tin người dùng từ Redux store
   const user = useSelector((state: RootState) => state.auth.user);
 
+  // Shipping address
+  const shipping_address = user?.address + ', ' + user?.ward + ', ' + user?.district + ', ' + user?.province;
+  
   // Lấy các sản phẩm đã chọn từ cartSlice
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const total = useSelector((state: RootState) => state.cart.total);
@@ -29,12 +34,17 @@ const Checkout: React.FC = () => {
       {/* Địa Chỉ Giao Hàng */}
       <div className="border-2 border-black p-4 rounded mb-6">
         <h3 className="text-lg text-violet-700 font-bold mb-2 border-b border-black pb-2">ĐỊA CHỈ NHẬN HÀNG</h3>
-        {/* <p><strong>Quốc gia:</strong> {user?.country || 'Vui lòng chọn'}</p>
-        <p><strong>Tỉnh/TP:</strong> {user?.city || 'Vui lòng chọn'}</p>
-        <p><strong>Quận/Huyện:</strong> {user?.district || 'Vui lòng chọn'}</p>
-        <p><strong>Xã/Phường:</strong> {user?.ward || 'Vui lòng chọn'}</p> */}
-        <p className='font-semibold'>Địa chỉ cụ thể: {user?.address || 'Vui lòng chọn'}</p>
-        <button className='font-semibold text-violet-700 hover:text-violet-600'>Thay đổi</button>
+        <div className='flex justify-between'>
+          <p className='font-semibold flex'>Địa chỉ cụ thể: { shipping_address ||
+            <span className='flex justify-center items-center ml-2'>
+              Vui lòng thay đổi địa chỉ 
+              <IoWarning size={24} color='red'/> 
+            </span>}
+          </p>
+          <Link to="/account/address">
+            <button className='font-semibold text-violet-700 hover:text-violet-600'>Thay đổi</button>
+          </Link>
+        </div>
       </div>
 
       {/* Phương Thức Vận Chuyển */}
