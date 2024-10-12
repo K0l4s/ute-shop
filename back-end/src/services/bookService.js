@@ -1,16 +1,13 @@
 const db = require("../models");
 const Book = db.Book;
 const Genre = db.Genre;
-const Author = db.Author;
 const Publisher = db.Publisher;
-const Review = db.Review;
-const Image = db.Image;
 const { Op } = require("sequelize");
 
 // Hàm tìm kiếm và lọc sách với phân trang
 const getBooks = async (filters, page = 1, limit = 16) => {
   try {
-    const { title, minPrice, maxPrice, publisher, age, sortByPrice } = filters;
+    const { title, minPrice, maxPrice, publisher, minAge, maxAge, sortByPrice } = filters;
 
     // Thiết lập điều kiện tìm kiếm
     const whereClause = {};
@@ -20,7 +17,7 @@ const getBooks = async (filters, page = 1, limit = 16) => {
       whereClause.title = { [Op.like]: `%${title}%` };
     }
 
-    // Lọc theo khoảng giá
+    // Lọc theo khoảng giá nếu có
     if (minPrice || maxPrice) {
       whereClause.price = {
         ...(minPrice ? { [Op.gte]: minPrice } : {}),
@@ -28,14 +25,13 @@ const getBooks = async (filters, page = 1, limit = 16) => {
       };
     }
 
-    // Lọc theo nhà xuất bản nếu có
-    // if (publisher) {
-    //   whereClause['$Publisher.name$'] = { [Op.eq]: publisher };
-    // }
+    // Lọc theo khoảng độ tuổi nếu có
+    if (minAge || maxAge) {
 
-    // Lọc theo độ tuổi nếu có
-    if (age) {
-      whereClause.age = { [Op.eq]: age };
+      whereClause.age = {
+        ...(minAge ? { [Op.gte]: minAge } : {}),
+        ...(maxAge ? { [Op.lte]: maxAge } : {}),
+      };
     }
 
     // Thiết lập sắp xếp
@@ -52,7 +48,7 @@ const getBooks = async (filters, page = 1, limit = 16) => {
     };
 
     // Lấy tổng số lượng sách thỏa mãn điều kiện
-    const totalBooks = await Book.count({ where: whereClause, include: [includePublisher], });
+    const totalBooks = await Book.count({ where: whereClause, include: [includePublisher] });
 
     // Tính toán phân trang
     const totalPages = Math.ceil(totalBooks / limit);
@@ -74,7 +70,7 @@ const getBooks = async (filters, page = 1, limit = 16) => {
       offset: offset,
       limit: limit,
     });
-    
+
     // Định dạng lại dữ liệu trước khi trả về
     const formattedBooks = books.map((book) => {
       return {
@@ -89,9 +85,8 @@ const getBooks = async (filters, page = 1, limit = 16) => {
         sold: book.sold,
         stock: book.stock,
         cover_img_url: book.cover_img_url,
-        // Bỏ các trường publisher_id, author_id, category_id
-        genres: book.genres.map((genre) => genre.name), // Trả về danh sách tên genres
-        publisher: book.Publisher?.name || null, // Đổi tên Publisher thành publisher
+        genres: book.genres.map((genre) => genre.name),
+        publisher: book.Publisher?.name || null,
       };
     });
 
@@ -147,5 +142,7 @@ const getBookDetailById = async (id) => {
 
 module.exports = {
   getBooks,
+
   getBookDetailById
 };
+
