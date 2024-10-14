@@ -6,6 +6,7 @@ const bookRoutes = require('./routes/bookRoutes.js');
 const reviewRoutes = require('./routes/reviewRoutes.js');
 const publisherRoutes = require('./routes/publisherRoutes.js');
 const orderRoutes = require('./routes/orderRoutes.js');
+const cartRoutes = require('./routes/cartRoutes.js');
 
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -33,6 +34,7 @@ app.use('/api/v1/book', bookRoutes);
 app.use('/api/v1/review', reviewRoutes);
 app.use('/api/v1/publisher', publisherRoutes);
 app.use('/api/v1/order', orderRoutes);
+app.use('/api/v1/cart', cartRoutes);
 
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);
