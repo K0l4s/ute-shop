@@ -1,4 +1,5 @@
 const express = require('express');
+const axios = require('axios');
 const db = require('./models/index.js');
 const authRoutes = require('./routes/authRoutes.js');
 const userRoutes = require('./routes/userRoutes.js');
@@ -33,6 +34,26 @@ app.use('/api/v1/book', bookRoutes);
 app.use('/api/v1/review', reviewRoutes);
 app.use('/api/v1/publisher', publisherRoutes);
 app.use('/api/v1/order', orderRoutes);
+
+app.get('/api/distance', async (req, res) => {
+  const { origins, destinations } = req.query;
+
+  try {
+    const response = await axios.get('https://maps.googleapis.com/maps/api/distancematrix/json', {
+      params: {
+        origins,
+        destinations,
+        key: process.env.GOOGLE_MAPS_API_KEY,
+        units: 'metric',
+      },
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error('Error fetching distance:', error);
+    res.status(500).json({ error: 'Failed to fetch distance' });
+  }
+});
 
 app.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);
