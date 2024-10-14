@@ -6,13 +6,14 @@ const Payment = db.Payment;
 
 const createOrder = async (userId, orderData) => {
   try {
-    const { total_price, shipping_address, shipping_method, payment_method, orderItems } = orderData;
+    const { total_price, shipping_address, shipping_method, shipping_fee, payment_method, orderItems } = orderData;
 
     const newOrder = await Order.create({
       user_id: userId,
       total_price: total_price,
       shipping_address: shipping_address,
       shipping_method: shipping_method,
+      shipping_fee: shipping_fee,
       status: 'PENDING', // Đơn hàng mới tạo sẽ có trạng thái mặc định là PENDING
     });
 
@@ -36,11 +37,17 @@ const createOrder = async (userId, orderData) => {
       });
     }
 
+    let payment_date = null;
+    if (payment_method === 'VNPAY') {
+      payment_date = new Date();
+    }
+
     // Tạo payment (COD hoặc VNPAY)
     const newPayment = await Payment.create({
       order_id: newOrder.id,
       user_id: userId,
       amount: total_price,
+      payment_date: payment_date,
       payment_method, // COD hoặc VNPAY
       status: 'PENDING'
     });
