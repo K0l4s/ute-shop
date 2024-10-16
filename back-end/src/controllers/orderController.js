@@ -13,6 +13,18 @@ const placeOrder = async (req, res) => {
   }
 };
 
+const getOrder = async (req, res) => {
+  const orderId = req.params.id;
+  
+  try {
+    const order = await orderService.getOrderById(orderId);
+    res.status(200).json(order);
+  } catch (error) {
+    res.status(404).json({ message: error.message });
+  }
+};
+
 module.exports = {
   placeOrder,
+  getOrder,
 };

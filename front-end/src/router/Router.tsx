@@ -15,6 +15,7 @@ import LandingPage from '../pages/landingPage/LandingPage'
 import ActiveAccount from '../pages/activeAccount/ActiveAccount'
 import SearchResults from '../pages/search/SearchResult'
 import Checkout from '../pages/checkout/Checkout'
+import PaymentSuccess from '../pages/checkout/PaymentSuccess'
 
 
 
@@ -60,6 +61,11 @@ const Router = () => {
             {/* Orders */}
             <Route path="/orders" element={<Order/>} />
             <Route path="/orders/:id" element={<ProductDetail/>} />
+
+            {/* Payment Success */}
+            <Route path="/order/vnpay_return" element={<PaymentSuccess/>} />
+
+            {/* Payment Fail */}
 
             {/* Route cho trang tìm kiếm */}
             <Route path="/search" element={<SearchResults />} />
