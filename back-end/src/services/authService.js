@@ -79,8 +79,9 @@ const loginUser = async ({ email, password, res }) => {
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 8 * 60 * 60 * 1000
+      secure: process.env.NODE_ENV === 'development',
+      maxAge: 8 * 60 * 60 * 1000,
+      sameSite: 'None' // allow cookies to enable cross-site usage (virtual domain)
     });
 
     const returnData = {

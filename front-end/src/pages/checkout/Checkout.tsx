@@ -6,7 +6,7 @@ import DiscountCode from '../../components/voucher/DiscountCode';
 import { IoWarning } from 'react-icons/io5';
 import { Link } from 'react-router-dom';
 import { getDistance } from '../../apis/maps';
-import { placeOrder } from '../../apis/order';
+import { checkOutByVNPay, placeOrder } from '../../apis/order';
 
 const Checkout: React.FC = () => {
   const dispatch = useDispatch();
@@ -113,8 +113,16 @@ const Checkout: React.FC = () => {
     };
 
     try {
-      const result = await placeOrder(orderData);
-      console.log('Order placed successfully:', result);
+      if (paymentMethod === "COD") {
+        const result = await placeOrder(orderData);
+        console.log('Order placed successfully:', result);
+      }
+      else if (paymentMethod === "VNPAY") {
+        const res = await checkOutByVNPay(orderData);
+        if (res.paymentUrl) {
+          window.location.href = res.paymentUrl;
+        }
+      }
     } catch (error) {
       console.error('Failed to place order:', error);
     }
@@ -139,7 +147,7 @@ const Checkout: React.FC = () => {
   }, [user]);
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto px-16 py-8">
       <h1 className="text-xl text-violet-700 font-bold mb-4">XÁC NHẬN THANH TOÁN</h1>
       
       {/* Địa Chỉ Giao Hàng */}
@@ -207,7 +215,7 @@ const Checkout: React.FC = () => {
             productsToCheckout.map((product) => (
               <div key={product.id} className="flex justify-between items-center p-2 bg-gray-100 rounded">
                 <div className="flex items-center space-x-4">
-                  <img src={product.image} alt={product.title} className="w-16 h-16 object-cover rounded" />
+                  <img src={product.image} alt={product.title} className="w-16 h-20 rounded" />
                   <div>
                     <h3 className="font-semibold">{product.title}</h3>
                     <p className="text-sm text-gray-600">Phân loại: {product.publisher}</p>
