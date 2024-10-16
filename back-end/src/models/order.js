@@ -13,6 +13,16 @@ module.exports = (sequelize) => {
         as: 'orderDetails',
         onDelete: 'CASCADE'
       });
+
+      Order.belongsTo(models.Discount, {
+        foreignKey: 'discount_id',
+        as: 'discount'
+      });
+
+      Order.belongsTo(models.Freeship, {
+        foreignKey: 'freeship_id',
+        as: 'freeship'
+      });
     }
   }
   Order.init({
@@ -23,6 +33,22 @@ module.exports = (sequelize) => {
         key: 'id',
       },
       allowNull: false
+    },
+    discount_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Discounts',
+        key: 'id'
+      },
+      allowNull: true
+    },
+    freeship_id: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Freeships',
+        key: 'id'
+      },
+      allowNull: true
     },
     total_price: {
       type: DataTypes.DECIMAL,
@@ -41,6 +67,10 @@ module.exports = (sequelize) => {
       type: DataTypes.ENUM('STANDARD', 'EXPRESS'),
       allowNull: false,
       defaultValue: 'STANDARD'
+    },
+    shipping_fee: {
+      type: DataTypes.DECIMAL,
+      allowNull: false
     },
     status: {
       type: DataTypes.ENUM('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'),

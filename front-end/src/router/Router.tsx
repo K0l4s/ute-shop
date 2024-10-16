@@ -4,7 +4,7 @@ import Cart from '../pages/cart/Cart'
 import Product from '../pages/products/Product'
 import Order from '../pages/order/Order'
 import ProductDetail from '../pages/productDetail/ProductDetail'
-
+import PaymentSuccess from '../pages/checkout/PaymentSuccess'
 import Login from '../pages/login/Login';
 // import Account from '../pages/account/Account'
 import AccountPage from '../pages/account/AccountPage'
@@ -46,6 +46,7 @@ const Router = () => {
           <Route path="/orders" element={<Order />} />
           <Route path="/orders/:id" element={<ProductDetail />} />
           <Route path="/search/" element={<SearchResults />} />
+          <Route path="/order/vnpay_return" element={<PaymentSuccess/>} />
         </Route>
 
         <Route element={<AdminLayout />}>

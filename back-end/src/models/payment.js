@@ -19,7 +19,6 @@ module.exports = (sequelize) => {
     amount: DataTypes.DECIMAL,
     payment_date: {
       type: DataTypes.DATE,
-      defaultValue: DataTypes.NOW
     },
     payment_method: {
       type: DataTypes.ENUM('COD', 'VNPAY'),
