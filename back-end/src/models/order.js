@@ -30,7 +30,7 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       references: {
         model: 'Users',
-        key: 'id'
+        key: 'id',
       },
       allowNull: false
     },
@@ -60,7 +60,7 @@ module.exports = (sequelize) => {
       defaultValue: DataTypes.NOW
     },
     shipping_address: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING, 
       allowNull: false
     },
     shipping_method: {

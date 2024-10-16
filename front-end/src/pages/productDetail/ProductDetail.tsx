@@ -12,6 +12,8 @@ import { IoCreateOutline } from 'react-icons/io5';
 import { useDispatch } from 'react-redux';
 import { addItem } from '../../redux/reducers/cartSlice';
 import internal from 'stream';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
 interface Book {
   id: number;
   title: string;
@@ -39,6 +41,8 @@ interface Book {
   Images: { url: string }[];
 }
 const ProductDetail: React.FC = () => {
+  // user address from redux
+  const userAddress = useSelector((state: RootState) => state.auth.user?.address + ', ' + state.auth.user?.ward + ', ' + state.auth.user?.district + ', ' + state.auth.user?.province);
   const { id } = useParams<{ id: string }>();  // Get the book ID from route params
   const [book, setBook] = useState<Book | null>(null); // Use 'Book' type or null for initial state
   const [error, setError] = useState<string | null>(null);
@@ -59,6 +63,7 @@ const ProductDetail: React.FC = () => {
     };
 
     fetchBook();
+    // add cover to Images
     setTotalRating(book?.Reviews.reduce((acc, review) => acc + review.star, 0) || 0);
   }, [id]);
 
@@ -107,7 +112,7 @@ const ProductDetail: React.FC = () => {
       <main className="container mx-auto mt-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left side (Image and Gallery) */}
-          <div>
+          <div className='shadow rounded-xl'>
             <Swiper modules={[Navigation, Pagination, Scrollbar, A11y]}
               spaceBetween={50}
               slidesPerView={1}
@@ -115,8 +120,11 @@ const ProductDetail: React.FC = () => {
               pagination={{ clickable: true }}
               scrollbar={{ draggable: true }}
             >
+              <SwiperSlide key={0}>
+              <img src={book.cover_img_url} alt="Product" className="w-7/12 m-auto" />
+              </SwiperSlide>
               {book.Images.map((image, index) => (
-                <SwiperSlide key={index}>
+                <SwiperSlide key={index+1}>
                   <img src={image.url} alt="Product" className="w-7/12 m-auto" />
                 </SwiperSlide>
               ))}
@@ -146,7 +154,7 @@ const ProductDetail: React.FC = () => {
                 : <button className="bg-gray-300 text-black px-4 py-2 rounded-lg mr-5">Hết hàng</button>}
             </div>
             <div className="mt-8">
-              <p>Thông tin vận chuyển: <Link to="/account/profile" className='text-blue-800 underline'>Giao hàng đến: TP. Hồ Chí Minh.</Link></p>
+              <p>Thông tin vận chuyển: <Link to="/account/address" className='text-blue-800 underline'>{userAddress || "TP. Hồ Chí Minh"}</Link></p>
               <p>Ưu đãi: <Link to="/voucher/1" className='text-blue-800 underline'> Mã giảm phí Ship 10k.</Link></p>
             </div>
           </div>

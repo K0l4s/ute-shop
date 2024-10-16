@@ -15,6 +15,17 @@ module.exports = {
           model: 'Users',
           key: 'id'
         },
+        
+
+        onDelete: 'CASCADE',
+        allowNull: false
+      },
+      bill_id: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'Bills',
+          key: 'id'
+        },
         onDelete: 'CASCADE',
         allowNull: false
       },

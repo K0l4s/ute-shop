@@ -1,4 +1,4 @@
-const { getBooks, getBookDetailById } = require("../services/bookService.js");
+const { getBooks, getBookDetailById, getTop10BooksByOrderQuantity  } = require("../services/bookService.js");
 
 // Controller tìm kiếm và lọc sách với phân trang
 const getBooksController = async (req, res) => {
@@ -41,7 +41,20 @@ const getBookDetailByIdController = async (req, res) => {
     return res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+const getTop10Books = async (req, res) => {
+  try {
+    const books = await getTop10BooksByOrderQuantity();
+    return res.status(200).json({
+      message: "success",
+      data: books
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+}
 module.exports = {
   getBooksController,
-  getBookDetailByIdController
+  getBookDetailByIdController,
+  getTop10Books
 };

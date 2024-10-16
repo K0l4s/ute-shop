@@ -93,8 +93,20 @@ const getOrderById = async (orderId) => {
     throw new Error(error.message);
   }
 }
-
+const getOrdersByUserId = async (id) => {
+  try {
+    const orders = await Order.findAll({
+    });
+    if(!orders) {
+      throw new Error('No orders found');
+    }
+    return orders;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
 module.exports = {
   createOrder,
-  getOrderById
+  getOrderById,
+  getOrdersByUserId
 };
