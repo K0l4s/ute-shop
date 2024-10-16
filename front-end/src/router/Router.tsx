@@ -1,5 +1,5 @@
 
-import {  Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import Cart from '../pages/cart/Cart'
 import Product from '../pages/products/Product'
 import Order from '../pages/order/Order'
@@ -15,79 +15,61 @@ import LandingPage from '../pages/landingPage/LandingPage'
 import ActiveAccount from '../pages/activeAccount/ActiveAccount'
 import SearchResults from '../pages/search/SearchResult'
 import Checkout from '../pages/checkout/Checkout'
+import CustomerLayout from './layout/CustomerLayout'
+import AdminLayout from './layout/AdminLayout'
+import Dashboard from '../pages/admin/dashboard/Dashboard'
 
 
 
 
 const Router = () => {
-  const infor = {
-    title: "Dế mèn phiêu lưu ký",
-  author: "Tô Hoài",
-  publisher: "Dân trí",
-  price: 80000,
-  discountPrice: 30000,
-  image: "https://lh4.googleusercontent.com/proxy/EBAyH1uGo9-ZhCvcsFiKFa4AixalbCWbR39f4S2yR68MYzf16ZdapZAbcibeYnYrsLU7HTL-kTIOGFTexFw_u2Xmk3W7Iibz",
-  stock: 20
-  }
-  
-  
   return (
     <>
-    
-        <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/cart" element={<Cart/>} />
-            <Route path="/checkout" element={<Checkout />} />
-            {/* Products Route */}
-            <Route path="/products" element={<Product/>} />
-            <Route path="/products/:id" element={<ProductDetail/>} />
-            {/* auth */}
-            <Route path="/login" element={<Login/>} />
+      <Routes>
+        <Route >
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/active" element={<ActiveAccount />} />
+          <Route path="/forgot" element={<ForgotPassword />} />
+          <Route path="/reset/password" element={<ResetPassword />} />
+        </Route>
+        <Route element={<CustomerLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/products" element={<Product />} />
+          <Route path="/products/:id" element={<ProductDetail />} />
+          <Route path="/account/profile" element={<AccountPage />} />
+          <Route path="/account/address" element={<AccountPage />} />
+          <Route path="/profile" element={<Cart />} />
+          <Route path="/profile/edit" element={<Cart />} />
+          <Route path="/orders" element={<Order />} />
+          <Route path="/orders/:id" element={<ProductDetail />} />
+          <Route path="/search/" element={<SearchResults />} />
+        </Route>
 
-            <Route path="/account/profile" element={<AccountPage/>} />
-            <Route path="/account/address" element={<AccountPage/>} />
+        <Route element={<AdminLayout />}>
+          <Route path="/admin" element={<Dashboard />} />
+          <Route path="/admin/categories" element={<Cart />} />
+          <Route path="/admin/categories/:id" element={<Cart />} />
+          <Route path="/admin/products" element={<Cart />} />
+          <Route path="/admin/products/:id" element={<Cart />} />
+          <Route path="/admin/orders" element={<Order />} />
+          <Route path="/admin/orders/:id" element={<Order />} />
 
+          <Route path="/admin/users" element={<Cart />} />
+          <Route path="/admin/users/:id" element={<Cart />} />
 
-            <Route path="/register" element={<Register/>} />
-            <Route path="/active" element={<ActiveAccount/>} />
-            <Route path="/forgot" element={<ForgotPassword/>} />
-            <Route path="/reset/password" element={<ResetPassword/>} />
-            {/* User */}
-            <Route path="/profile" element={<Cart/>} />
+          {/* Vouchers */}
+          <Route path="/admin/vouchers" element={<Cart />} />
 
-            <Route path="/profile/edit" element={<Cart/>} />
+          <Route path="/admin/config" element={<Cart />} />
 
-            {/* Orders */}
-            <Route path="/orders" element={<Order/>} />
-            <Route path="/orders/:id" element={<ProductDetail/>} />
+          {/* Cashier */}
+          <Route path="admin/cashier" element={<Cart />} />
+        </Route>
+      </Routes>
 
-            {/* Route cho trang tìm kiếm */}
-            <Route path="/search" element={<SearchResults />} />
-
-            {/* Admin */}
-            <Route path="/admin" element={<Cart/>} />
-            <Route path="/admin/categories" element={<Cart/>} />
-            <Route path="/admin/categories/:id" element={<Cart/>} />
-            <Route path="/admin/products" element={<Cart/>} />
-            {/* <Route path="/admin/products/create" element={<Cart/>} />  */} 
-            <Route path="/admin/products/:id" element={<Cart/>} />
-            
-            {/* <Route path="/admin/products/:id/edit" element={<Cart/>} /> */}
-            <Route path="/admin/orders" element={<Order/>} />
-            <Route path="/admin/orders/:id" element={<Order/>} />
-
-            <Route path="/admin/users" element={<Cart/>} />
-            <Route path="/admin/users/:id" element={<Cart/>} />
-
-            {/* Vouchers */}
-            <Route path="/admin/vouchers" element={<Cart/>} />
-
-            <Route path="/admin/config" element={<Cart/>} />
-
-            {/* Cashier */}
-            <Route path="admin/cashier" element={<Cart/>} />
-        </Routes>
-        
     </>
   )
 }

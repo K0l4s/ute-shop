@@ -13,6 +13,19 @@ const placeOrder = async (req, res) => {
   }
 };
 
+const getAllOrdersByUser = async (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    // Gọi service để lấy danh sách đơn hàng của user
+    const orders = await orderService.getOrdersByUserId(userId);
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+
 module.exports = {
   placeOrder,
+  getAllOrdersByUser
 };

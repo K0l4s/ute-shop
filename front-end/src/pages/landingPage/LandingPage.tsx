@@ -5,6 +5,7 @@ import 'swiper/css/pagination';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
 import { useNavigate } from "react-router-dom";
+import { getTop10BooksAPI } from "../../apis/book";
 
 interface Book {
   id: number;
@@ -26,13 +27,14 @@ const LandingPage = () => {
   const [top10Books, setTop10Books] = useState<Book[]>([]);
   const getTop10Books = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/v1/book/top/10");
-      if (response.ok) {
-        const res = await response.json();
-
+      getTop10BooksAPI().
+      then((res) => 
+      {
         setTop10Books(res.data);
-        // setTop10Books(data);
       }
+      );
+
+      
     } catch (err) {
       console.error("Error fetching data: ", err);
     }
@@ -109,7 +111,7 @@ const LandingPage = () => {
               {top10Books.length > 0 &&
                 top10Books.map((book, index) => (
                   <SwiperSlide key={index}>
-                    <div key={book.id} className="bg-white p-4 shadow rounded-lg cursor-pointer"
+                    <div key={book.id} className="min-w-40 bg-white p-4 shadow rounded-lg cursor-pointer"
                      onClick={()=>navigate("/products/"+book.id)}>
                       {/* <div className="bg-green-200 h-48 mb-4"></div> */}
                       <img src={book.cover_img_url} alt="" className="h-48 mb-4" />
@@ -118,7 +120,7 @@ const LandingPage = () => {
                         <p className="text-xl text-red-500 font-semibold">{book.salePrice}</p>
                         <p className="text-decoration-line: line-through text-gray-500">{book.price}</p>
                       </div>
-                      <p>Tổng số lượt bán: {book.totalSell}/{book.stock} cuốn</p>
+                      <p>Tổng số lượt bán: {book.totalSell || 0}/{book.stock} cuốn</p>
                     </div>
                   </SwiperSlide>
                 ))

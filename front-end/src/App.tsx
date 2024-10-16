@@ -46,23 +46,9 @@ function App() {
 
     checkLoginStatus();
   }, [dispatch]);
-  const navbarHideList = [
-    '/login',
-    '/register',
-    '/forgot',
-    '/reset/password'
-  ]
-  const isHideNavbar = navbarHideList.includes(window.location.pathname)
   return (
     <>
-    {!isHideNavbar &&
-    <Navbar />}
-    {/* <div className="overflow-auto"> */}
-    <div>
     <Router />
-    </div>
-    {!isHideNavbar &&
-    <Footer/>}
     </>
   );
 }

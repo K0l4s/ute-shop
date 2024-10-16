@@ -3,9 +3,43 @@ const Book = db.Book;
 const Genre = db.Genre;
 const Publisher = db.Publisher;
 const Order = db.Order;
+const Author = db.Author;
+const Image = db.Image;
 const sequelize = db.sequelize;
 const { Op } = require("sequelize");
-
+const getTop10BooksByOrderQuantity = async () => {
+  try{
+  const topBooksQuery = `
+      SELECT 
+        Books.id, 
+        Books.ISBN, 
+        Books.title, 
+        Books.desc, 
+        Books.price, 
+        Books.salePrice, 
+        Books.year, 
+        Books.stock, 
+        Books.cover_img_url, 
+        Books.publisher_id, 
+        Books.author_id, 
+        Books.category_id, 
+        SUM(Orders.quantity) AS totalSell 
+      FROM Books 
+      LEFT JOIN Orders ON Books.id = Orders.book_id 
+      GROUP BY Books.id 
+      ORDER BY totalSell DESC 
+      LIMIT 10;
+    `;
+    const [topBooks, metadata] = await sequelize.query(topBooksQuery);
+    if (topBooks.length === 0) {
+      throw new Error('Cant find any book');
+    }
+    return topBooks;
+  } catch (error) {
+    console.error('Error fetching top 10 books by order quantity:', error);
+    throw error; // Rethrow error after logging
+  }
+}
 // Hàm tìm kiếm và lọc sách với phân trang
 const getBooks = async (filters, page = 1, limit = 16) => {
   try {
@@ -141,8 +175,11 @@ const getBookDetailById = async (id) => {
     throw error;
   }
 };
+
 module.exports = {
-  searchBooksByTitle,
+  // searchBooksByTitle,
+  getTop10BooksByOrderQuantity,
+  getBooks,
   getBookDetailById
 };
 
