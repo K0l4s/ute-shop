@@ -17,7 +17,7 @@ interface Order {
   user_id: number;
   voucher_id: number;
   discount_id: number;
-  order_detail: {
+  orderDetails: {
     book: {
       id: number,
       title: string;
@@ -34,7 +34,7 @@ const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [sortField, setSortField] = useState<string>(''); // Trường được chọn để sắp xếp
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // Thứ tự sắp xếp: asc hoặc desc
-
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   useEffect(() => {
     getOrderByUser().then((res) => {
       console.log(res);
@@ -81,8 +81,10 @@ const Orders = () => {
   };
   const [isOpenDetail, setIsOpenDetail] = useState(false);
   const handleOpenDetail = () => {
-    console.log("dskfh")
+    if(!isOpenDetail)
+      setSelectedOrder(orders[0]);
     setIsOpenDetail(!isOpenDetail);
+    
   };
   return (
     <>
@@ -153,9 +155,9 @@ const Orders = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <button className="p-2 bg-blue-500 text-white rounded-md mr-2" onClick={handleOpenDetail}><TiEye /> </button>
-                    {/* {order.status === 'PENDING' && new Date().getTime() - new Date(order.order_date).getTime() < 30 * 60 * 1000 && ( */}
+                    {order.status === 'PENDING' && new Date().getTime() - new Date(order.order_date).getTime() < 30 * 60 * 1000 && (
                       <button className="p-2 bg-red-500 text-white rounded-md"><RiDeleteBin3Fill /></button>
-                    {/* )} */}
+                    )} 
                   </td>
                 </tr>
               ))}
@@ -163,7 +165,7 @@ const Orders = () => {
           </table>
         </div>
       </div>
-      <OrderDetailModal isOpen={isOpenDetail} onRequestClose={handleOpenDetail} />
+      <OrderDetailModal isOpen={isOpenDetail} onRequestClose={handleOpenDetail} Order={selectedOrder} />
     </>
   );
 };
