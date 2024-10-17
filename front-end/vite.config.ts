@@ -10,7 +10,11 @@ export default defineConfig({
     port: 3000,
     hmr: {
       host: 'uteshop.local', // Virtual domain
+      protocol: 'ws',
     },
+    watch: {
+      usePolling: true // Bật polling mode nếu hệ thống không theo dõi thay đổi file tốt
+    }
   },
   css: {
     devSourcemap: true
