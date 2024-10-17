@@ -168,7 +168,7 @@ const resetPassword = async ({ email, code, password }) => {
     if (!user.is_active) {
       throw new Error("Active this account first");
     }
-    if (user.code !== code) {
+    if (user.code != code) {
       throw new Error("Invalid code");
     }
 

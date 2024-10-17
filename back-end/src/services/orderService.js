@@ -96,6 +96,18 @@ const getOrderById = async (orderId) => {
 const getOrdersByUserId = async (id) => {
   try {
     const orders = await Order.findAll({
+      where: { user_id: id },
+      include: [
+      {
+        model: Detail_Order,
+        as: 'orderDetails',
+        include: {
+          model: Book,
+          as: 'book'
+        },
+      }
+      ],
+      order: [['order_date', 'DESC']]
     });
     if(!orders) {
       throw new Error('No orders found');

@@ -18,6 +18,7 @@ import Checkout from '../pages/checkout/Checkout'
 import CustomerLayout from './layout/CustomerLayout'
 import AdminLayout from './layout/AdminLayout'
 import Dashboard from '../pages/admin/dashboard/Dashboard'
+import OrderDetailModal from '../components/modals/OrderDetailModal'
 
 
 
@@ -41,10 +42,11 @@ const Router = () => {
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/account/profile" element={<AccountPage />} />
           <Route path="/account/address" element={<AccountPage />} />
+          <Route path="/account/orders" element={<AccountPage />} />
           <Route path="/profile" element={<Cart />} />
           <Route path="/profile/edit" element={<Cart />} />
           <Route path="/orders" element={<Order />} />
-          <Route path="/orders/:id" element={<ProductDetail />} />
+          <Route path="/orders/:id" element={<OrderDetailModal />} />
           <Route path="/search/" element={<SearchResults />} />
           <Route path="/order/vnpay_return" element={<PaymentSuccess/>} />
         </Route>

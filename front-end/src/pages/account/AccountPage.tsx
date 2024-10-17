@@ -25,6 +25,8 @@ const AccountPage = () => {
         return <FavoriteBooks />;
       case 'purchasedBooks':
         return <PurchasedBooks />;
+      case 'orders':
+        return <Orders />;
       default:
         return <Account />;
     }

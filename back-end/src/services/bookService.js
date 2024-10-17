@@ -3,14 +3,17 @@ const Book = db.Book;
 const Genre = db.Genre;
 const Publisher = db.Publisher;
 const Order = db.Order;
+const User = db.User;
+const Detail_Order = db.Detail_Order;
 const Author = db.Author;
 const Image = db.Image;
+const Review = db.Review;
 const sequelize = db.sequelize;
 const { Op } = require("sequelize");
 const getTop10BooksByOrderQuantity = async () => {
-  try{
-  const topBooksQuery = `
-      SELECT 
+  try {
+    const topBooksQuery = `
+       SELECT 
         Books.id, 
         Books.ISBN, 
         Books.title, 
@@ -23,9 +26,9 @@ const getTop10BooksByOrderQuantity = async () => {
         Books.publisher_id, 
         Books.author_id, 
         Books.category_id, 
-        SUM(Orders.quantity) AS totalSell 
+        SUM(detail_orders.quantity) AS totalSell 
       FROM Books 
-      LEFT JOIN Orders ON Books.id = Orders.book_id 
+      LEFT JOIN detail_orders ON Books.id = detail_orders.book_id 
       GROUP BY Books.id 
       ORDER BY totalSell DESC 
       LIMIT 10;
@@ -138,35 +141,57 @@ const getBooks = async (filters, page = 1, limit = 16) => {
 
 const getBookDetailById = async (id) => {
   try {
-    // Kiểm tra nếu không có id
+    // Check if ID is provided
     if (!id) {
       throw new Error("Id is required");
     }
-    // Tìm sách theo id
+
+    // Fetch book details by ID
     const book = await Book.findByPk(id, {
       include: [
         {
           model: Genre,
-          as: 'genres',
-          attributes: ['name'],  // Lấy thông tin thể loại
-          through: { attributes: [] }  // Không lấy dữ liệu bảng trung gian
+          as: 'genres', // Alias for Genre association
+          attributes: ['name'],
+          through: { attributes: [] } // Don't include the join table data
         },
         {
-          model: Author
+          model: Author,
+          as: 'Author' // Ensure this matches the association alias
         },
         {
-          model: Publisher
+          model: Publisher,
+          as: 'Publisher' // Ensure this matches the association alias
         },
-        // {
-        //   model: Review
-        // },
+        {
+          model: Review,
+          as: 'Reviews', // Ensure this matches the association alias
+          include: [
+            {
+              model: User,
+              attributes: ['firstName', 'lastName']
+            }
+          ]
+        },
         {
           model: Image,
-          attributes: ['url'],
-        }
+          as: 'Images', // Ensure this matches the association alias
+          attributes: ['url']
+        },
+        
+        // Add any other includes as necessary
       ]
     });
-    // Kiểm tra nếu không tìm thấy sách
+    const totalSold = await Detail_Order.sum('quantity', {
+      where: {
+        book_id: id
+      }
+    });
+    console.log(totalSold);
+    // add totalSold to book
+    book.sold = totalSold;
+    console.log(book);
+    // Check if the book was found
     if (!book) {
       return null;
     }
@@ -175,6 +200,26 @@ const getBookDetailById = async (id) => {
     throw error;
   }
 };
+
+const getTotalSoldBookById = async (id) => {
+  try {
+    // Check if ID is provided
+    if (!id) {
+      throw new Error("Id is required");
+    }
+
+    // Fetch total sold book by ID
+    const totalSold = await Detail_Order.sum('quantity', {
+      where: {
+        book_id: id
+      }
+    });
+
+    return totalSold;
+  } catch (error) {
+    throw error;
+  }
+}
 
 module.exports = {
   // searchBooksByTitle,
