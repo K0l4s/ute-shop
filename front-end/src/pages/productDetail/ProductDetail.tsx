@@ -177,7 +177,7 @@ const ProductDetail: React.FC = () => {
               </div>
               {book.stock > book.sold + 1 ?
                 <>
-                  <button className={`${book.stock > book.sold + 1 ? 'bg-red-200' : 'bg-gray-200'} text-white px-4 py-2 rounded-lg mr-5 `} disabled={book.stock > book.sold + 1}>Mua ngay</button>
+                  <button className={`${book.stock > book.sold + 1 ? 'bg-green-800' : 'bg-gray-200'} text-white px-4 py-2 rounded-lg mr-5 `} onClick={()=>console.log("Clicks")}>Mua ngay</button>
                   <button className={`${book.stock > book.sold + 1 ? 'bg-blue-200' : 'bg-gray-200'} text-black px-4 py-2 rounded-lg`} onClick={handleAddToCart}>Thêm vào giỏ hàng</button>
                 </>
                 : <button className="bg-gray-300 text-black px-4 py-2 rounded-lg mr-5">Hết hàng</button>}
