@@ -1,12 +1,11 @@
-
 import { useEffect, useState } from 'react';
 import { getOrderByUser } from '../../apis/order';
 import OrderDetailModal from '../../components/modals/OrderDetailModal';
-import { BsViewList } from 'react-icons/bs'
+import { BsViewList } from 'react-icons/bs';
 import { TiEye } from 'react-icons/ti';
 import { RiDeleteBin3Fill } from 'react-icons/ri';
+
 interface Order {
-  // bill_id: number;
   id: number;
   order_date: string;
   shipping_address: string;
@@ -17,23 +16,24 @@ interface Order {
   user_id: number;
   voucher_id: number;
   discount_id: number;
-  order_detail: {
+  orderDetails: {
     book: {
-      id: number,
+      id: number;
       title: string;
       price: string;
-    }
+    };
     quantity: number;
     price: string;
   }[];
-
   freeship_id: number;
-
 }
+
 const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [sortField, setSortField] = useState<string>(''); // Trường được chọn để sắp xếp
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // Thứ tự sắp xếp: asc hoặc desc
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [isOpenDetail, setIsOpenDetail] = useState(false);
 
   useEffect(() => {
     getOrderByUser().then((res) => {
@@ -44,15 +44,17 @@ const Orders = () => {
 
   const formatDateTime = (date: string) => {
     const d = new Date(date);
-    return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()} ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()} `;
-  }
+    return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()} ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+  };
 
   const formatPrice = (price: string) => {
     return price.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }
+  };
+
   const formatDescription = (description: string) => {
-    return description.length > 10 ? description.slice(0, 10) + '...' : description
-  }
+    return description.length > 10 ? description.slice(0, 10) + '...' : description;
+  };
+
   // Hàm sắp xếp dữ liệu dựa trên trường và thứ tự
   const sortedOrders = [...orders].sort((a, b) => {
     if (!sortField) return 0; // Nếu chưa chọn trường nào thì không sắp xếp
@@ -79,11 +81,14 @@ const Orders = () => {
       setSortOrder('asc');
     }
   };
-  const [isOpenDetail, setIsOpenDetail] = useState(false);
-  const handleOpenDetail = () => {
-    console.log("dskfh")
-    setIsOpenDetail(!isOpenDetail);
+
+  const handleOpenDetail = (key: number) => {
+    const orderToShow = orders[key];
+    setSelectedOrder(orderToShow);
+    console.log("Selected Order:", orderToShow); // Kiểm tra giá trị của đơn hàng được chọn
+    setIsOpenDetail(true); // Mở modal
   };
+
   return (
     <>
       <div>
@@ -116,7 +121,7 @@ const Orders = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {sortedOrders.map((order: Order) => (
+              {sortedOrders.map((order: Order, index) => (
                 <tr key={order.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.id}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateTime(order.order_date)}</td>
@@ -152,10 +157,10 @@ const Orders = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <button className="p-2 bg-blue-500 text-white rounded-md mr-2" onClick={handleOpenDetail}><TiEye /> </button>
-                    {/* {order.status === 'PENDING' && new Date().getTime() - new Date(order.order_date).getTime() < 30 * 60 * 1000 && ( */}
+                    <button className="p-2 bg-blue-500 text-white rounded-md mr-2" onClick={() => handleOpenDetail(index)}><TiEye /></button>
+                    {order.status === 'PENDING' && new Date().getTime() - new Date(order.order_date).getTime() < 30 * 60 * 1000 && (
                       <button className="p-2 bg-red-500 text-white rounded-md"><RiDeleteBin3Fill /></button>
-                    {/* )} */}
+                    )}
                   </td>
                 </tr>
               ))}
@@ -163,7 +168,7 @@ const Orders = () => {
           </table>
         </div>
       </div>
-      <OrderDetailModal isOpen={isOpenDetail} onRequestClose={handleOpenDetail} />
+      <OrderDetailModal isOpen={isOpenDetail} onRequestClose={() => setIsOpenDetail(false)} Order={selectedOrder} />
     </>
   );
 };

@@ -16,15 +16,15 @@ connection.connect(err => {
     return;
   }
 
-  // const createDatabaseQuery = `CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\``;
+  const createDatabaseQuery = `CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME}\``;
 
-  // connection.query(createDatabaseQuery, (err, result) => {
-  //   if (err) {
-  //     console.error('Error creating database:', err);
-  //     return;
-  //   }
+  connection.query(createDatabaseQuery, (err, result) => {
+    if (err) {
+      console.error('Error creating database:', err);
+      return;
+    }
 
-  //   console.log('Database created or already exists.');
-  //   connection.end();
-  // });
+    console.log('Database created or already exists.');
+    connection.end();
+  });
 });
