@@ -15,17 +15,6 @@ module.exports = {
           model: 'Users',
           key: 'id'
         },
-        
-
-        onDelete: 'CASCADE',
-        allowNull: false
-      },
-      bill_id: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Bills',
-          key: 'id'
-        },
         onDelete: 'CASCADE',
         allowNull: false
       },
@@ -35,6 +24,7 @@ module.exports = {
           model: 'Discounts',
           key: 'id'
         },
+        onDelete: 'CASCADE',
         allowNull: true
       },
       freeship_id: {
@@ -43,6 +33,7 @@ module.exports = {
           model: 'Freeships',
           key: 'id'
         },
+        onDelete: 'CASCADE',
         allowNull: true
       },
       total_price: {
