@@ -6,6 +6,16 @@ const { Op } = require("sequelize");
 // Hàm thêm sản phẩm vào giỏ hàng
 const addToCart = async (userId, bookId, quantity) => {
   try {
+    // Lấy thông tin sách để kiểm tra số lượng tồn kho
+    const book = await Book.findOne({ where: { id: bookId } });
+    if (!book) {
+      throw new Error("Sách không tồn tại");
+    }
+
+    if (quantity < 1){
+      throw new Error("Số lượng sách không hợp lệ");
+    }
+
     // Kiểm tra nếu sách có tồn tại trong giỏ hàng
     const cartItem = await Cart.findOne({
       where: {
@@ -13,6 +23,14 @@ const addToCart = async (userId, bookId, quantity) => {
         book_id: bookId
       }
     });
+
+    // Tính toán số lượng cần thêm
+    const totalQuantity = cartItem ? cartItem.quantity + quantity : quantity;
+
+    // Kiểm tra số lượng tồn kho
+    if (totalQuantity > book.stock) {
+      throw new Error(`Chỉ có ${book.stock} sản phẩm còn lại trong kho`);
+    }
 
     if (cartItem) {
       // Nếu sản phẩm đã có trong giỏ hàng, cập nhật số lượng
@@ -36,6 +54,16 @@ const addToCart = async (userId, bookId, quantity) => {
 // Hàm cập nhật số lượng sản phẩm trong giỏ hàng
 const updateCartItem = async (userId, bookId, quantity) => {
   try {
+    // Lấy thông tin sách để kiểm tra số lượng tồn kho
+    const book = await Book.findOne({ where: { id: bookId } });
+    if (!book) {
+      throw new Error("Sách không tồn tại");
+    }
+
+    if (book.stock < quantity || quantity < 1){
+      throw new Error("Số lượng sách không hợp lệ");
+    }
+
     // Kiểm tra nếu sản phẩm có trong giỏ hàng
     const cartItem = await Cart.findOne({
       where: {
@@ -90,7 +118,7 @@ const getUserCart = async (userId) => {
       include: {
         model: Book,
         as: 'book',
-        attributes: ['id', 'title', 'price', 'cover_img_url'] // Chỉ lấy các thông tin cần thiết của sách
+        attributes: ['id', 'title', 'price', 'salePrice', 'cover_img_url'] 
       }
     });
 
@@ -106,9 +134,79 @@ const getUserCart = async (userId) => {
   }
 };
 
+// Hàm tăng số lượng sản phẩm trong giỏ hàng khi nhấn +
+const increaseQuantity = async (userId, bookId) => {
+  try {
+    // Lấy thông tin sách để kiểm tra số lượng tồn kho
+    const book = await Book.findOne({ where: { id: bookId } });
+    if (!book) {
+      throw new Error("Sách không tồn tại");
+    }
+    
+    // Kiểm tra nếu sách có tồn tại trong giỏ hàng
+    const cartItem = await Cart.findOne({
+      where: {
+        user_id: userId,
+        book_id: bookId
+      }
+    });
+
+    if (!cartItem) {
+      throw new Error("Sản phẩm chưa có trong giỏ hàng");
+    }
+
+    // Kiểm tra số lượng tồn kho
+    if (cartItem.quantity + 1 > book.stock) {
+      throw new Error(`Chỉ có ${book.stock} sản phẩm còn lại trong kho`);
+    }
+
+    // Tăng số lượng sản phẩm
+    cartItem.quantity += 1;
+    await cartItem.save();
+
+    return { message: "Đã thêm 1 sản phẩm" };
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Hàm giảm số lượng sản phẩm trong giỏ hàng khi nhấn +
+const decreaseQuantity = async (userId, bookId) => {
+  try {
+    // Kiểm tra nếu sách có tồn tại trong giỏ hàng
+    const cartItem = await Cart.findOne({
+      where: {
+        user_id: userId,
+        book_id: bookId
+      }
+    });
+
+    if (!cartItem) {
+      throw new Error("Sản phẩm chưa có trong giỏ hàng");
+    }
+
+    // Nếu số lượng là 1 thì xóa sản phẩm khỏi giỏ hàng
+    if (cartItem.quantity === 1) {
+      await cartItem.destroy();
+      return { message: "Sản phẩm đã được xóa khỏi giỏ hàng" };
+    }
+
+    // Giảm số lượng sản phẩm
+    cartItem.quantity -= 1;
+    await cartItem.save();
+
+    return { message: "Đã giảm 1 sản phẩm" };
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 module.exports = {
   addToCart,
   updateCartItem,
   removeFromCart,
-  getUserCart
+  getUserCart,
+  increaseQuantity,
+  decreaseQuantity
 };

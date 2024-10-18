@@ -1,9 +1,9 @@
-const { addToCart, updateCartItem, removeFromCart, getUserCart } = require("../services/cartService.js");
+const { addToCart, updateCartItem, removeFromCart, getUserCart, increaseQuantity, decreaseQuantity } = require("../services/cartService.js");
 
 // Controller thêm sản phẩm vào giỏ hàng
 const addToCartController = async (req, res) => {
   const { bookId, quantity } = req.body;
-  const userId = req.user.id; // Giả sử user đã được xác thực và lưu thông tin trong `req.user`
+  const userId = req.user.id; // Thêm điều kiện check login hay chưa?
   
   try {
     const result = await addToCart(userId, bookId, quantity);
@@ -58,9 +58,39 @@ const getUserCartController = async (req, res) => {
   }
 };
 
+// Controller tăng sản phẩm trong giỏ hàng
+const increaseQuantityController = async (req, res) => {
+  const { bookId} = req.body;
+  const userId = req.user.id; 
+  
+  try {
+    const result = await increaseQuantity(userId, bookId);
+    return res.status(200).json({ message: result.message });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
+// Controller giảm sản phẩm trong giỏ hàng
+const decreaseQuantityController = async (req, res) => {
+  const { bookId} = req.body;
+  const userId = req.user.id; 
+  
+  try {
+    const result = await decreaseQuantity(userId, bookId);
+    return res.status(200).json({ message: result.message });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
 module.exports = {
   addToCartController,
   updateCartItemController,
   removeFromCartController,
-  getUserCartController
+  getUserCartController,
+  increaseQuantityController,
+  decreaseQuantityController
 };
