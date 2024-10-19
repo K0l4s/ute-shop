@@ -16,11 +16,11 @@ interface VoucherModalProps {
   onRequestClose: () => void;
 }
 
-const vouchers = [
-  { id: 1, title: 'MÃ GIẢM GIÁ 30K - ĐƠN HÀNG TỪ 200K', desc: 'Áp dụng cho tất cả các loại sách...' },
-  { id: 2, title: 'MÃ FREESHIP 30K - ĐƠN HÀNG TỪ 200K', desc: 'Áp dụng cho tất cả các loại sách...' },
-  { id: 3, title: 'MÃ GIẢM GIÁ 50K - ĐƠN HÀNG TỪ 300K', desc: 'Áp dụng cho sách tiếng Anh...' },
-];
+// const vouchers = [
+//   { id: 1, title: 'MÃ GIẢM GIÁ 30K - ĐƠN HÀNG TỪ 200K', desc: 'Áp dụng cho tất cả các loại sách...' },
+//   { id: 2, title: 'MÃ FREESHIP 30K - ĐƠN HÀNG TỪ 200K', desc: 'Áp dụng cho tất cả các loại sách...' },
+//   { id: 3, title: 'MÃ GIẢM GIÁ 50K - ĐƠN HÀNG TỪ 300K', desc: 'Áp dụng cho sách tiếng Anh...' },
+// ];
 
 const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose }) => {
   const dispatch = useDispatch();
