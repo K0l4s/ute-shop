@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getOrderByUser } from '../../apis/order';
 import OrderDetailModal from '../../components/modals/OrderDetailModal';
-import { BsViewList } from 'react-icons/bs';
+// import { BsViewList } from 'react-icons/bs';
 import { TiEye } from 'react-icons/ti';
 import { RiDeleteBin3Fill } from 'react-icons/ri';
 

@@ -12,8 +12,8 @@ const Checkout: React.FC = () => {
   const dispatch = useDispatch();
   const [shippingFee, setShippingFee] = useState<number>(20000);
   const [estimatedDeliveryDate, setEstimatedDeliveryDate] = useState<string>("");
-  const [freeship, setFreeship] = useState<number>(0);
-  const [discount, setDiscount] = useState<number>(0);
+  const [freeship] = useState<number>(0);
+  const [discount] = useState<number>(0);
   const [paymentMethod, setPaymentMethod] = useState<string>("COD");
 
   // Lấy thông tin người dùng từ Redux store

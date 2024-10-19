@@ -1,29 +1,30 @@
-import React, { useState } from 'react';
-import logo from '../../assets/images/logo.png'
-import { TbLockAccess, TbLockAccessOff } from 'react-icons/tb'
+// import React, { useState } from 'react';
+// import logo from '../../assets/images/logo.png'
+// import { TbLockAccess, TbLockAccessOff } from 'react-icons/tb'
 // import { SiAwssecretsmanager } from "react-icons/si";
-import { BiSearch } from 'react-icons/bi';
-import { BsMenuButtonWideFill } from 'react-icons/bs';
+// import { BiSearch } from 'react-icons/bi';
+// import { BsMenuButtonWideFill } from 'react-icons/bs';
 import { FaRegUserCircle } from 'react-icons/fa';
-import { FiShoppingCart } from 'react-icons/fi';
-import { IoMdNotificationsOutline } from 'react-icons/io';
+// import { FiShoppingCart } from 'react-icons/fi';
+// import { IoMdNotificationsOutline } from 'react-icons/io';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/reducers/authSlice';
 import { useNavigate, Link } from 'react-router-dom';
 import Menu from '../menu/Menu';
+import { useState } from 'react';
 
 const AdminNavbar = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [activeCategory, setActiveCategory] = useState<string>('');
-    const [isVisible, setIsVisible] = useState<boolean>(false);
-    const [searchQuery, setSearchQuery] = useState<string>('');
-    const handleCategoryClick = (category: string) => {
-        setActiveCategory(category);
-        setIsVisible(!isVisible); // Toggle visibility when clicking on the category
-    };
+    const [activeCategory] = useState<string>('');
+    const [isVisible] = useState<boolean>(false);
+    // const [searchQuery, setSearchQuery] = useState<string>('');
+    // const handleCategoryClick = (category: string) => {
+    //     setActiveCategory(category);
+    //     setIsVisible(!isVisible); // Toggle visibility when clicking on the category
+    // };
     const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
     // const isAdmin = true;
 

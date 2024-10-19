@@ -18,7 +18,7 @@ import Checkout from '../pages/checkout/Checkout'
 import CustomerLayout from './layout/CustomerLayout'
 import AdminLayout from './layout/AdminLayout'
 import Dashboard from '../pages/admin/dashboard/Dashboard'
-import OrderDetailModal from '../components/modals/OrderDetailModal'
+// import OrderDetailModal from '../components/modals/OrderDetailModal'
 
 
 
@@ -46,7 +46,7 @@ const Router = () => {
           <Route path="/profile" element={<Cart />} />
           <Route path="/profile/edit" element={<Cart />} />
           <Route path="/orders" element={<Order />} />
-          <Route path="/orders/:id" element={<OrderDetailModal />} />
+          {/* <Route path="/orders/:id" element={<OrderDetailModal />} /> */}
           <Route path="/search/" element={<SearchResults />} />
           <Route path="/order/vnpay_return" element={<PaymentSuccess/>} />
         </Route>
