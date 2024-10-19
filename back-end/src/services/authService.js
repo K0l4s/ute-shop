@@ -30,6 +30,8 @@ const registerUser = async ({ firstname, lastname, address, birthday, phone, ema
       password: hashedPassword,
       is_active: false,
       code: verificationCode,
+      createAt: new Date(),
+      updateAt: new Date()
     });
 
     const emailSubject = "Email verification";

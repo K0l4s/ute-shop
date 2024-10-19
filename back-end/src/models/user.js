@@ -30,7 +30,12 @@ module.exports = (sequelize) => {
       type: DataTypes.ENUM(Role.CUSTOMER, Role.ADMIN),
       allowNull: false,
       defaultValue: Role.CUSTOMER
-    }
+    },
+    createAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      field: 'createAt' // Đảm bảo tên cột trong cơ sở dữ liệu là 'createAt'
+    },
   }, {
     sequelize,
     modelName: 'User',
