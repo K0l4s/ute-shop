@@ -44,12 +44,19 @@ const getDashboardInformation = async ({ startDay, endDay }) => {
             revenue: data ? data.dataValues.revenue : 0
         };
     });
+    // 5. Lấy số người dùng mới trong tháng bằng SELECT * FROM users ORDER BY createAt DESC LIMIT 20;
+    const newUsers = await User.findAll({
+        order: [['createAt', 'DESC']],
+        limit: 20,
+        attributes: ['id', 'firstname', 'lastname', 'createAt','avatar_url']
+    })
 
     return {
         totalUsers,
         totalOrders,
         totalBooks,
-        monthlyData
+        monthlyData,
+        newUsers
     };
 }
 

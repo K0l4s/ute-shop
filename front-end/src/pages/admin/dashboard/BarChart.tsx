@@ -29,6 +29,7 @@ interface BarChartProps {
 const BarChart: React.FC<BarChartProps> = ({ data, width, height }) => {
   const options = {
     responsive: true,
+    maintainAspectRatio: false, // Ensures the chart maintains its aspect ratio
     plugins: {
       legend: {
         position: 'bottom' as const,
@@ -41,7 +42,7 @@ const BarChart: React.FC<BarChartProps> = ({ data, width, height }) => {
   };
 
   return (
-    <div className="p-4 bg-white shadow-xl rounded-lg">
+    <div className="p-4 bg-white shadow-xl rounded-lg h-80"> {/* Use height to manage container size */}
       <Bar data={data} options={options} width={width} height={height} />
     </div>
   );
