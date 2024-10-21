@@ -32,6 +32,7 @@ const Login: React.FC<LoginProps> = () => {
         birthday: data.data.birthday,
         avatar_url: data.data.avatar_url,
       }));
+      console.log(data.data);
       navigate('/');
     } catch (err) {
       alert('Đăng nhập thất bại!');

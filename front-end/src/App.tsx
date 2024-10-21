@@ -33,6 +33,7 @@ function App() {
             gender: userData.data["gender"],
             birthday: userData.data["birthday"],
             avatar_url: userData.data["avatar_url"],
+            role: userData.data["role"],
           }));
 
         } else {

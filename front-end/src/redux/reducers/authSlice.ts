@@ -12,6 +12,7 @@ interface User {
   gender: boolean;
   birthday: Date;
   avatar_url: string;
+  role: string;
 }
 
 interface AuthState {
@@ -41,6 +42,7 @@ const authSlice = createSlice({
     setUser(state, action) {
       // state.user = action.payload;
       state.user = { ...state.user, ...action.payload };
+      console.log(state.user);
     },
   },
 });
