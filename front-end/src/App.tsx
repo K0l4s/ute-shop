@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import Footer from "./components/footer/Footer";
-import Navbar from "./components/navbar/Navbar";
+// import Footer from "./components/footer/Footer";
+// import Navbar from "./components/navbar/Navbar";
 import Router from "./router/Router";
 import { checkAuthStatus, setUser } from './redux/reducers/authSlice';
 import { useDispatch } from 'react-redux';
@@ -46,23 +46,9 @@ function App() {
 
     checkLoginStatus();
   }, [dispatch]);
-  const navbarHideList = [
-    '/login',
-    '/register',
-    '/forgot',
-    '/reset/password'
-  ]
-  const isHideNavbar = navbarHideList.includes(window.location.pathname)
   return (
     <>
-    {!isHideNavbar &&
-    <Navbar />}
-    {/* <div className="overflow-auto"> */}
-    <div>
     <Router />
-    </div>
-    {!isHideNavbar &&
-    <Footer/>}
     </>
   );
 }

@@ -59,6 +59,10 @@ module.exports = {
         allowNull: false,
         defaultValue: Role.CUSTOMER,
       },
+      createAt: {
+        allowNull: false,
+        type: Sequelize.DATE
+      }
     }, {
       timestamps: false,
     });

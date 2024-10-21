@@ -33,10 +33,10 @@ const Register: React.FC<RegisterProps> = () => {
           lastname,
           email,
           password,
+          repeat_psswd,
           phone,
           birthday,
           address,
-          repeat_psswd,
         }),
       });
 

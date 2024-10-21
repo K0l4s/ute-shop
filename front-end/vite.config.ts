@@ -6,7 +6,15 @@ import path from 'path'
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000
+    host: '0.0.0.0',  // listening all IP
+    port: 3000,
+    hmr: {
+      host: 'uteshop.local', // Virtual domain
+      protocol: 'ws',
+    },
+    watch: {
+      usePolling: true // Bật polling mode nếu hệ thống không theo dõi thay đổi file tốt
+    }
   },
   css: {
     devSourcemap: true

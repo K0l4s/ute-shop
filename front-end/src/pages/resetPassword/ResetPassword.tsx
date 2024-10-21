@@ -3,7 +3,7 @@ import { resetPasswordApis } from '../../apis/auth';
 import { useNavigate } from 'react-router-dom';
 
 const ResetPassword: React.FC = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [code, setCode] = useState(Array(6).fill(''));
@@ -14,21 +14,23 @@ const ResetPassword: React.FC = () => {
     setCode(updatedCode);
   };
 
-  const handleSubmit = async() => {
-    try{
-        const response = await resetPasswordApis(email, password, code.join(''));
-        console.log('Data:', response);
-        if(response.ok){
-          alert('Vertify complete!');
-          navigate("/login");
-        }
-        else{
-            const msg = await response.json();
-          alert('Error:' + msg.error);
-        }
-    }catch(err){
-        console.error('Có lỗi xảy ra: ', err);
-        }
+  const handleSubmit = async () => {
+    try {
+      console.log('Code:', code.join(''));
+      const response = await resetPasswordApis(email, password, code.join(''));
+      console.log('Data:', response);
+
+      if (response.ok) {
+        alert('Vertify complete!');
+        navigate("/login");
+      }
+      else {
+        const msg = await response.json();
+        alert('Error:' + msg.error);
+      }
+    } catch (err) {
+      console.error('Có lỗi xảy ra: ', err);
+    }
 
   };
 

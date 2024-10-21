@@ -30,6 +30,8 @@ const registerUser = async ({ firstname, lastname, address, birthday, phone, ema
       password: hashedPassword,
       is_active: false,
       code: verificationCode,
+      createAt: new Date(),
+      updateAt: new Date()
     });
 
     const emailSubject = "Email verification";
@@ -79,8 +81,9 @@ const loginUser = async ({ email, password, res }) => {
 
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 8 * 60 * 60 * 1000
+      secure: process.env.NODE_ENV === 'development',
+      maxAge: 8 * 60 * 60 * 1000,
+      sameSite: 'None' // allow cookies to enable cross-site usage (virtual domain)
     });
 
     const returnData = {
@@ -167,7 +170,7 @@ const resetPassword = async ({ email, code, password }) => {
     if (!user.is_active) {
       throw new Error("Active this account first");
     }
-    if (user.code !== code) {
+    if (user.code != code) {
       throw new Error("Invalid code");
     }
 

@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
   class User extends Model {
     static associate(models) {
       User.hasMany(models.Token, { foreignKey: 'userId', as: 'tokens' });
-      User.hasMany(models.Review, { foreignKey: 'userId', as: 'reviews' });
+      User.hasMany(models.Review, { foreignKey: 'user_id', as: 'reviews' });
       User.hasMany(models.Cart, { foreignKey: 'user_id', as: 'carts' });
       User.hasMany(models.Order, { foreignKey: 'user_id', as: 'orders' });
     }
@@ -30,7 +30,12 @@ module.exports = (sequelize) => {
       type: DataTypes.ENUM(Role.CUSTOMER, Role.ADMIN),
       allowNull: false,
       defaultValue: Role.CUSTOMER
-    }
+    },
+    createAt: {
+      type: DataTypes.DATE,
+      defaultValue: DataTypes.NOW,
+      field: 'createAt' // Đảm bảo tên cột trong cơ sở dữ liệu là 'createAt'
+    },
   }, {
     sequelize,
     modelName: 'User',
