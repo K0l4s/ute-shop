@@ -34,7 +34,7 @@ interface Book {
   salePrice?: number;
   year: string;
   stock: number;
-  sold: number;
+  sold_count: number;
   cover_img_url: string;
   Author: { name: string };
   Publisher: { name: string };
@@ -125,7 +125,8 @@ const ProductDetail: React.FC = () => {
       title: book.title,
       price: book.price,
       salePrice: book.salePrice,
-      image: book.Images[0].url,
+      // image: book.Images[0].url || "",
+      image: book.cover_img_url || "",
       stars: totalRating,
       age: "15",
       publisher: book.Publisher.name,
@@ -169,16 +170,16 @@ const ProductDetail: React.FC = () => {
               </div>
               <p>Nhà xuất bản: {book.Publisher.name}</p>
               <p>Năm xuất bản: {book.year || "----"}</p>
-              <p>Tình trạng: {book.stock > book.sold + 1 ? 'Còn hàng' : 'Hết hàng'}</p>
+              <p>Tình trạng: {book.stock > book.sold_count + 1 ? 'Còn hàng' : 'Hết hàng'}</p>
               <div className="flex items-center space-x-2">
                 <span className="text-yellow-500">★★★★☆</span>
                 {/* <span>({book.Reviews.length} reviews)</span> */}
                 {/* <IoCreateOutline className="text-2xl cursor-pointer hover:text-cyan-900"  /> */}
               </div>
-              {book.stock > book.sold + 1 ?
+              {book.stock > book.sold_count + 1 ?
                 <>
-                  <button className={`${book.stock > book.sold + 1 ? 'bg-red-200' : 'bg-gray-200'} text-white px-4 py-2 rounded-lg mr-5 `} disabled={book.stock > book.sold + 1}>Mua ngay</button>
-                  <button className={`${book.stock > book.sold + 1 ? 'bg-blue-200' : 'bg-gray-200'} text-black px-4 py-2 rounded-lg`} onClick={handleAddToCart}>Thêm vào giỏ hàng</button>
+                  <button className={`${book.stock > book.sold_count + 1 ? 'bg-green-500' : 'bg-gray-200'} text-black px-4 py-2 rounded-lg mr-5 `} >Mua ngay</button>
+                  <button className={`${book.stock > book.sold_count + 1 ? 'bg-blue-200' : 'bg-gray-200'} text-black px-4 py-2 rounded-lg`} onClick={handleAddToCart}>Thêm vào giỏ hàng</button>
                 </>
                 : <button className="bg-gray-300 text-black px-4 py-2 rounded-lg mr-5">Hết hàng</button>}
             </div>

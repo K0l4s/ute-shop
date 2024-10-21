@@ -1,5 +1,5 @@
 const { Model, DataTypes } = require('sequelize');
-
+const orderStatus = require('../enums/orderStatus');
 module.exports = (sequelize) => {
   class Order extends Model {
     static associate(models) {
@@ -73,7 +73,8 @@ module.exports = (sequelize) => {
       allowNull: false
     },
     status: {
-      type: DataTypes.ENUM('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'),
+      // type: DataTypes.ENUM('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'),
+      type: DataTypes.ENUM(orderStatus.PENDING,orderStatus.CONFIRMED, orderStatus.PROCESSING, orderStatus.SHIPPED, orderStatus.DELIVERED, orderStatus.CANCELLED,orderStatus.RETURNED),
       allowNull: false,
       defaultValue: 'PENDING'
     },

@@ -18,6 +18,7 @@ import CustomerLayout from './layout/CustomerLayout'
 import AdminLayout from './layout/AdminLayout'
 import Dashboard from '../pages/admin/dashboard/Dashboard'
 import AdminOrder from '../pages/admin/order/AdminOrder'
+import AdminAuthorPage from '../pages/admin/author/AdminAuthorPage'
 // import OrderDetailModal from '../components/modals/OrderDetailModal'
 
 
@@ -62,10 +63,10 @@ const Router = () => {
     
           <Route path="/admin/users" element={<Cart />} />
           <Route path="/admin/users/:id" element={<Cart />} />
-
+          <Route path="/admin/authors" element={<AdminAuthorPage />} />
           {/* Vouchers */}
           <Route path="/admin/vouchers" element={<Cart />} />
-
+ 
           <Route path="/admin/config" element={<Cart />} />
 
           {/* Cashier */}

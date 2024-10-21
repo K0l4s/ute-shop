@@ -76,7 +76,8 @@ const loginUser = async ({ email, password, res }) => {
       token,
       revoked: false,
       expired: false,
-      userId: user.id
+      userId: user.id,
+      role: user.role,
     });
 
     res.cookie('token', token, {
@@ -98,6 +99,7 @@ const loginUser = async ({ email, password, res }) => {
       avatar_url: user.avatar_url,
       phone: user.phone,
       email: user.email,
+      role: user.role
     };
     return { message: "Login successful", data: returnData };
   } catch (err) {

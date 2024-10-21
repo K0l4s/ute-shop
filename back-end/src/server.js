@@ -9,6 +9,7 @@ const publisherRoutes = require('./routes/publisherRoutes.js');
 const orderRoutes = require('./routes/orderRoutes.js');
 const paymentRoutes = require('./routes/paymentRoutes.js');
 const analystRoutes = require('./routes/analystRoutes.js');
+const authorRoutes = require('./routes/authorRoutes.js');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
@@ -19,7 +20,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 var corsOptions = {
-  origin: ["http://localhost:3000", "http://uteshop.local:3000"],
+  origin: ["http://localhost:3000", "http://uteshop.local:3000", "https://uteshop.vercel.app","http://192.168.1.7:3000"],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 200
@@ -37,6 +38,7 @@ app.use('/api/v1/publisher', publisherRoutes);
 app.use('/api/v1/order', orderRoutes);
 app.use('/api/v1/payment', paymentRoutes);
 app.use('/api/v1/analyst', analystRoutes);
+app.use('/api/v1/author', authorRoutes);
 
 app.get('/api/distance', async (req, res) => {
   const { origins, destinations } = req.query;

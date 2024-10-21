@@ -178,9 +178,20 @@ const getBookDetailById = async (id) => {
           as: 'Images', // Ensure this matches the association alias
           attributes: ['url']
         },
-        
         // Add any other includes as necessary
-      ]
+      ],
+      attributes: {
+        include: [
+            [
+                db.sequelize.literal(`(
+                    SELECT COUNT(*)
+                    FROM Books
+                    WHERE Books.author_id = Author.id
+                )`),
+                'sold_count'
+            ]
+        ]
+    }
     });
     const totalSold = await Detail_Order.sum('quantity', {
       where: {

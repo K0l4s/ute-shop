@@ -14,7 +14,7 @@ import { logout } from '../../redux/reducers/authSlice';
 import { useNavigate, Link } from 'react-router-dom';
 import Menu from '../menu/Menu';
 import { useState } from 'react';
-
+import Cookies from 'js-cookie';
 const AdminNavbar = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -38,6 +38,7 @@ const AdminNavbar = () => {
             if (response.ok) {
                 // Nếu logout thành công, cập nhật trạng thái trong Redux
                 dispatch(logout());
+                Cookies.remove('token');
                 alert('Đăng xuất thành công!');
                 // Có thể điều hướng về trang đăng nhập hoặc trang chủ
                 navigate('/login');

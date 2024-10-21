@@ -26,7 +26,7 @@ const createOrder = async (userId, orderData, transaction) => {
       }
 
       // Cập nhật stock
-      await book.update({ stock: book.stock - item.quantity });
+      // await book.update({ stock: book.stock - item.quantity });
 
       // Thêm chi tiết đơn hàng vào bảng Detail_Order
       await Detail_Order.create({

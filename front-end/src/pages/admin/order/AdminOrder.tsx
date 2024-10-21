@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { getAllOrder } from "../../../apis/order";
+import { PiFileCsvBold } from "react-icons/pi";
+import OrderConfigModal from "../../../components/modals/OrderConfigModal";
 // import jsPDF from "jspdf";
 // import html2canvas from "html2canvas";
 
@@ -46,6 +48,15 @@ interface Order {
 
 const AdminOrder = () => {
   const [orders, setOrders] = useState<Order[]>([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -143,12 +154,16 @@ const AdminOrder = () => {
   };
 
   return (
+    <>
     <div className="p-6 min-h-screen">
       <h1 className="text-3xl font-bold text-center mb-6">Order Management</h1>
       {/* action button */}
       <div className="flex justify-end mb-4 p-2">
         <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-3">
           Detail View
+        </button>
+        <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-3" onClick={openModal}>
+          Xử lý hàng loạt
         </button>
         {/* <button
           onClick={exportTableToPdf}
@@ -158,9 +173,9 @@ const AdminOrder = () => {
         </button> */}
         <button
           onClick={exportTableToCsv}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ease-in-out duration-300 hover:text-green-500" 
         >
-          Export to CSV
+          <PiFileCsvBold className=" ease-in-out"/>
         </button>
       </div>
       <div className="overflow-x-auto">
@@ -213,6 +228,8 @@ const AdminOrder = () => {
         </div>
       </div>
     </div>
+    {isModalOpen && <OrderConfigModal onClose={closeModal} />}
+    </>
   );
 };
 
