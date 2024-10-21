@@ -28,13 +28,12 @@ const LandingPage = () => {
   const getTop10Books = async () => {
     try {
       getTop10BooksAPI().
-      then((res) => 
-      {
-        setTop10Books(res.data);
-      }
-      );
+        then((res) => {
+          setTop10Books(res.data);
+        }
+        );
 
-      
+
     } catch (err) {
       console.error("Error fetching data: ", err);
     }
@@ -112,16 +111,40 @@ const LandingPage = () => {
                 top10Books.map((book, index) => (
                   <SwiperSlide key={index}>
                     <div key={book.id} className="min-w-40 bg-white p-4 shadow rounded-lg cursor-pointer"
-                     onClick={()=>navigate("/products/"+book.id)}>
-                      {/* <div className="bg-green-200 h-48 mb-4"></div> */}
+                      onClick={() => navigate("/products/" + book.id)}>
+                      {/* Hình ảnh của sách */}
                       <img src={book.cover_img_url} alt="" className="h-48 mb-4" />
+
+                      {/* Tên của sách */}
                       <h3 className="font-semibold">{book.title}</h3>
+
+                      {/* Giá bán */}
                       <div className="">
-                        <p className="text-xl text-red-500 font-semibold">{book.salePrice}</p>
-                        <p className="text-decoration-line: line-through text-gray-500">{book.price}</p>
+                        <p className="text-xl text-red-500 font-semibold">
+                          {book.salePrice ? `$${book.salePrice}` : ''}
+                        </p>
+                        <p className="line-through text-gray-500">
+                          {book.price ? `$${book.price}` : ''}
+                        </p>
                       </div>
+
+                      {/* Số lượng bán */}
                       <p>Tổng số lượt bán: {book.totalSell || 0}/{book.stock} cuốn</p>
+
+                      {/* Thanh progress */}
+                      <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                        <div
+                          className="bg-blue-600 h-2.5 rounded-full"
+                          style={{ width: `${Math.min((book.totalSell / book.stock) * 100, 100)}%` }}
+                        ></div>
+                      </div>
+
+                      {/* Hiển thị phần trăm */}
+                      <p className="text-sm text-gray-600 mt-1">
+                        Đã bán: {((book.totalSell / book.stock) * 100).toFixed(2)}%
+                      </p>
                     </div>
+
                   </SwiperSlide>
                 ))
 
