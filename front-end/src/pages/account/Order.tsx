@@ -161,6 +161,8 @@ const Orders = () => {
                     {order.status === 'PENDING' && new Date().getTime() - new Date(order.order_date).getTime() < 30 * 60 * 1000 && (
                       <button className="p-2 bg-red-500 text-white rounded-md"><RiDeleteBin3Fill /></button>
                     )}
+                    <button className="p-2 bg-green-500 text-white rounded-md mr-2">Đã nhận được hàng</button>
+                    <button className="p-2 bg-green-500 text-white rounded-md">Trả hàng</button>
                   </td>
                 </tr>
               ))}

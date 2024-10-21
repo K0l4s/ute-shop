@@ -117,8 +117,85 @@ const getOrdersByUserId = async (id) => {
     throw new Error(error.message);
   }
 }
+const getAllOrders = async () => {
+  try {
+    const orders = await Order.findAll({
+      include: [
+      {
+        model: Detail_Order,
+        as: 'orderDetails',
+        include: {
+          model: Book,
+          as: 'book'
+        },
+      }
+      ],
+      order: [['order_date', 'DESC']]
+    });
+    if(!orders) {
+      throw new Error('No orders found');
+    }
+    return orders;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+const shipOrder = async (orderId) => {
+  try {
+    const order = await Order.findByPk(orderId);
+    if (!order) {
+      throw new Error(`Order with ID ${orderId} not found`);
+    }
+    if(order.status == 'PENDING') {
+      throw new Error(`Order with ID ${orderId} has not been confirmed yet`);
+    }
+    if(order.status == 'SHIPPED') {
+      throw new Error(`Order with ID ${orderId} has been shipped`);
+    }
+    if(order.status == 'CANCELLED') {
+      throw new Error(`Order with ID ${orderId} has been cancelled`);
+    }
+    if (order.status !== 'PROCESSING') {
+      throw new Error(`Order with ID ${orderId} has been processed`);
+    }
+
+    await order.update({ status: 'SHIPPED' });
+
+    return order;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+const cancelOrder = async (orderId) => {
+  try {
+    const order = await Order.findByPk(orderId);
+    if (!order) {
+      throw new Error(`Order with ID ${orderId} not found`);
+    }
+    if(order.status == 'PENDING') {
+      throw new Error(`Order with ID ${orderId} has not been confirmed yet`);
+    }
+    if(order.status == 'CANCELLED') {
+      throw new Error(`Order with ID ${orderId} has been cancelled yet`);
+    }
+    if(order.status == 'SHIPPED') {
+      throw new Error(`Order with ID ${orderId} has been shipped`);
+    }
+    if (order.status !== 'PROCESSING') {
+      throw new Error(`Order with ID ${orderId} has been processed`);
+    }
+
+    await order.update({ status: 'CANCELLED' });
+
+    return order;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
 module.exports = {
   createOrder,
   getOrderById,
-  getOrdersByUserId
+  getOrdersByUserId,
+  getAllOrders,
+  shipOrder
 };
