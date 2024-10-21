@@ -26,7 +26,7 @@ const Navbar = () => {
   };
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   // const isAdmin = true;
-
+  const role = useSelector((state: RootState) => state.auth.user?.role || "customer");
   const handleLogout = async () => {
     try {
       const response = await fetch('http://localhost:8080/api/v1/auth/logout', {
@@ -125,6 +125,11 @@ const Navbar = () => {
                   <Link to="/account/favorites" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                     Sách yêu thích
                   </Link>
+                  {role === 'admin' && (
+                    <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                      Admin Management
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="block w-full text-left px-4 py-2 text-rose-600 font-bold hover:bg-gray-200 rounded-md"
