@@ -27,7 +27,12 @@ const login = async (req, res) => {
 
 // Đăng xuất
 const logout = (req, res) => {
-  res.clearCookie('token'); // Xóa cookie
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'development',
+    sameSite: 'None', // cross-site requests
+  });
+
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
