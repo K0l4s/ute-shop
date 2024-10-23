@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from '../../assets/images/logo.png'
 // import { TbLockAccess, TbLockAccessOff } from 'react-icons/tb'
 // import { SiAwssecretsmanager } from "react-icons/si";
@@ -15,6 +15,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import Menu from '../menu/Menu';
 import Notification from '../socket/Notification';
 import { AnimatePresence, motion } from 'framer-motion';
+import { getNotifications } from '../../apis/notification';
+import { NotificationMessage } from '../../models/type';
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -24,6 +26,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [openNoti, setOpenNoti] = useState(false);
   const [openAcc, setOpenAcc] = useState(false);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
 
   const handleCategoryClick = (category: string) => {
     setActiveCategory(category);
@@ -65,6 +68,22 @@ const Navbar = () => {
     }
   }
   
+  // Fetch notifications count on mount
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const data = await getNotifications();
+        // Count unread notifications
+        const unreadCount = data.filter((notification: NotificationMessage) => !notification.is_read).length;
+        setUnreadCount(unreadCount);
+      } catch (error) {
+        console.error("Failed to get notifications", error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
   return (
     // navbar using tailwindcss
     <>
@@ -109,6 +128,13 @@ const Navbar = () => {
                   className="relative group w-fit h-fit py-2 cursor-pointer"
                 >
                   <IoMdNotificationsOutline size={34} className='text-white group-hover:text-violet-700' />
+                  
+                  {/* Unread notification count */}
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-600 text-white rounded-full text-sm flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
                   <AnimatePresence>
                     {openNoti && (
                       <motion.div
@@ -119,7 +145,7 @@ const Navbar = () => {
                         transition={{ duration: 0.2, ease: "easeOut" }}
                         className="absolute right bg-white rounded-lg shadow-lg group-hover:block"
                       >
-                        <Notification />
+                        <Notification setUnreadCount={setUnreadCount}/>
                       </motion.div>
                     )}
                   </AnimatePresence>

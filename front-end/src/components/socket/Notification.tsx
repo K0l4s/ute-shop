@@ -1,20 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { getNotifications } from '../../apis/notification';
 import { FiPackage, FiTag } from 'react-icons/fi'; // Icons for order update and promotion
-import { format, formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
+import { format, toZonedTime } from 'date-fns-tz';
 import { Link } from 'react-router-dom';
+import { NotificationMessage } from '../../models/type';
 
-interface NotificationMessage {
-  id: number;
-  user_id: number;
-  order_id: number | null;
-  message: string;
-  is_read: boolean;
-  type: 'ORDER_UPDATE' | 'PROMOTION' | 'SYSTEM';
-  createdAt: string;
-}
-
-const Notification: React.FC = () => {
+const Notification: React.FC<{ setUnreadCount: (count: number) => void }> = ({ setUnreadCount }) => {
   const [notifications, setNotifications] = useState<NotificationMessage[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,6 +35,10 @@ const Notification: React.FC = () => {
       try {
         const data = await getNotifications();
         setNotifications(data);
+
+        // Count unread notifications
+        const unreadCount = data.filter((notification: NotificationMessage) => !notification.is_read).length;
+        setUnreadCount(unreadCount);
       } catch (error) {
         setError("Failed to get notifications");
       }
@@ -54,7 +50,9 @@ const Notification: React.FC = () => {
   useEffect(() => {
     // Connect to websocket server
     const socket = new WebSocket('ws://localhost:8080');
-
+    socket.onopen = () => {
+      console.log("WebSocket connected!");
+    }
     socket.onerror = (error) => {
       console.error('WebSocket error:', error);
     };
@@ -66,6 +64,10 @@ const Notification: React.FC = () => {
 
       // Cập nhật danh sách thông báo
       setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
+
+      // Update unread notification count
+      const unreadCount = [newNotification, ...notifications].filter(n => !n.is_read).length;
+      setUnreadCount(unreadCount);
     };
 
     // Đóng kết nối khi component unmount
@@ -75,19 +77,21 @@ const Notification: React.FC = () => {
   }, []);
 
   const formatNotificationTime = (createdAt: string) => {
-    const timeDifference = Date.now() - new Date(createdAt).getTime();
+    const timeZone = 'Asia/Bangkok';
+    const zonedDate = toZonedTime(createdAt, timeZone);
+    const timeDifference = Date.now() - zonedDate.getTime();
     const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // amount ms of 1 day
     let formattedTime = '';
 
     if (timeDifference > oneDayInMilliseconds) {
       // Format thành HH:mm ngày dd-MM-yyyy nếu lớn hơn 24 giờ
-      formattedTime = format(new Date(createdAt), 'HH:mm dd-MM-yyyy');
+      formattedTime = format(zonedDate, 'HH:mm dd-MM-yyyy', { timeZone: timeZone });
       const [time, date] = formattedTime.split(" ");
       return time + " ngày " + date;
     }
 
     // formatDistanceToNow cho các khoảng thời gian nhỏ hơn 24 giờ
-    formattedTime = formatDistanceToNow(new Date(createdAt), { addSuffix: true });
+    formattedTime = formatDistanceToNow(zonedDate, { addSuffix: true });
     Object.keys(translations).forEach(englishWord => {
       const vietnameseWord = translations[englishWord as keyof typeof translations];
       formattedTime = formattedTime.replace(new RegExp(`\\b${englishWord}\\b`, 'g'), vietnameseWord);
