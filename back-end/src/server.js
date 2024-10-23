@@ -1,4 +1,5 @@
 const express = require('express');
+const http = require('http');
 const axios = require('axios');
 const db = require('./models/index.js');
 const authRoutes = require('./routes/authRoutes.js');
@@ -11,17 +12,24 @@ const cartRoutes = require('./routes/cartRoutes.js');
 
 const paymentRoutes = require('./routes/paymentRoutes.js');
 const analystRoutes = require('./routes/analystRoutes.js');
+const authorRoutes = require('./routes/authorRoutes.js');
+const notificationRoutes = require('./routes/notificationRoutes.js');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const setupWebSocket = require('./config/websocketConfig.js');
 
 const port = process.env.PORT || 8080;
 
 const app = express();
+const server = http.createServer(app);
+
 app.use(express.json());
 app.use(cookieParser());
 
+const wss = setupWebSocket(server); 
+
 var corsOptions = {
-  origin: ["http://localhost:3000", "http://uteshop.local:3000"],
+  origin: ["http://localhost:3000", "http://uteshop.local:3000", "https://uteshop.vercel.app","http://192.168.1.7:3000"],
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 200
@@ -40,7 +48,8 @@ app.use('/api/v1/order', orderRoutes);
 app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/payment', paymentRoutes);
 app.use('/api/v1/analyst', analystRoutes);
-
+app.use('/api/v1/author', authorRoutes);
+app.use('/api/v1/notification', notificationRoutes);
 app.get('/api/distance', async (req, res) => {
   const { origins, destinations } = req.query;
 
@@ -61,7 +70,7 @@ app.get('/api/distance', async (req, res) => {
   }
 });
 
-app.listen(port, async () => {
+server.listen(port, async () => {
   console.log(`Server is running on http://localhost:${port}`);
   try {
     await db.sequelize.sync(); // Sync models with the database

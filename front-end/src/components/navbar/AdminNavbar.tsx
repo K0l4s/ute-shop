@@ -14,7 +14,6 @@ import { logout } from '../../redux/reducers/authSlice';
 import { useNavigate, Link } from 'react-router-dom';
 import Menu from '../menu/Menu';
 import { useState } from 'react';
-
 const AdminNavbar = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();

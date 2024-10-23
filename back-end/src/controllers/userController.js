@@ -20,6 +20,7 @@ const getUserProfile = async (req, res) => {
       phone: user.phone,
       email: user.email,
       birthday: user.birthday,
+      role: user.role
     }
   });
 };

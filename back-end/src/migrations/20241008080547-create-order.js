@@ -1,7 +1,9 @@
 'use strict';
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
+  
   async up(queryInterface, Sequelize) {
+    const orderStatus = (await import('../enums/orderStatus.js')).default;
     await queryInterface.createTable('Orders', {
       id: {
         allowNull: false,
@@ -59,9 +61,10 @@ module.exports = {
         allowNull: false
       },
       status: {
-        type: Sequelize.ENUM('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'),
+        // type: Sequelize.ENUM('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'),
+        type: Sequelize.ENUM(orderStatus.PENDING,orderStatus.CONFIRMED, orderStatus.PROCESSING, orderStatus.SHIPPED, orderStatus.DELIVERED, orderStatus.CANCELLED,orderStatus.RETURNED),
         allowNull: false,
-        defaultValue: 'PENDING'
+        defaultValue: orderStatus.PENDING
       },
       updatedAt: {
         allowNull: false,

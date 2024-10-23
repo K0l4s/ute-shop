@@ -18,7 +18,6 @@ const login = async (req, res) => {
 
   try {
     const response = await loginUser({ email, password, res });
-    console.log(response);
     res.status(201).json(response);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -27,7 +26,12 @@ const login = async (req, res) => {
 
 // Đăng xuất
 const logout = (req, res) => {
-  res.clearCookie('token'); // Xóa cookie
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'development',
+    sameSite: 'None', // cross-site requests
+  });
+
   res.status(200).json({ message: 'Logged out successfully' });
 };
 

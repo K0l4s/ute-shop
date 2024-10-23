@@ -2,7 +2,6 @@
 import { Route, Routes } from 'react-router-dom'
 import Cart from '../pages/cart/Cart'
 import Product from '../pages/products/Product'
-import Order from '../pages/order/Order'
 import ProductDetail from '../pages/productDetail/ProductDetail'
 import PaymentSuccess from '../pages/checkout/PaymentSuccess'
 import Login from '../pages/login/Login';
@@ -18,6 +17,8 @@ import Checkout from '../pages/checkout/Checkout'
 import CustomerLayout from './layout/CustomerLayout'
 import AdminLayout from './layout/AdminLayout'
 import Dashboard from '../pages/admin/dashboard/Dashboard'
+import AdminOrder from '../pages/admin/order/AdminOrder'
+import AdminAuthorPage from '../pages/admin/author/AdminAuthorPage'
 // import OrderDetailModal from '../components/modals/OrderDetailModal'
 
 
@@ -37,6 +38,7 @@ const Router = () => {
         <Route element={<CustomerLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/cart" element={<Cart />} />
+          <Route path="/notifications/view" />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/products" element={<Product />} />
           <Route path="/products/:id" element={<ProductDetail />} />
@@ -45,7 +47,7 @@ const Router = () => {
           <Route path="/account/orders" element={<AccountPage />} />
           <Route path="/profile" element={<Cart />} />
           <Route path="/profile/edit" element={<Cart />} />
-          <Route path="/orders" element={<Order />} />
+          {/* <Route path="/orders" element={<Order />} /> */}
           {/* <Route path="/orders/:id" element={<OrderDetailModal />} /> */}
           <Route path="/search/" element={<SearchResults />} />
           <Route path="/order/vnpay_return" element={<PaymentSuccess/>} />
@@ -57,15 +59,15 @@ const Router = () => {
           <Route path="/admin/categories/:id" element={<Cart />} />
           <Route path="/admin/products" element={<Cart />} />
           <Route path="/admin/products/:id" element={<Cart />} />
-          <Route path="/admin/orders" element={<Order />} />
-          <Route path="/admin/orders/:id" element={<Order />} />
-
+          <Route path="/admin/orders" element={<AdminOrder />} />
+          {/* <Route path="/admin/orders/:id" element={<Order />} /> */}
+    
           <Route path="/admin/users" element={<Cart />} />
           <Route path="/admin/users/:id" element={<Cart />} />
-
+          <Route path="/admin/authors" element={<AdminAuthorPage />} />
           {/* Vouchers */}
           <Route path="/admin/vouchers" element={<Cart />} />
-
+ 
           <Route path="/admin/config" element={<Cart />} />
 
           {/* Cashier */}
