@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from '../../assets/images/logo.png'
 // import { TbLockAccess, TbLockAccessOff } from 'react-icons/tb'
 // import { SiAwssecretsmanager } from "react-icons/si";
@@ -13,6 +13,10 @@ import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/reducers/authSlice';
 import { useNavigate, Link } from 'react-router-dom';
 import Menu from '../menu/Menu';
+import Notification from '../socket/Notification';
+import { AnimatePresence, motion } from 'framer-motion';
+import { getNotifications } from '../../apis/notification';
+import { NotificationMessage } from '../../models/type';
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -20,6 +24,10 @@ const Navbar = () => {
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [openNoti, setOpenNoti] = useState(false);
+  const [openAcc, setOpenAcc] = useState(false);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+
   const handleCategoryClick = (category: string) => {
     setActiveCategory(category);
     setIsVisible(!isVisible); // Toggle visibility when clicking on the category
@@ -60,6 +68,22 @@ const Navbar = () => {
     }
   }
   
+  // Fetch notifications count on mount
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const data = await getNotifications();
+        // Count unread notifications
+        const unreadCount = data.filter((notification: NotificationMessage) => !notification.is_read).length;
+        setUnreadCount(unreadCount);
+      } catch (error) {
+        console.error("Failed to get notifications", error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
   return (
     // navbar using tailwindcss
     <>
@@ -91,51 +115,97 @@ const Navbar = () => {
         <div>
           {isAuthenticated ? (
             <div>
-            <ul className="flex space-x-4">
+            <ul className="flex space-x-4 items-center">
               <li>
-                <Link to="/cart" className="text-white">
-                  <div className="py-2">
-                    <IoMdNotificationsOutline size={34}/>
-                  </div>
-                </Link>
+                {/* Notification Icon with Dropdown */}
+                <div
+                  onMouseEnter={() => {
+                    setOpenNoti(true);
+                  }}
+                  onMouseLeave={() => {
+                    setOpenNoti(false);
+                  }}
+                  className="relative group w-fit h-fit py-2 cursor-pointer"
+                >
+                  <IoMdNotificationsOutline size={34} className='text-white group-hover:text-violet-700' />
+                  
+                  {/* Unread notification count */}
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-600 text-white rounded-full text-sm flex items-center justify-center">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                  <AnimatePresence>
+                    {openNoti && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 8 }}
+                        exit={{ opacity: 0, y: 15 }}
+                        style={{ translateX: "-90%", willChange: 'transform, opacity', backfaceVisibility: 'hidden' }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute right bg-white rounded-lg shadow-lg group-hover:block"
+                      >
+                        <Notification setUnreadCount={setUnreadCount}/>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
               </li>
               <li>
                 <Link to="/cart" className="text-white">
                   <div className="py-2">
-                    <FiShoppingCart size={34}/>
+                    <FiShoppingCart size={34} className='hover:text-violet-700'/>
                   </div>
                 </Link>
               </li>
               {/* User icon with dropdown menu */}
               <li className="relative group">
-                <Link to="/account/profile">
-                  <div className="py-2">
-                    <FaRegUserCircle size={34} className="text-white cursor-pointer" />
-                  </div>
-                </Link>
-                
-                {/* Dropdown menu */}
-                <div className="absolute right-0 w-48 bg-white rounded-lg shadow-lg hidden group-hover:block">
-                  <Link to="/account/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-t-lg">
-                    Tài khoản của tôi
-                  </Link>
-                  <Link to="/account/orders" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                    Đơn hàng của tôi
-                  </Link>
-                  <Link to="/account/favorites" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                    Sách yêu thích
-                  </Link>
-                  {role === 'admin' && (
-                    <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
-                      Admin Management
-                    </Link>
-                  )}
-                  <button
-                    onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-rose-600 font-bold hover:bg-gray-200 rounded-md"
-                  >
-                    Đăng xuất
-                  </button>
+                <div
+                  onMouseEnter={() => {
+                    setOpenAcc(true);
+                  }}
+                  onMouseLeave={() => {
+                    setOpenAcc(false);
+                  }}
+                  className="relative group w-fit h-fit py-2 cursor-pointer"
+                >
+                  <FaRegUserCircle size={34} className='text-white group-hover:text-violet-700' />
+                  <AnimatePresence>
+                    {openAcc && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 8 }}
+                        exit={{ opacity: 0, y: 15 }}
+                        style={{ translateX: "-50%", willChange: 'transform, opacity', backfaceVisibility: 'hidden' }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute right-0 bg-white rounded-lg shadow-lg group-hover:block"
+                      >
+                        {/* Dropdown menu */}
+                        <div className="absolute right-0 w-48 bg-white rounded-lg shadow-lg group-hover:block">
+                          <Link to="/account/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-t-lg">
+                            Tài khoản của tôi
+                          </Link>
+                          <Link to="/account/orders" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                            Đơn hàng của tôi
+                          </Link>
+                          <Link to="/account/favorites" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                            Sách yêu thích
+                          </Link>
+                          {role === 'admin' && (
+                            <Link to="/admin" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                              Admin Management
+                            </Link>
+                          )}
+                          <button
+                            onClick={handleLogout}
+                            className="block w-full text-left px-4 py-2 text-rose-600 font-bold hover:bg-gray-200 rounded-md"
+                          >
+                            Đăng xuất
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </li>
             </ul>

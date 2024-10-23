@@ -18,7 +18,6 @@ const login = async (req, res) => {
 
   try {
     const response = await loginUser({ email, password, res });
-    console.log(response);
     res.status(201).json(response);
   } catch (err) {
     res.status(500).json({ error: err.message });
