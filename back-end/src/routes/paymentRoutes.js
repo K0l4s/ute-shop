@@ -10,6 +10,7 @@ const Payment = db.Payment;
 const Detail_Order = db.Detail_Order;
 const sequelize = db.sequelize;
 const Book = db.Book;
+const Notification = db.Notification;
 const querystring = require('qs');
 const crypto = require('crypto');
 
@@ -18,9 +19,10 @@ router.post('/create_payment_url', authenticateJWT, async function (req, res, ne
   const userId = req.user.id; // Lấy userId từ req.user sau khi authenticateJWT
   const orderData = req.body;
   const t = await sequelize.transaction();
+  const wss = req.wss;
   try {
     // Tạo đơn hàng trước khi gọi đến VNPAY
-    const { newOrder, newPayment } = await createOrder(userId, orderData, t);
+    const { newOrder, newPayment } = await createOrder(userId, orderData, t, wss);
 
     let vnpUrl = await generateVnpUrl(newOrder, req, res);
     await t.commit();
@@ -108,6 +110,18 @@ router.get('/vnpay_ipn', async function (req, res, next) {
                 // Thanh toán thành công, cập nhật trạng thái đơn hàng và thanh toán
                 await Order.update({ status: 'PROCESSING' }, { where: { id: orderId }, transaction: t});
                 await Payment.update({ status: 'COMPLETED', payment_date: new Date() }, { where: { order_id: orderId }, transaction: t});
+                // Tạo thông báo mới trong database
+                const newNotification = await Notification.create({
+                  user_id: userId,
+                  order_id: orderId,
+                  message: `Đơn hàng #${orderId} của bạn đã được thanh toán thành công và đang chờ xử lý.`,
+                  type: 'ORDER_UPDATE',
+                  createdAt: new Date(),
+                  is_read: false
+                });
+                
+                // Gửi thông báo qua WebSocket
+                sendNotificationToClient(req.wss, userId, newNotification.message);
                 await t.commit();
                 res.status(200).json({RspCode: '00', Message: 'Success'})
               }
@@ -123,7 +137,7 @@ router.get('/vnpay_ipn', async function (req, res, next) {
                 }
                 await Order.destroy({ where: { id: orderId }, transaction: t });
                 await Payment.destroy({ where: { order_id: orderId }, transaction: t });
-                
+                await Notification.destroy({ where: { order_id: orderId }});
                 await t.commit();
                 res.status(200).json({ RspCode: '24', Message: 'Payment cancelled or failed, rolled back order and payment' });
                 // res.status(200).json({RspCode: '00', Message: 'Success'})

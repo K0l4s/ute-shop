@@ -3,8 +3,23 @@ const Order = db.Order;
 const Detail_Order = db.Detail_Order;
 const Book = db.Book;
 const Payment = db.Payment;
+const Notification = db.Notification;
 
-const createOrder = async (userId, orderData, transaction) => {
+// Hàm WebSocket để gửi thông báo
+const sendNotificationToClient = (wss, userId, message) => {
+  if (!wss || !wss.clients) {
+    console.error('WebSocket server is not initialized');
+    return;
+  }
+
+  wss.clients.forEach(client => {
+    if (client.readyState === WebSocket.OPEN && client.userId === userId) {
+      client.send(JSON.stringify({ message }));
+    }
+  });
+};
+
+const createOrder = async (userId, orderData, transaction, wss) => {
   try {
     const { total_price, shipping_address, shipping_method, shipping_fee, payment_method, orderItems } = orderData;
 
@@ -51,6 +66,21 @@ const createOrder = async (userId, orderData, transaction) => {
       payment_method, // COD hoặc VNPAY
       status: 'PENDING'
     }, {transaction});
+
+    // Tạo một thông báo mới trong database
+  
+    if (payment_method === "COD") {
+      const newNotification = await Notification.create({
+        user_id: userId,
+        order_id: newOrder.id? newOrder.id : null,
+        message: `Đơn hàng #${newOrder.id} của bạn đã được đặt thành công và đang chờ xử lý.`,
+        type: 'ORDER_UPDATE',
+        createdAt: new Date(),
+        is_read: false
+      }, { transaction });
+      // Gửi thông báo qua WebSocket
+      sendNotificationToClient(wss, userId, newNotification.message);
+    }
 
     return { newOrder, newPayment };
   } catch (error) {
