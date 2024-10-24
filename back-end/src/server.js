@@ -46,7 +46,11 @@ app.use('/api/v1/review', reviewRoutes);
 app.use('/api/v1/publisher', publisherRoutes);
 app.use('/api/v1/order', orderRoutes);
 app.use('/api/v1/cart', cartRoutes);
-app.use('/api/v1/payment', paymentRoutes);
+// app.use('/api/v1/payment', paymentRoutes);
+app.use('/api/v1/payment', (req, res, next) => {
+  req.wss = wss;
+  next();
+}, paymentRoutes);
 app.use('/api/v1/analyst', analystRoutes);
 app.use('/api/v1/author', authorRoutes);
 app.use('/api/v1/notification', notificationRoutes);
