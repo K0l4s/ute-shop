@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CartItems from "../../components/cart/cartItems/CartItems"
 import DiscountCode from "../../components/voucher/DiscountCode";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { useDispatch } from "react-redux";
-import { removeItem, updateQuantity, toggleCheck, toggleSelectAll } from "../../redux/reducers/cartSlice";
+import { removeItem, updateQuantity, toggleCheck, toggleSelectAll, setItems } from "../../redux/reducers/cartSlice";
 import { Link } from "react-router-dom";
+import { getUserCart, removeFromCart, updateCartItem } from "../../apis/cart";
 
 const Cart: React.FC = () => {
   // Lấy item từ store
@@ -14,12 +15,43 @@ const Cart: React.FC = () => {
 
   const [selectAll, setSelectAll] = useState(true);
 
+  //Gọi API để lấy giỏ hàng khi component được mount
+  useEffect(() => {
+    const fetchCart = async () => {
+      try{
+        const response = await getUserCart();
+        const cartItems = response.data.map((item:any) => ({
+          id: item.book.id,
+          title: item.book.title,
+          price: parseFloat(item.book.price),
+          salePrice: item.book.salePrice ? parseFloat(item.book.salePrice) : undefined,
+          image: item.book.cover_img_url,
+          stars: item.book.stars || 0,
+          age: item.book.age || '',
+          publisher: item.book.publisher || '',
+          quantity: item.quantity,
+          checked: true,
+        }));
+        dispatch(setItems(cartItems));
+      } catch(error){
+        console.error("Failed to fetch cart:", error);
+      }
+    };
+
+    fetchCart();
+  }, [dispatch]);
+  
   // Hàm để cập nhật số lượng sách
-  const handleQuantityChange = (id: number, delta: number) => {
+  const handleQuantityChange = async (id: number, delta: number) => {
     const book = books.find((book) => book.id === id);
     if (book) {
       const newQuantity = Math.max(1, book.quantity + delta);
-      dispatch(updateQuantity({ id, quantity: newQuantity }));
+      try{
+        await updateCartItem(id, newQuantity); // Gọi API để cập nhật số lượng
+        dispatch(updateQuantity({ id, quantity: newQuantity }));
+      } catch(error){
+        console.error("Failed to update quantity:", error);
+      }
     }
   };
 
@@ -39,9 +71,14 @@ const Cart: React.FC = () => {
   };
 
   // Hàm xóa sách khỏi giỏ hàng
-  const handleRemoveBook = (id: number) => {
-    dispatch(removeItem(id));
-    alert('Xóa sách thành công');
+  const handleRemoveBook = async (id: number) => {
+    try{
+      await removeFromCart(id);
+      dispatch(removeItem(id));
+      alert('Xóa sách thành công');
+    } catch(error){
+      console.error("Failed to remove book from cart:", error);
+    }
   };
 
   // Tính tổng tiền dựa trên các sách đã checked
