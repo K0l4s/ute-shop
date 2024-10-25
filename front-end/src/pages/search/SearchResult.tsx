@@ -8,6 +8,7 @@ import { addItem } from '../../redux/reducers/cartSlice';
 import { useLocation } from 'react-router-dom';
 import { searchBooks } from '../../apis/book';
 import { getPublisher } from '../../apis/publisher';
+import { addToCart } from '../../apis/cart';
 
 type Publisher = {
   id: number;
@@ -105,21 +106,26 @@ const SearchResults: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const handleAddToCart = (book: Book) => {
-    const cartItem = {
-      id: book.id,
-      title: book.title,
-      price: book.price,
-      salePrice: book.salePrice,
-      image: book.cover_img_url,
-      stars: book.stars,
-      age: book.age,
-      publisher: book.publisher,
-      quantity: 1, // Mặc định thêm 1 sản phẩm vào giỏ
-      checked: true, // Mặc định là đã chọn sản phẩm
-    };
-    dispatch(addItem(cartItem));
-    alert(`Book ${book.id} added to cart`);
+  const handleAddToCart = async (book: Book) => {
+    try {
+      await addToCart(book.id, 1);
+      const cartItem = {
+          id: book.id,
+          title: book.title,
+          price: book.price,
+          salePrice: book.salePrice,
+          image: book.cover_img_url,
+          stars: book.stars,
+          age: book.age,
+          publisher: book.publisher,
+          quantity: 1, //Mặc định thêm 1 sản phẩm vào giỏ
+          checked: true, // Mặc định là đã chọn sản phẩm
+      };
+      dispatch(addItem(cartItem));
+      alert('Book ${book.title} added to cart');
+    } catch(error){
+        console.error('Failed to add book to cart:', error);
+    }  
   };
 
   const handleBuyNow = (id: number) => {
