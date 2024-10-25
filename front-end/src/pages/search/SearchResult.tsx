@@ -25,6 +25,7 @@ type Book = {
   cover_img_url: string;
   publisher: string;
   age: string;
+  stock: number;
 };
 
 const SearchResults: React.FC = () => {
@@ -119,6 +120,7 @@ const SearchResults: React.FC = () => {
           age: book.age,
           publisher: book.publisher,
           quantity: 1, //Mặc định thêm 1 sản phẩm vào giỏ
+          stock: book.stock,
           checked: true, // Mặc định là đã chọn sản phẩm
       };
       dispatch(addItem(cartItem));

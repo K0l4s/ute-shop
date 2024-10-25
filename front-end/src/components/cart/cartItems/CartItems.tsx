@@ -9,6 +9,7 @@ interface CartItemsProps {
     salePrice?: number;
     image: string;
     quantity: number;
+    stock: number;
     checked: boolean;
   }[];
   onQuantityChange: (id: number, delta: number) => void;
@@ -36,31 +37,39 @@ const CartItems: React.FC<CartItemsProps> = ({ books, onQuantityChange, onCheckb
             </div>
           </div>
           
-          <div className='flex justify-between w-1/3'>
-
-          <div className="flex items-center">
-            <button
-              className="border px-2 rounded"
-              onClick={() => onQuantityChange(book.id, -1)}
-            >
-              -
-            </button>
-            <span className="mx-2">{book.quantity}</span>
-            <button
-              className="border px-2 rounded"
-              onClick={() => onQuantityChange(book.id, 1)}
-            >
-              +
+          <div className='flex justify-between w-1/3 items-center'>
+            <div className="flex flex-col">
+              <div className="flex items-center">
+                <button
+                  className="border px-2 rounded"
+                  onClick={() => onQuantityChange(book.id, -1)}
+                  disabled={book.quantity <= 1}
+                >
+                  -
+                </button>
+                <span className="mx-2">{book.quantity}</span>
+                <button
+                  className="border px-2 rounded"
+                  onClick={() => onQuantityChange(book.id, 1)}
+                  disabled={book.quantity >= book.stock}
+                >
+                  +
+                </button>
+              
+              </div>
+              {book.quantity >= book.stock && (
+                <span className="text-sm text-red-500 mt-2">Số lượng tối đa</span>
+              )}
+            </div>
+            
+            <p className="font-semibold text-lg text-red-500">
+              {((book.salePrice || book.price) * book.quantity).toLocaleString()} đ
+            </p>
+            <button className="ml-4 text-violet-600 hover:text-violet-700" onClick={() => onRemoveBook(book.id)}>
+              <FaTrashAlt size={24} />
             </button>
           </div>
-          <p className="font-semibold text-lg text-red-500">
-            {((book.salePrice || book.price) * book.quantity).toLocaleString()} đ
-          </p>
-          <button className="ml-4 text-violet-600 hover:text-violet-700" onClick={() => onRemoveBook(book.id)}>
-            <FaTrashAlt size={24} />
-          </button>
-          </div>
-
+          
         </div>
       ))}
     </div>

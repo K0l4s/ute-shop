@@ -30,6 +30,7 @@ const Cart: React.FC = () => {
           age: item.book.age || '',
           publisher: item.book.publisher || '',
           quantity: item.quantity,
+          stock: item.book.stock,
           checked: true,
         }));
         dispatch(setItems(cartItems));
@@ -92,7 +93,6 @@ const Cart: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="flex max-w-7xl mx-auto">
-        
         {/* Cart Items Section */}
         <div className="w-2/3 p-4 bg-white mr-4 rounded shadow-lg">
           <h1 className="text-xl font-bold mb-4 text-violet-700">GIỎ HÀNG ({books.length} sản phẩm)</h1>
@@ -113,14 +113,23 @@ const Cart: React.FC = () => {
             </div>
           </div>
           
-          {/* Cart Items */}
-          <div className="border-t border-gray-200 mt-2">
-            <CartItems 
-              books={books} 
-              onQuantityChange={handleQuantityChange} 
-              onCheckboxChange={handleCheckboxChange}
-              onRemoveBook={handleRemoveBook} />
-          </div>
+          {books.length === 0 ? (
+            <div className="w-full flex justify-center items-center mt-2">
+              <img src="./suchEmpty.jpeg" alt="Empty Cart" className="w-full h-auto rounded" />
+            </div>
+          ) : (
+            <>
+            {/* Cart Items */}
+            <div className="border-t border-gray-200 mt-2">
+              <CartItems 
+                books={books} 
+                onQuantityChange={handleQuantityChange} 
+                onCheckboxChange={handleCheckboxChange}
+                onRemoveBook={handleRemoveBook} />
+            </div>
+            </>
+          )}
+          
         </div>
 
         <div className="w-1/3">
@@ -135,14 +144,15 @@ const Cart: React.FC = () => {
               <span className="font-bold text-red-500">{totalPrice.toLocaleString()} đ</span>
             </div>
             <Link to="/checkout">
-              <button className="w-full bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700">
+              <button 
+                className="w-full bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700"
+                disabled={books.length === 0}>
                 THANH TOÁN
               </button>
             </Link>
             <p className="text-sm text-red-500 mt-2">Giá tiền chưa tính phí vận chuyển</p>
           </div>
         </div>
-          
       </div>
     </div>
   );

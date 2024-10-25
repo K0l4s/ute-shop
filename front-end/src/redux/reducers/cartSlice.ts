@@ -8,6 +8,7 @@ interface CartItem {
   stars: number;
   image: string;
   quantity: number;
+  stock: number;
   age: string;
   publisher: string;
   checked: boolean;
