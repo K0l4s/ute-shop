@@ -41,6 +41,10 @@ module.exports = {
         allowNull: false,
         defaultValue: 'ORDER_UPDATE'
       },
+      url: {
+        type: Sequelize.STRING,
+        allowNull: true
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
