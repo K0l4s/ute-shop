@@ -82,6 +82,10 @@ const Cart: React.FC = () => {
       console.error("Failed to remove book from cart:", error);
     }
   };
+  
+  const handleDirectToProductPage = async (id: number) => {
+    window.location.href = `/products/${id}`;
+  };
 
   // Tính tổng tiền dựa trên các sách đã checked
   const totalPrice = books.reduce((total, book) => {
@@ -126,7 +130,8 @@ const Cart: React.FC = () => {
                 books={books} 
                 onQuantityChange={handleQuantityChange} 
                 onCheckboxChange={handleCheckboxChange}
-                onRemoveBook={handleRemoveBook} />
+                onRemoveBook={handleRemoveBook}
+                onDirectToProduct={handleDirectToProductPage} />
             </div>
             </>
           )}
