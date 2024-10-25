@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { removeItem, updateQuantity, toggleCheck, toggleSelectAll, setItems } from "../../redux/reducers/cartSlice";
 import { Link } from "react-router-dom";
 import { getUserCart, removeFromCart, updateCartItem } from "../../apis/cart";
+import { showToast } from "../../utils/toastUtils";
 
 const Cart: React.FC = () => {
   // Lấy item từ store
@@ -76,7 +77,7 @@ const Cart: React.FC = () => {
     try{
       await removeFromCart(id);
       dispatch(removeItem(id));
-      alert('Xóa sách thành công');
+      showToast("Đã xóa khỏi giỏ hàng", "success");
     } catch(error){
       console.error("Failed to remove book from cart:", error);
     }

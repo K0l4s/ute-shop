@@ -9,6 +9,7 @@ import { useLocation } from 'react-router-dom';
 import { searchBooks } from '../../apis/book';
 import { getPublisher } from '../../apis/publisher';
 import { addToCart } from '../../apis/cart';
+import { showToast } from '../../utils/toastUtils';
 
 type Publisher = {
   id: number;
@@ -124,9 +125,9 @@ const SearchResults: React.FC = () => {
           checked: true, // Mặc định là đã chọn sản phẩm
       };
       dispatch(addItem(cartItem));
-      alert('Book ${book.title} added to cart');
+      showToast('Đã thêm thành công', 'success');
     } catch(error){
-        console.error('Failed to add book to cart:', error);
+      showToast('Đã xảy ra lỗi', 'error');
     }  
   };
 

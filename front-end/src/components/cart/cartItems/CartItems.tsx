@@ -41,7 +41,7 @@ const CartItems: React.FC<CartItemsProps> = ({ books, onQuantityChange, onCheckb
             <div className="flex flex-col">
               <div className="flex items-center">
                 <button
-                  className="border px-2 rounded"
+                  className={`${book.quantity > 1 ? 'border-black' : ''}  border px-2 rounded`}
                   onClick={() => onQuantityChange(book.id, -1)}
                   disabled={book.quantity <= 1}
                 >
@@ -49,7 +49,7 @@ const CartItems: React.FC<CartItemsProps> = ({ books, onQuantityChange, onCheckb
                 </button>
                 <span className="mx-2">{book.quantity}</span>
                 <button
-                  className="border px-2 rounded"
+                  className={`${book.quantity < book.stock ? 'border-black ' : ''} border px-2 rounded`}
                   onClick={() => onQuantityChange(book.id, 1)}
                   disabled={book.quantity >= book.stock}
                 >
