@@ -10,16 +10,29 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       code: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
       name: {
         type: Sequelize.STRING
       },
-      value: {
-        type: Sequelize.DECIMAL
+      discount_val: {
+        type: Sequelize.DECIMAL,
+        allowNull: true
+      },
+      discount_perc: {
+        type: Sequelize.DECIMAL,
+        allowNull: true
+      },
+      min_order_val: {
+        type: Sequelize.DECIMAL,
+        allowNull: true
       },
       desc: {
         type: Sequelize.STRING
+      },
+      stock: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

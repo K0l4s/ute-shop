@@ -8,6 +8,9 @@ module.exports = (sequelize) => {
       User.hasMany(models.Review, { foreignKey: 'user_id', as: 'reviews' });
       User.hasMany(models.Cart, { foreignKey: 'user_id', as: 'carts' });
       User.hasMany(models.Order, { foreignKey: 'user_id', as: 'orders' });
+
+      User.belongsToMany(models.Discount, { through: 'UserDiscounts', as: 'discounts' });
+      User.belongsToMany(models.Freeship, { through: 'UserFreeships', as: 'freeships' });
     }
   }
 
