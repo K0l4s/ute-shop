@@ -130,7 +130,8 @@ const ProductDetail: React.FC = () => {
       stars: totalRating,
       age: "15",
       publisher: book.Publisher.name,
-      quantity: 1, // Mặc định thêm 1 sản phẩm vào giỏ
+      quantity: 1, // Mặc định thêm 1 sản phẩm vào giỏ,
+      stock: book.stock,
       checked: true, // Mặc định là đã chọn sản phẩm
     };
     dispatch(addItem(cartItem));

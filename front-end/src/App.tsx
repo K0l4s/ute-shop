@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 // import Footer from "./components/footer/Footer";
 // import Navbar from "./components/navbar/Navbar";
 import Router from "./router/Router";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { checkAuthStatus, setUser } from './redux/reducers/authSlice';
 import { useDispatch } from 'react-redux';
