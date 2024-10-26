@@ -81,6 +81,18 @@ const Account = () => {
 
     if (response) {
       dispatch(setUser({ ...updatedUser, avatar_url: response.data.avatar_url || updatedUser.avatarUrl }));
+      // Save updated user data to localStorage
+      const existingUserData = JSON.parse(localStorage.getItem('userData') || '{}');
+      localStorage.setItem('userData', JSON.stringify({
+        ...existingUserData,
+        firstname: updatedUser.firstname,
+        lastname: updatedUser.lastname,
+        phone: updatedUser.phone,
+        email: updatedUser.email,
+        gender: updatedUser.gender,
+        birthday: updatedUser.birthday,
+        avatar_url: response.data.avatar_url || updatedUser.avatarUrl
+      }));
     } else {
       alert('Error saving changes: ' + (response?.message || 'Unknown error'));
     }

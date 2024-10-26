@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import Router from "./router/Router";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { checkAuthStatus, setUser } from './redux/reducers/authSlice';
+import { checkAuthStatus, setAuthLoading, setUser } from './redux/reducers/authSlice';
 import { useDispatch } from 'react-redux';
 import { checkAuthStatusApi } from './apis/auth';
 import { getProfileApi } from './apis/user';
@@ -14,36 +14,53 @@ function App() {
 
   useEffect(() => {
     const checkLoginStatus = async () => {
+      dispatch(setAuthLoading(true));
       try {
         const data = await checkAuthStatusApi();
 
         if (data.authenticated) {
           dispatch(checkAuthStatus(true)); // Set the authentication status
-
-          // Fetch user details if authenticated
-          const userData = await getProfileApi();
-
-          dispatch(setUser({
-            firstname: userData.data["firstname"],
-            lastname: userData.data["lastname"],
-            phone: userData.data["phone"],
-            email: userData.data["email"],
-            province: userData.data["province"],
-            district: userData.data["district"],
-            ward: userData.data["ward"],
-            address: userData.data["address"],
-            gender: userData.data["gender"],
-            birthday: userData.data["birthday"],
-            avatar_url: userData.data["avatar_url"],
-            role: userData.data["role"],
-          }));
-
+          
+          const storedUserData = localStorage.getItem("userData");
+          if (storedUserData) {
+            // Load user data from localStorage
+            const userData = JSON.parse(storedUserData);
+            dispatch(setUser({
+              firstname: userData["firstname"],
+              lastname: userData["lastname"],
+              phone: userData["phone"],
+              email: userData["email"],
+              province: userData["province"],
+              district: userData["district"],
+              ward: userData["ward"],
+              address: userData["address"],
+              birthday: userData["birthday"],
+              avatar_url: userData["avatar_url"],
+            }))
+          } else {
+            const userData = await getProfileApi();
+            localStorage.setItem("userData", JSON.stringify(userData));
+            dispatch(setUser({
+              firstname: userData.data["firstname"],
+              lastname: userData.data["lastname"],
+              phone: userData.data["phone"],
+              email: userData.data["email"],
+              province: userData.data["province"],
+              district: userData.data["district"],
+              ward: userData.data["ward"],
+              address: userData.data["address"],
+              birthday: userData.data["birthday"],
+              avatar_url: userData.data["avatar_url"],
+            }));
+          }
         } else {
           dispatch(checkAuthStatus(false));
         }
       } catch (error) {
         console.error('Error checking login status:', error);
         dispatch(checkAuthStatus(false));
+      } finally {
+        dispatch(setAuthLoading(false));
       }
     };
 

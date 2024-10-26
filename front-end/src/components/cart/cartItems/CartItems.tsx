@@ -15,14 +15,15 @@ interface CartItemsProps {
   onQuantityChange: (id: number, delta: number) => void;
   onRemoveBook: (id: number) => void;
   onCheckboxChange: (id:number) => void;
+  onDirectToProduct: (id: number) => void;
 }
 
-const CartItems: React.FC<CartItemsProps> = ({ books, onQuantityChange, onCheckboxChange, onRemoveBook }) => {
+const CartItems: React.FC<CartItemsProps> = ({ books, onQuantityChange, onCheckboxChange, onRemoveBook, onDirectToProduct }) => {
   return (
     <div>
       {books.map((book) => (
         <div key={book.id} className="flex items-center justify-between py-4 border-b w-full">
-          <div className='flex w-2/3 items-center'>
+          <div className='flex w-2/3 items-center' onClick={() => onDirectToProduct(book.id)}>
             <input 
               type="checkbox" 
               className="mr-4 w-5 h-5" 
