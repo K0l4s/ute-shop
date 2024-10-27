@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import AdminNavbar from "../../components/navbar/AdminNavbar";
 import AdminLeftBar from "../../components/leftbar/AdminLeftBar";
 import { useSelector } from "react-redux";
@@ -6,16 +6,11 @@ import { RootState } from "../../redux/store";
 import { useEffect } from "react";
 
 const AdminLayout = () => {
-    const user = useSelector((state: RootState) => state.auth.user);
-    // console.log("role", useSelector((state: RootState) => state.auth || "customer"));
-    const navigate = useNavigate();
-    useEffect(() => {
-        console.log("role", user?.role);
-        if(user?.role != "admin") {
-            navigate("/");
-            alert("You are not authorized to access this page");
-        }
-    }, [user]);
+    const role = useSelector((state: RootState) => state.auth.user?.role || "customer");
+    if(role !== "admin") {
+        alert("You are not authorized to access this page");
+        return <h1>You dont have permission</h1>
+    }
     return (
         <div className="min-h-screen">
             <AdminNavbar />

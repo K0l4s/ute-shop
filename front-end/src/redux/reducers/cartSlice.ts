@@ -8,6 +8,7 @@ interface CartItem {
   stars: number;
   image: string;
   quantity: number;
+  stock: number;
   age: string;
   publisher: string;
   checked: boolean;
@@ -27,6 +28,9 @@ const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
+    setItems: (state, action: PayloadAction<CartItem[]>) => {
+      state.items = action.payload;
+    },
     addItem: (state, action: PayloadAction<CartItem>) => {
       const existingItem = state.items.find(item => item.id === action.payload.id);
       if (existingItem) {
@@ -64,6 +68,6 @@ const cartSlice = createSlice({
   },
 });
 
-export const { addItem, removeItem, updateQuantity, toggleCheck, toggleSelectAll, calculateTotal } = cartSlice.actions;
+export const { setItems, addItem, removeItem, updateQuantity, toggleCheck, toggleSelectAll, calculateTotal } = cartSlice.actions;
 
 export default cartSlice.reducer;

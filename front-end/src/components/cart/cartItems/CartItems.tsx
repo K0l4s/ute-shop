@@ -9,19 +9,21 @@ interface CartItemsProps {
     salePrice?: number;
     image: string;
     quantity: number;
+    stock: number;
     checked: boolean;
   }[];
   onQuantityChange: (id: number, delta: number) => void;
   onRemoveBook: (id: number) => void;
   onCheckboxChange: (id:number) => void;
+  onDirectToProduct: (id: number) => void;
 }
 
-const CartItems: React.FC<CartItemsProps> = ({ books, onQuantityChange, onCheckboxChange, onRemoveBook }) => {
+const CartItems: React.FC<CartItemsProps> = ({ books, onQuantityChange, onCheckboxChange, onRemoveBook, onDirectToProduct }) => {
   return (
     <div>
       {books.map((book) => (
         <div key={book.id} className="flex items-center justify-between py-4 border-b w-full">
-          <div className='flex w-2/3 items-center'>
+          <div className='flex w-2/3 items-center' onClick={() => onDirectToProduct(book.id)}>
             <input 
               type="checkbox" 
               className="mr-4 w-5 h-5" 
@@ -36,31 +38,39 @@ const CartItems: React.FC<CartItemsProps> = ({ books, onQuantityChange, onCheckb
             </div>
           </div>
           
-          <div className='flex justify-between w-1/3'>
-
-          <div className="flex items-center">
-            <button
-              className="border px-2 rounded"
-              onClick={() => onQuantityChange(book.id, -1)}
-            >
-              -
-            </button>
-            <span className="mx-2">{book.quantity}</span>
-            <button
-              className="border px-2 rounded"
-              onClick={() => onQuantityChange(book.id, 1)}
-            >
-              +
+          <div className='flex justify-between w-1/3 items-center'>
+            <div className="flex flex-col">
+              <div className="flex items-center">
+                <button
+                  className={`${book.quantity > 1 ? 'border-black' : ''}  border px-2 rounded`}
+                  onClick={() => onQuantityChange(book.id, -1)}
+                  disabled={book.quantity <= 1}
+                >
+                  -
+                </button>
+                <span className="mx-2">{book.quantity}</span>
+                <button
+                  className={`${book.quantity < book.stock ? 'border-black ' : ''} border px-2 rounded`}
+                  onClick={() => onQuantityChange(book.id, 1)}
+                  disabled={book.quantity >= book.stock}
+                >
+                  +
+                </button>
+              
+              </div>
+              {book.quantity >= book.stock && (
+                <span className="text-sm text-red-500 mt-2">Số lượng tối đa</span>
+              )}
+            </div>
+            
+            <p className="font-semibold text-lg text-red-500">
+              {((book.salePrice || book.price) * book.quantity).toLocaleString()} đ
+            </p>
+            <button className="ml-4 text-violet-600 hover:text-violet-700" onClick={() => onRemoveBook(book.id)}>
+              <FaTrashAlt size={24} />
             </button>
           </div>
-          <p className="font-semibold text-lg text-red-500">
-            {((book.salePrice || book.price) * book.quantity).toLocaleString()} đ
-          </p>
-          <button className="ml-4 text-violet-600 hover:text-violet-700" onClick={() => onRemoveBook(book.id)}>
-            <FaTrashAlt size={24} />
-          </button>
-          </div>
-
+          
         </div>
       ))}
     </div>
