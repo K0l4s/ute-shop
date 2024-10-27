@@ -118,7 +118,7 @@ const getUserCart = async (userId) => {
       include: {
         model: Book,
         as: 'book',
-        attributes: ['id', 'title', 'price', 'salePrice', 'cover_img_url'] 
+        attributes: ['id', 'title', 'price', 'salePrice', 'cover_img_url', 'stock'] 
       }
     });
 

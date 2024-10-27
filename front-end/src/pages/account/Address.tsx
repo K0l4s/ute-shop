@@ -96,7 +96,15 @@ const Address: React.FC = () => {
         ward: ward,
         address: specificAddress
       }));
-
+      
+      const existingUserData = JSON.parse(localStorage.getItem('userData') || '{}');
+      localStorage.setItem("userData", JSON.stringify({
+        ...existingUserData,
+        province: province,
+        district: district,
+        ward: ward,
+        address: specificAddress
+      }));
       alert("Địa chỉ đã được cập nhật thành công!");
     } catch (err) {
       console.error("Error updating location:", err);

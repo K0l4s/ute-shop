@@ -19,6 +19,7 @@ import AdminLayout from './layout/AdminLayout'
 import Dashboard from '../pages/admin/dashboard/Dashboard'
 import AdminOrder from '../pages/admin/order/AdminOrder'
 import AdminAuthorPage from '../pages/admin/author/AdminAuthorPage'
+import { RequireAuth } from './RequireAuth'
 // import OrderDetailModal from '../components/modals/OrderDetailModal'
 
 
@@ -37,20 +38,20 @@ const Router = () => {
         </Route>
         <Route element={<CustomerLayout />}>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/cart" element={<Cart />} />
+          <Route path="/cart" element={<RequireAuth><Cart /></RequireAuth>} />
           <Route path="/notifications/view" />
-          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout" element={<RequireAuth><Checkout /></RequireAuth>} />
           <Route path="/products" element={<Product />} />
           <Route path="/products/:id" element={<ProductDetail />} />
-          <Route path="/account/profile" element={<AccountPage />} />
-          <Route path="/account/address" element={<AccountPage />} />
-          <Route path="/account/orders" element={<AccountPage />} />
-          <Route path="/profile" element={<Cart />} />
-          <Route path="/profile/edit" element={<Cart />} />
+          <Route path="/account/profile" element={<RequireAuth><AccountPage /></RequireAuth>} />
+          <Route path="/account/address" element={<RequireAuth><AccountPage /></RequireAuth>} />
+          <Route path="/account/orders" element={<RequireAuth><AccountPage /></RequireAuth>} />
+          {/* <Route path="/profile" element={<Cart />} /> */}
+          {/* <Route path="/profile/edit" element={<Cart />} /> */}
           {/* <Route path="/orders" element={<Order />} /> */}
           {/* <Route path="/orders/:id" element={<OrderDetailModal />} /> */}
           <Route path="/search/" element={<SearchResults />} />
-          <Route path="/order/vnpay_return" element={<PaymentSuccess/>} />
+          <Route path="/order/vnpay_return" element={<RequireAuth><PaymentSuccess/></RequireAuth>} />
         </Route>
 
         <Route element={<AdminLayout />}>

@@ -45,6 +45,7 @@ const Navbar = () => {
       if (response.ok) {
         // Nếu logout thành công, cập nhật trạng thái trong Redux
         dispatch(logout());
+        localStorage.removeItem('userData');
         alert('Đăng xuất thành công!');
         // Có thể điều hướng về trang đăng nhập hoặc trang chủ
         navigate('/login'); 

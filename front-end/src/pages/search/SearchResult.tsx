@@ -8,6 +8,8 @@ import { addItem } from '../../redux/reducers/cartSlice';
 import { useLocation } from 'react-router-dom';
 import { searchBooks } from '../../apis/book';
 import { getPublisher } from '../../apis/publisher';
+import { addToCart } from '../../apis/cart';
+import { showToast } from '../../utils/toastUtils';
 
 type Publisher = {
   id: number;
@@ -24,6 +26,7 @@ type Book = {
   cover_img_url: string;
   publisher: string;
   age: string;
+  stock: number;
 };
 
 const SearchResults: React.FC = () => {
@@ -105,21 +108,27 @@ const SearchResults: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const handleAddToCart = (book: Book) => {
-    const cartItem = {
-      id: book.id,
-      title: book.title,
-      price: book.price,
-      salePrice: book.salePrice,
-      image: book.cover_img_url,
-      stars: book.stars,
-      age: book.age,
-      publisher: book.publisher,
-      quantity: 1, // Mặc định thêm 1 sản phẩm vào giỏ
-      checked: true, // Mặc định là đã chọn sản phẩm
-    };
-    dispatch(addItem(cartItem));
-    alert(`Book ${book.id} added to cart`);
+  const handleAddToCart = async (book: Book) => {
+    try {
+      await addToCart(book.id, 1);
+      const cartItem = {
+          id: book.id,
+          title: book.title,
+          price: book.price,
+          salePrice: book.salePrice,
+          image: book.cover_img_url,
+          stars: book.stars,
+          age: book.age,
+          publisher: book.publisher,
+          quantity: 1, //Mặc định thêm 1 sản phẩm vào giỏ
+          stock: book.stock,
+          checked: true, // Mặc định là đã chọn sản phẩm
+      };
+      dispatch(addItem(cartItem));
+      showToast('Đã thêm thành công', 'success');
+    } catch(error){
+      showToast('Đã xảy ra lỗi', 'error');
+    }  
   };
 
   const handleBuyNow = (id: number) => {
