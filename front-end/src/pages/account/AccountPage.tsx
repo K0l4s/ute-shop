@@ -5,9 +5,30 @@ import Orders from './Order';
 import FavoriteBooks from './FavoriteBooks';
 import PurchasedBooks from './PurchasedBooks';
 import { Link, useLocation } from 'react-router-dom';
-
+import OrderDetail from './OrderDetail';
+interface Order {
+  id: number;
+  order_date: string;
+  shipping_address: string;
+  shipping_method: 'STANDARD' | 'EXPRESS';
+  status: 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'RETURNED';
+  total_price: string;
+  updatedAt: string;
+  orderDetails: {
+    book: {
+      id: number;
+      title: string;
+      price: string;
+      category: string;
+      cover_img_url: string;
+    };
+    quantity: number;
+    price: string;
+  }[];
+}
 const AccountPage = () => {
   const location = useLocation();
+  
 
   // State to keep track of which section is selected
   const [selectedSection, setSelectedSection] = useState('account'); // Default section
