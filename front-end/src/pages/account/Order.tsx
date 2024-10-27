@@ -1,177 +1,132 @@
 import { useEffect, useState } from 'react';
 import { getOrderByUser } from '../../apis/order';
-import OrderDetailModal from '../../components/modals/OrderDetailModal';
-// import { BsViewList } from 'react-icons/bs';
-import { TiEye } from 'react-icons/ti';
-import { RiDeleteBin3Fill } from 'react-icons/ri';
+import { Order } from '../../models/OrderType';
+import OrderDetail from './OrderDetail';
 
-interface Order {
-  id: number;
-  order_date: string;
-  shipping_address: string;
-  shipping_method: string;
-  status: string;
-  total_price: string;
-  updatedAt: string;
-  user_id: number;
-  voucher_id: number;
-  discount_id: number;
-  orderDetails: {
-    book: {
-      id: number;
-      title: string;
-      price: string;
-    };
-    quantity: number;
-    price: string;
-  }[];
-  freeship_id: number;
-}
+
 
 const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [sortField, setSortField] = useState<string>(''); // Trường được chọn để sắp xếp
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // Thứ tự sắp xếp: asc hoặc desc
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [isOpenDetail, setIsOpenDetail] = useState(false);
-
+  const [filteredStatus, setFilteredStatus] = useState<'ALL' | 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'RETURNED'>('ALL');
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null); // To hold the order to show in modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
   useEffect(() => {
-    getOrderByUser().then((res) => {
-      console.log(res);
-      setOrders(res);
-    });
+    getOrderByUser().then((res) => setOrders(res));
   }, []);
 
-  const formatDateTime = (date: string) => {
-    const d = new Date(date);
-    return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()} ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+  const filterOrders = (status: typeof filteredStatus) => {
+    setFilteredStatus(status);
   };
 
-  const formatPrice = (price: string) => {
-    return price.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const filteredOrders = filteredStatus === 'ALL' ? orders : orders.filter(order => order.status === filteredStatus);
+
+  const handleCancelOrder = (orderId: number) => {
+    console.log(`Cancel order #${orderId}`);
+    // Code để hủy đơn hàng tại đây
   };
 
-  const formatDescription = (description: string) => {
-    return description.length > 10 ? description.slice(0, 10) + '...' : description;
+  const handleReorder = (orderId: number) => {
+    console.log(`Reorder #${orderId}`);
+    // Code để mua lại đơn hàng tại đây
   };
 
-  // Hàm sắp xếp dữ liệu dựa trên trường và thứ tự
-  const sortedOrders = [...orders].sort((a, b) => {
-    if (!sortField) return 0; // Nếu chưa chọn trường nào thì không sắp xếp
-    let fieldA = a[sortField as keyof Order];
-    let fieldB = b[sortField as keyof Order];
-
-    if (typeof fieldA === 'string') {
-      fieldA = fieldA.toLowerCase();
-      fieldB = fieldB.toString();
-    }
-
-    if (sortOrder === 'asc') {
-      return fieldA > fieldB ? 1 : -1;
-    } else {
-      return fieldA < fieldB ? 1 : -1;
-    }
-  });
-
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortOrder('asc');
-    }
+  const handleConfirmDelivery = (orderId: number) => {
+    console.log(`Confirm delivery of order #${orderId}`);
+    // Code để xác nhận nhận hàng tại đây
   };
 
-  const handleOpenDetail = (key: number) => {
-    const orderToShow = orders[key];
-    setSelectedOrder(orderToShow);
-    console.log("Selected Order:", orderToShow); // Kiểm tra giá trị của đơn hàng được chọn
-    setIsOpenDetail(true); // Mở modal
+  const isWithinCancelPeriod = (orderDate: string) => {
+    const orderTime = new Date(orderDate).getTime();
+    const now = Date.now();
+    const thirtyMinutes = 30 * 60 * 1000;
+    return now - orderTime <= thirtyMinutes;
+  };
+
+  const openModal = (order: Order) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setSelectedOrder(null);
+    setIsModalOpen(false);
   };
 
   return (
-    <>
-      <div>
-        <h2 className="text-2xl font-bold mb-4">Đơn hàng của tôi</h2>
-        {orders.length === 0 && <p>Không có đơn hàng nào.</p>}
-
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('id')}>
-                  ID {sortField === 'id' && (sortOrder === 'asc' ? '▲' : '▼')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('order_date')}>
-                  Order Time {sortField === 'order_date' && (sortOrder === 'asc' ? '▲' : '▼')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('total_price')}>
-                  Total Price {sortField === 'total_price' && (sortOrder === 'asc' ? '▲' : '▼')}
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider' onClick={() => handleSort('shipping_address')}>
-                  Address {sortField === 'shipping_address' && (sortOrder === 'asc' ? '▲' : '▼')}
-                </th>
-                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider' onClick={() => handleSort('shipping_method')}>
-                  Shipping Method {sortField === 'shipping_method' && (sortOrder === 'asc' ? '▲' : '▼')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer" onClick={() => handleSort('status')}>
-                  Status {sortField === 'status' && (sortOrder === 'asc' ? '▲' : '▼')}
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {sortedOrders.map((order: Order, index) => (
-                <tr key={order.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{order.id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDateTime(order.order_date)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatPrice(order.total_price)} vnđ</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDescription(order.shipping_address)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.shipping_method === 'STANDARD'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : order.shipping_method === 'EXPRESS'
-                          ? 'bg-blue-100 text-blue-800'
-                          : ''
-                        }`}
-                    >
-                      {order.shipping_method}
-                    </span>
-                  </td>
-
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${order.status === 'PENDING'
-                        ? 'bg-yellow-100 text-yellow-800'
-                        : order.status === 'SHIPPED'
-                          ? 'bg-blue-100 text-blue-800'
-                          : order.status === 'DELIVERED'
-                            ? 'bg-green-100 text-green-800'
-                            : order.status === 'CANCELLED'
-                              ? 'bg-red-100 text-red-800'
-                              : ''
-                        }`}
-                    >
-                      {order.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <button className="p-2 bg-blue-500 text-white rounded-md mr-2" onClick={() => handleOpenDetail(index)}><TiEye /></button>
-                    {order.status === 'PENDING' && new Date().getTime() - new Date(order.order_date).getTime() < 30 * 60 * 1000 && (
-                      <button className="p-2 bg-red-500 text-white rounded-md"><RiDeleteBin3Fill /></button>
-                    )}
-                    <button className="p-2 bg-green-500 text-white rounded-md mr-2">Đã nhận được hàng</button>
-                    <button className="p-2 bg-green-500 text-white rounded-md">Trả hàng</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h2 className="text-2xl font-bold mb-4">Đơn hàng của tôi</h2>
+      <div className="flex space-x-2 mb-4 overflow-x-auto">
+        <button onClick={() => filterOrders('ALL')} className={`px-4 py-2 ${filteredStatus === 'ALL' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Tất cả</button>
+        <button onClick={() => filterOrders('PENDING')} className={`px-4 py-2 ${filteredStatus === 'PENDING' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đang chờ</button>
+        <button onClick={() => filterOrders('CONFIRMED')} className={`px-4 py-2 ${filteredStatus === 'CONFIRMED' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đã xác nhận</button>
+        <button onClick={() => filterOrders('PROCESSING')} className={`px-4 py-2 ${filteredStatus === 'PROCESSING' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đang xử lý</button>
+        <button onClick={() => filterOrders('SHIPPED')} className={`px-4 py-2 ${filteredStatus === 'SHIPPED' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đang giao hàng</button>
+        <button onClick={() => filterOrders('DELIVERED')} className={`px-4 py-2 ${filteredStatus === 'DELIVERED' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đã hoàn thành</button>
+        <button onClick={() => filterOrders('CANCELLED')} className={`px-4 py-2 ${filteredStatus === 'CANCELLED' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đã hủy</button>
+        <button onClick={() => filterOrders('RETURNED')} className={`px-4 py-2 ${filteredStatus === 'RETURNED' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đã trả hàng</button>
       </div>
-      <OrderDetailModal isOpen={isOpenDetail} onRequestClose={() => setIsOpenDetail(false)} Order={selectedOrder} />
-    </>
+
+      {filteredOrders.length === 0 ? (
+        <p>Không có đơn hàng nào.</p>
+      ) : (
+        <div>
+          {filteredOrders.map(order => (
+            <div key={order.id} className="mb-6 p-4 bg-white border border-gray-200 rounded-lg">
+              <div className="flex justify-between items-center border-b pb-2 mb-4">
+                <h3 className="text-lg font-semibold">Đơn hàng #{order.id}</h3>
+                <span className={`text-sm font-medium ${order.status === 'SHIPPED' ? 'text-green-500' : 'text-gray-500'}`}>
+                  {order.status === 'SHIPPED' ? 'Đơn hàng đang giao' : order.status === 'DELIVERED' ? 'Đã hoàn thành' : ''}
+                </span>
+              </div>
+
+              {order.orderDetails.map(detail => (
+                <div key={detail.book.id} className="flex items-center mb-4">
+                  <img src={detail.book.cover_img_url} alt={detail.book.title} className="w-16 h-20 mr-4 object-cover rounded" />
+                  <div className="flex-1">
+                    <h4 className="text-base font-semibold">{detail.book.title}</h4>
+                    <p className="text-sm text-gray-600">Phân loại: {detail.book.category}</p>
+                    <p className="text-sm text-gray-600">Số lượng: {detail.quantity}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-lg font-semibold text-red-500">{detail.price} đ</p>
+                    <p className="text-sm line-through text-gray-400">{detail.book.price} đ</p>
+                  </div>
+                </div>
+              ))}
+
+              <div className="flex justify-between items-center border-t pt-2 mt-4">
+                <div className='flex flex-col'>
+                  <span className="text-lg font-semibold">Thành tiền: {order.total_price} đ</span>
+                  <span className="text-sm text-gray-500">Ngày đặt: {new Date(order.order_date).toLocaleString()}</span>
+                </div>
+                <div className="flex p-5 space-x-3">
+                  <button onClick={() => openModal(order)} className="bg-green-500 text-white px-4 py-2 rounded">Detail</button>
+                  {order.status === 'PENDING'
+                    &&
+                    isWithinCancelPeriod(order.order_date) &&
+                    (
+                      <button onClick={() => handleCancelOrder(order.id)} className="bg-red-500 text-white px-4 py-2 rounded">Hủy đơn</button>
+                    )}
+                  {(order.status === 'CONFIRMED' || order.status === 'PROCESSING' || order.status === 'CANCELLED' || order.status === 'RETURNED') && (
+                    <button onClick={() => handleReorder(order.id)} className="bg-blue-500 text-white px-4 py-2 rounded">Mua lại</button>
+                  )}
+                  {order.status === 'SHIPPED' && (
+                    <button onClick={() => handleConfirmDelivery(order.id)} className="bg-green-500 text-white px-4 py-2 rounded">Nhận được hàng</button>
+                  )}
+                </div>
+
+              </div>
+            </div>
+          ))}
+        </div>
+
+      )}
+      {/* Modal for Order Details */}
+      {isModalOpen && selectedOrder && (
+        <OrderDetail order={selectedOrder} onClose={closeModal} isOpen={isModalOpen}/>
+
+      )}
+    </div>
   );
 };
 
