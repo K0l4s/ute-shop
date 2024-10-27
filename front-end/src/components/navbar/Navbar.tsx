@@ -34,7 +34,7 @@ const Navbar = () => {
   };
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   // const isAdmin = true;
-  const role = useSelector((state: RootState) => state.auth.user?.role || "customer");
+  const user = useSelector((state: RootState) => state.auth.user);
   const handleLogout = async () => {
     try {
       const response = await fetch('http://localhost:8080/api/v1/auth/logout', {
