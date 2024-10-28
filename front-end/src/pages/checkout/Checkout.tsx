@@ -89,10 +89,10 @@ const Checkout: React.FC = () => {
   };
 
   // thay đổi shipping method
-  const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newShippingMethod = e.target.value;
-    encryptCartData(paymentMethod, newShippingMethod);
-  };
+  // const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const newShippingMethod = e.target.value;
+  //   encryptCartData(paymentMethod, newShippingMethod);
+  // };
 
   const calculateShippingFeeExpectedTime = (distance: number, duration: number) => {
     const baseFee = 20000; // Base fee
