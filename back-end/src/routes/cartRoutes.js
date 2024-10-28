@@ -1,5 +1,5 @@
 const express = require("express");
-const { addToCartController, updateCartItemController, removeFromCartController, getUserCartController, increaseQuantityController, decreaseQuantityController } = require("../controllers/cartController");
+const { addToCartController, updateCartItemController, removeFromCartController, getUserCartController, increaseQuantityController, decreaseQuantityController, validateCartController, toggleCheckedController, toggleCheckAllController } = require("../controllers/cartController");
 const { authenticateJWT } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
@@ -22,4 +22,9 @@ router.post('/inc', authenticateJWT, increaseQuantityController);
 // Giamr sản phẩm trong giỏ hàng
 router.post('/dec', authenticateJWT, decreaseQuantityController);
 
+router.post('/toggle', authenticateJWT, toggleCheckedController);
+
+router.post('/toggle/all', authenticateJWT, toggleCheckAllController);
+
+router.post('/validate', authenticateJWT, validateCartController);
 module.exports = router;   

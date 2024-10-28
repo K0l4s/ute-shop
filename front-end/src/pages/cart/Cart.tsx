@@ -5,16 +5,16 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { useDispatch } from "react-redux";
 import { removeItem, updateQuantity, toggleCheck, toggleSelectAll, setItems } from "../../redux/reducers/cartSlice";
-import { Link } from "react-router-dom";
-import { getUserCart, removeFromCart, updateCartItem } from "../../apis/cart";
+import { useNavigate } from "react-router-dom";
+import { encodeCartData, getUserCart, removeFromCart, toggleCheckAllStatus, toggleCheckStatus, updateCartItem } from "../../apis/cart";
 import { showToast } from "../../utils/toastUtils";
 
 const Cart: React.FC = () => {
   // Lấy item từ store
   const books = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch();
-
-  const [selectAll, setSelectAll] = useState(true);
+  const navigate = useNavigate();
+  const [selectAll, setSelectAll] = useState(false);
 
   //Gọi API để lấy giỏ hàng khi component được mount
   useEffect(() => {
@@ -32,9 +32,12 @@ const Cart: React.FC = () => {
           publisher: item.book.publisher || '',
           quantity: item.quantity,
           stock: item.book.stock,
-          checked: true,
+          checked: item.checked,
         }));
         dispatch(setItems(cartItems));
+
+        const allChecked = cartItems.every((item: any) => item.checked);
+        setSelectAll(allChecked);
       } catch(error){
         console.error("Failed to fetch cart:", error);
       }
@@ -58,18 +61,23 @@ const Cart: React.FC = () => {
   };
 
   // Cập nhật trạng thái checked của từng sách
-  const handleCheckboxChange = (id: number) => {
+  const handleCheckboxChange = async (id: number) => {
     dispatch(toggleCheck(id));
+    await toggleCheckStatus(id);
+    
+    const allChecked = books.every((book) => book.checked || book.id === id );
+    setSelectAll(allChecked);
     if (selectAll) {
       setSelectAll(false);
     }
   };
 
   // Cập nhật trạng thái chọn tất cả
-  const handleSelectAll = () => {
+  const handleSelectAll = async () => {
     const newSelectAll = !selectAll;
     setSelectAll(newSelectAll);
     dispatch(toggleSelectAll(newSelectAll));
+    await toggleCheckAllStatus();
   };
 
   // Hàm xóa sách khỏi giỏ hàng
@@ -95,6 +103,29 @@ const Cart: React.FC = () => {
     return total;
   }, 0);
 
+  // Kiểm tra xem có sách nào được check không
+  const isAnyBookChecked = books.some((book) => book.checked);
+  
+  const handleCheckout = async () => {
+    if (!isAnyBookChecked) {
+      showToast("Không có sản phẩm nào được chọn để thanh toán", "error");
+      return;
+    }
+    
+    const selectedItems = books.filter(book => book.checked);
+    const shipping_method = "STANDARD";
+    const payment_method = "COD";
+    const totalAmount = totalPrice;
+
+    try {
+      const response = await encodeCartData({ selectedItems, shipping_method, payment_method, totalAmount});
+      const encodedData = response.data.encryptedData;
+      navigate(`/checkout?data=${encodeURIComponent(encodedData)}`);
+    } catch (error) {
+      console.error("Failed to encode cart data:", error);
+    }
+
+  };
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       <div className="flex max-w-7xl mx-auto">
@@ -149,13 +180,12 @@ const Cart: React.FC = () => {
               <span className="font-semibold">Tổng số tiền</span>
               <span className="font-bold text-red-500">{totalPrice.toLocaleString()} đ</span>
             </div>
-            <Link to="/checkout">
-              <button 
-                className="w-full bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700"
-                disabled={books.length === 0}>
-                THANH TOÁN
-              </button>
-            </Link>
+            <button 
+              className="w-full bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700"
+              onClick={handleCheckout}
+              disabled={!isAnyBookChecked}>
+              THANH TOÁN
+            </button>
             <p className="text-sm text-red-500 mt-2">Giá tiền chưa tính phí vận chuyển</p>
           </div>
         </div>

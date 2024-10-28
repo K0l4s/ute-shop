@@ -88,3 +88,49 @@ export const decreaseQuantity = async (bookId: number) => {
     throw error;
   }
 };
+
+export const toggleCheckStatus = async (bookId: number) => {
+  try {
+    const response = await axios.post(BASE_URL + "/cart/toggle", {
+      bookId
+    }, {
+      withCredentials: true
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error toggling check:", error);
+    throw error;
+  }
+};
+
+export const toggleCheckAllStatus = async () => {
+  try {
+    const response = await axios.post(BASE_URL + "/cart/toggle/all", {}, {
+      withCredentials: true
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error toggling check:", error);
+    throw error;
+  }
+};
+
+export const validateCart = async (cartItems: any) => {
+  try {
+    const response = await axios.post(BASE_URL + "/cart/validate", {cartItems}, {
+      withCredentials: true
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error validating cart:", error);
+    throw error;
+  }
+}
+
+export const encodeCartData = (data: any) => {
+  return axios.post(BASE_URL + '/checkout/encode-cart', data, {withCredentials: true});
+};
+
+export const decodeCartData = (encodedData: any) => {
+  return axios.get(BASE_URL + `/checkout/decode-cart?data=${encodedData}`, {withCredentials: true});
+};

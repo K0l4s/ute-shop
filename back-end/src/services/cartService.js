@@ -1,7 +1,7 @@
 const db = require("../models");
 const Cart = db.Cart;
 const Book = db.Book;
-const { Op } = require("sequelize");
+const { Op, where } = require("sequelize");
 
 // Hàm thêm sản phẩm vào giỏ hàng
 const addToCart = async (userId, bookId, quantity) => {
@@ -125,7 +125,8 @@ const getUserCart = async (userId) => {
     // Định dạng lại dữ liệu giỏ hàng trước khi trả về
     const formattedCartItems = cartItems.map((item) => ({
       book: item.book,
-      quantity: item.quantity
+      quantity: item.quantity,
+      checked: item.checked
     }));
 
     return formattedCartItems;
@@ -201,6 +202,100 @@ const decreaseQuantity = async (userId, bookId) => {
   }
 };
 
+const toggleChecked = async (userId, bookId) => {
+  try {
+    const cartItem = await Cart.findOne({
+      where: {
+        user_id: userId,
+        book_id: bookId
+      }
+    });
+
+    if (!cartItem) {
+      throw new Error("Sản phẩm không tồn tại trong giỏ hàng");
+    }
+
+    cartItem.checked = !cartItem.checked;
+    await cartItem.save();
+
+    return { message: "Trạng thái sản phẩm đã được cập nhật" };
+  } catch (error) {
+    throw error;
+  }
+};
+
+const toggleCheckAll = async (userId) => {
+  try {
+    const cartItems = await Cart.findAll({
+      where: {
+        user_id: userId
+      }
+    });
+
+    // Check if all items are checked
+    const allChecked = cartItems.every(item => item.checked);
+
+    cartItems.forEach(async (item) => {
+      item.checked = !allChecked;
+      await item.save();
+    });
+
+    return { message: "Trạng thái sản phẩm đã được cập nhật" };
+  } catch (error) {
+    throw error;
+  }
+};
+
+const validateCart = async (userId, cartItems) => {
+  try {
+    // Lay items cua cart trong db
+    const dbCartItems = await Cart.findAll({
+      where: {
+        user_id: userId
+      },
+      include: {
+        model: Book,
+        as: 'book'
+      }
+    });
+
+    const errors = [];
+
+    // Kiem tra xem cartItems co match voi items trong db ?
+    cartItems.forEach(item => {
+      const dbCartItem = dbCartItems.find(dbItem => dbItem.bookId === item.bookId);
+
+      if (!dbCartItem) {
+        errors.push(`Sản phẩm ${item.bookId} không tồn tại trong giỏ hàng`);
+      } else if (dbCartItem.quantity !== item.quantity) {
+        errors.push(`Số lượng sản phẩm ${dbCartItem.book.title} không hợp lệ. 
+          Số lượng trong giỏ hàng là ${dbCartItem.quantity}`);
+      } else if (dbCartItem.book.stock < item.quantity) {
+        errors.push(`Số lượng sản phẩm ${dbCartItem.book.title} không hợp lệ. 
+          Chỉ còn ${dbCartItem.book.stock} sản phẩm trong kho`);
+      }
+    })
+
+    if (errors.length > 0) {
+      return { valid: false, errors };
+    }
+
+    dbCartItems.forEach(dbItem => {
+      const cartItem = cartItems.find(item => item.book_id === dbItem.bookId);
+      if (!cartItem) {
+        errors.push(`Sản phẩm ${dbItem.book.title} không có trong giỏ hàng được cung cấp`);
+      }
+    });
+
+    if (errors.length > 0) {
+      return { valid: false, errors };
+    }
+    
+    return { valid: true };
+  } catch (error) {
+    throw error;
+  }
+};
 
 module.exports = {
   addToCart,
@@ -208,5 +303,8 @@ module.exports = {
   removeFromCart,
   getUserCart,
   increaseQuantity,
-  decreaseQuantity
+  decreaseQuantity,
+  toggleChecked,
+  toggleCheckAll,
+  validateCart
 };
