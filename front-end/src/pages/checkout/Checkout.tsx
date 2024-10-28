@@ -1,21 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { calculateTotal } from '../../redux/reducers/cartSlice';
 import DiscountCode from '../../components/voucher/DiscountCode';
 import { IoWarning } from 'react-icons/io5';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getDistance } from '../../apis/maps';
 import { checkOutByVNPay, placeOrder } from '../../apis/order';
+import { decodeCartData, encodeCartData } from '../../apis/cart';
+import { showToast } from '../../utils/toastUtils';
 
 const Checkout: React.FC = () => {
-  const dispatch = useDispatch();
+  interface Product {
+    id: number;
+    quantity: number;
+    salePrice?: number;
+    price: number;
+    image: string;
+    title: string;
+    publisher: string;
+  }
+  const navigate = useNavigate();
+  const [productsToCheckout, setProductsToCheckout] = useState<Product[]>([]);
   const [shippingFee, setShippingFee] = useState<number>(20000);
   const [estimatedDeliveryDate, setEstimatedDeliveryDate] = useState<string>("");
   const [freeship] = useState<number>(0);
   const [discount] = useState<number>(0);
-  const [paymentMethod, setPaymentMethod] = useState<string>("COD");
-
+  const [shipping_method, setShippingMethod] = useState<string>("STANDARD");
+  const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [lastEncodedData, setLastEncodedData] = useState<string | null>(null);
   // Lấy thông tin người dùng từ Redux store
   const user = useSelector((state: RootState) => state.auth.user);
 
@@ -25,14 +38,60 @@ const Checkout: React.FC = () => {
   
   // Lấy các sản phẩm đã chọn từ cartSlice
   const cartItems = useSelector((state: RootState) => state.cart.items);
-  const total = useSelector((state: RootState) => state.cart.total);
 
-  // Lọc các sản phẩm đã được checked
-  const productsToCheckout = cartItems.filter((item) => item.checked);
+  useEffect(() => {
+    const fetchDecodedData = async () => {
+      const queryParams = new URLSearchParams(location.search);
+      const dataFromUrl = queryParams.get("data");
+      if (dataFromUrl && dataFromUrl !== lastEncodedData) {
+        try {
+          const response = await decodeCartData(dataFromUrl);
+          const { decodedData } = response.data;
+          setProductsToCheckout(decodedData.selectedItems || []);
+          setShippingMethod(decodedData.shipping_method || "STANDARD");
+          setPaymentMethod(decodedData.payment_method || "COD");
+          setTotalAmount(decodedData.totalAmount || 0);
+          setLastEncodedData(dataFromUrl);
+        } catch (error) {
+          console.error("Failed to decode cart data:", error);
+        }
+      }
+    };
+  
+    fetchDecodedData();
+  }, [location.search, lastEncodedData]);
+
+  const encryptCartData = async (newPaymentMethod: string, newShippingMethod: string) => {
+    const cartData = {
+      selectedItems: productsToCheckout,
+      shipping_method: newShippingMethod,
+      payment_method: newPaymentMethod,
+      totalAmount
+    };
+
+    try {
+      const response = await encodeCartData(cartData);
+      const encodedData = response.data.encryptedData;
+      setPaymentMethod(newPaymentMethod);
+      setShippingMethod(newShippingMethod);
+      setLastEncodedData(encodedData);
+      const newUrl = `${window.location.pathname}?data=${encodeURIComponent(encodedData)}`;
+      window.history.replaceState(null, '', newUrl);
+    } catch (error) {
+      console.error("Failed to encode cart data:", error);
+    }
+  };
 
   // thay đổi payment method
   const handlePaymentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPaymentMethod(e.target.value);
+    const newPaymentMethod = e.target.value;
+    encryptCartData(newPaymentMethod, shipping_method);
+  };
+
+  // thay đổi shipping method
+  const handleShippingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newShippingMethod = e.target.value;
+    encryptCartData(paymentMethod, newShippingMethod);
   };
 
   const calculateShippingFeeExpectedTime = (distance: number, duration: number) => {
@@ -93,8 +152,10 @@ const Checkout: React.FC = () => {
 
   // Tính toán lại tổng tiền khi các sản phẩm thay đổi
   useEffect(() => {
-    dispatch(calculateTotal());
-  }, [cartItems, dispatch]);
+    const newTotal = cartItems.reduce((acc, item) => 
+      acc + (item.salePrice || item.price) * item.quantity, 0);
+    setTotalAmount(newTotal);
+  }, [cartItems]);
   
   const handlePlaceOrder = async () => {
     const orderItems = productsToCheckout.map(item => ({
@@ -104,7 +165,7 @@ const Checkout: React.FC = () => {
     }));
     
     const orderData = {
-      total_price: total + shippingFee - freeship - discount,
+      total_price: totalAmount + shippingFee - freeship - discount,
       shipping_address,
       shipping_method: "STANDARD",
       shipping_fee: shippingFee,
@@ -114,8 +175,10 @@ const Checkout: React.FC = () => {
 
     try {
       if (paymentMethod === "COD") {
-        const result = await placeOrder(orderData);
-        console.log('Order placed successfully:', result);
+        await placeOrder(orderData);
+        showToast("Đơn hàng đã được đặt thành công!", "success");
+        navigate("/account/orders");
+        window.scrollTo(0, 0);
       }
       else if (paymentMethod === "VNPAY") {
         const res = await checkOutByVNPay(orderData);
@@ -238,7 +301,7 @@ const Checkout: React.FC = () => {
         <div className="space-y-2">
           <div className="flex justify-between">
             <span>Tổng tiền:</span>
-            <span>{total.toLocaleString()} đ</span>
+            <span>{totalAmount.toLocaleString()} đ</span>
           </div>
           <div className="flex justify-between">
             <span>Phí vận chuyển:</span>
@@ -254,7 +317,7 @@ const Checkout: React.FC = () => {
           </div>
           <div className="flex justify-between font-bold">
             <span>Thành tiền:</span>
-            <span>{(total + shippingFee - freeship - discount).toLocaleString()} đ</span>
+            <span>{(totalAmount + shippingFee - freeship - discount).toLocaleString()} đ</span>
           </div>
         </div>
       </div>

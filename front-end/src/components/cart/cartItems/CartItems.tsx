@@ -23,18 +23,20 @@ const CartItems: React.FC<CartItemsProps> = ({ books, onQuantityChange, onCheckb
     <div>
       {books.map((book) => (
         <div key={book.id} className="flex items-center justify-between py-4 border-b w-full">
-          <div className='flex w-2/3 items-center' onClick={() => onDirectToProduct(book.id)}>
+          <div className='flex w-2/3 items-center'>
             <input 
               type="checkbox" 
               className="mr-4 w-5 h-5" 
               checked={book.checked}
               onChange={() => onCheckboxChange(book.id)} />
-            <img src={book.image} alt={book.title} className="w-16 h-20" />
-            <div className="flex-1 px-4">
-              <p className="font-semibold line-clamp-3">{book.title}</p>
-              <p className="text-base">{book.salePrice? <span className='line-through text-gray-500'>{book.price.toLocaleString()} đ</span> 
-                : <span className='text-red-500 font-semibold'>{book.price.toLocaleString()} đ</span>}</p>
-              {book.salePrice && <p className="text-base font-semibold text-red-500">{book.salePrice ? book.salePrice.toLocaleString() : book.price.toLocaleString()} đ</p> }
+            <div className="flex" onClick={() => onDirectToProduct(book.id)}>
+              <img src={book.image} alt={book.title} className="w-16 h-20" />
+              <div className="flex-1 px-4">
+                <p className="font-semibold line-clamp-3">{book.title}</p>
+                <p className="text-base">{book.salePrice? <span className='line-through text-gray-500'>{book.price.toLocaleString()} đ</span> 
+                  : <span className='text-red-500 font-semibold'>{book.price.toLocaleString()} đ</span>}</p>
+                {book.salePrice && <p className="text-base font-semibold text-red-500">{book.salePrice ? book.salePrice.toLocaleString() : book.price.toLocaleString()} đ</p> }
+              </div>
             </div>
           </div>
           

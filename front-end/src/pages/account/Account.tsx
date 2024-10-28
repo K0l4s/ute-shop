@@ -13,6 +13,8 @@ const Account = () => {
   
   // Get user data from Redux
   const user = useSelector((state: RootState) => state.auth.user);
+  const localStorageUser = JSON.parse(localStorage.getItem('userData') || '{}');
+
   // Form state for user data
   const [firstname, setFirstname] = useState(user?.firstname || '');
   const [lastname, setLastname] = useState(user?.lastname || '');
@@ -34,11 +36,10 @@ const Account = () => {
       setLastname(user.lastname || '');
       setPhone(user.phone || '');
       setEmail(user.email || '');
-      setGender(user.gender === true ? 'male' : 'female');
+      setGender(localStorageUser.gender === true ? 'male' : 'female');
       setBirthday(user.birthday ? new Date(user.birthday).toISOString().split('T')[0] : '');
       setAvatarUrl(user.avatar_url);
-    }
-  }, [user]);
+    }  }, [user]);
 
   // Clean up avatar URL when component unmounts
   useEffect(() => {
