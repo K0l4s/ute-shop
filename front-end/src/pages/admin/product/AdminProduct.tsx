@@ -126,7 +126,7 @@ const AdminProduct = () => {
     };
 
     return (
-        <div className="p-8">
+        <div className="p-8 text-white">
             <h1 className="text-2xl font-semibold mb-4">Product Management</h1>
 
             {/* Filter Inputs */}
@@ -136,24 +136,32 @@ const AdminProduct = () => {
                     type="text"
                     name="title"
                     placeholder="Filter by Title"
-                    className="border px-4 py-2 rounded w-10/12"
+                    className="border px-4 py-2 rounded-full w-10/12 bg-gradient-to-r from-violet-800 to-blue-900 border-none
+                    focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:ring-opacity-50"
+
                     onChange={handleFilterChange}
                 />
-                <select name="price" onChange={handleFilterChange} className="border px-4 py-2 rounded">
-                    <option value="">All Prices</option>
-                    <option value="< 50.000">Less than 50,000</option>
-                    <option value="50.000 - 100.000">50,000 - 100,000</option>
-                    <option value="> 100.000">Greater than 100,000</option>
+                <select
+                    name="price"
+                    onChange={handleFilterChange}
+                    className="focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:ring-opacity-50 border px-4 py-2 rounded text-black bg-gradient-to-r from-violet-800 to-blue-900 text-white rounded-full border-none"
+                >
+                    <option value="" className="text-black">All Prices</option>
+                    <option value="< 50.000" className="text-black">Less than 50,000</option>
+                    <option value="50.000 - 100.000" className="text-black">50,000 - 100,000</option>
+                    <option value="> 100.000" className="text-black">Greater than 100,000</option>
                 </select>
+
             </div>
             <h2 className="text-lg font-semibold mb-2">Actions</h2>
-            <div>
-                <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5"><FaPlus className="mr-2" /> Add New Book</button>
+            <div className="flex flex-cols gap-3">
+                <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5"><FaPlus className="mr-2" />Thêm sách</button>
+                <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5"><FaPlus className="mr-2" />Nhập hàng</button>
             </div>
             {/* Table */}
-            <div className="overflow-x-auto">
-                <table className="min-w-full text-left text-sm text-gray-700">
-                    <thead className="bg-gray-100">
+            <div className="overflow-x-auto rounded-xl">
+                <table className="min-w-full text-left text-sm text-gray-700 bg-gradient-to-r from-violet-800 to-blue-900 rounded-xl text-white">
+                    <thead className="bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-t-lg text-black">
                         <tr>
                             <th className="px-5 py-4 cursor-pointer" onClick={() => handleSort('ISBN')}>
                                 ISBN {sortField === 'ISBN' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
@@ -187,20 +195,20 @@ const AdminProduct = () => {
                     <tbody>
                         {/* add new book components */}
                         {books.map((book) => (
-                            <tr key={book.id} className="border-b hover:bg-gray-50">
-                                <td className="px-5 py-4 text-gray-700">#{book.ISBN}</td>
+                            <tr key={book.id} className="border-b hover:bg-gray-100 hover:text-black hover:opacity-80 cursor-pointer">
+                                <td className="px-5 py-4 ">#{book.ISBN}</td>
                                 <td className="px-5 py-4">
-                                    <img src={book.cover_img_url} alt={book.title} className="h-12 object-fit object-cover" />
+                                    <img src={book.cover_img_url} alt={book.title} className="h-12 object-fit object-cover rounded-lg shadow-5xl" />
                                 </td>
-                                <td className="px-5 py-4 text-gray-700">{book.title}</td>
-                                <td className="px-5 py-4 text-gray-700">{book.Author.name}</td>
-                                <td className="px-5 py-4 text-gray-700">{book.Publisher.name}</td>
-                                <td className="px-5 py-4 text-gray-700">{formatMoney(Number(book.price))}</td>
-                                <td className="px-5 py-4 text-gray-700">{formatMoney(Number(book.salePrice))}</td>
-                                <td className="px-5 py-4 text-gray-700">{book.total_sold}</td>
-                                <td className="px-5 py-4 text-gray-700">{book.stock}</td>
-                                <td className="px-5 py-4 text-gray-700">{book.total_sold < book.stock ?
-                                    <p className="bg-green-200 rounded-xl p-1">Available</p>
+                                <td className="px-5 py-4 ">{book.title}</td>
+                                <td className="px-5 py-4 ">{book.Author.name}</td>
+                                <td className="px-5 py-4 ">{book.Publisher.name}</td>
+                                <td className="px-5 py-4 ">{formatMoney(Number(book.price))}</td>
+                                <td className="px-5 py-4 ">{formatMoney(Number(book.salePrice))}</td>
+                                <td className="px-5 py-4">{book.total_sold}</td>
+                                <td className="px-5 py-4 ">{book.stock}</td>
+                                <td className="px-5 py-4 ">{book.total_sold < book.stock ?
+                                    <p className="bg-green-200 rounded-xl p-1 text-black">Available</p>
                                     :
                                     <p className="bg-red-200 rounded-xl p-1">Sold out</p>}</td>
                                 <td className="px-5 py-4 flex items-center space-x-2">

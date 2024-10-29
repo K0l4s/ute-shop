@@ -17,7 +17,7 @@ const AdminAccess = ({ children }: { children: JSX.Element }) => {
 const AdminLayout = () => {
     return (
         <AdminAccess>
-            <div className="min-h-screen">
+            <div className="min-h-screen bg-gray-900">
                 <AdminNavbar />
                 <div className="grid grid-cols-7 lg:grid-cols-12">
                     <div className="col-span-1 lg:col-span-2">

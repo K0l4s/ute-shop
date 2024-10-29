@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTachometerAlt, FaUser, FaBoxOpen, FaShoppingCart, FaTags } from 'react-icons/fa';
+import { FaTachometerAlt, FaUser, FaBoxOpen, FaShoppingCart, FaTags, FaBookOpen } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import MenuGroup from './MenuGroup';
 
@@ -13,6 +13,7 @@ interface Submenu {
 const AdminLeftBar: React.FC = () => {
     // Define the structure of the submenus
     const productSubmenus: Submenu[] = [
+        { title: 'Books', link: '/admin/products', icon: FaBookOpen },
         { title: 'Author', link: '/admin/authors', icon: FaBoxOpen },
         { title: 'Category', link: '/admin/categories', icon: FaBoxOpen },
         { title: 'Brand', link: '/admin/brands', icon: FaBoxOpen },
@@ -24,7 +25,7 @@ const AdminLeftBar: React.FC = () => {
     ];
 
     return (
-        <div className="bg-gray-900 min-h-screen fixed lg:w-64 w-16 md:w-48 transition-all duration-300">
+        <div className="bg-gradient-to-b from-violet-900 to-blue-900 min-h-screen fixed lg:w-64 w-16 md:w-48 transition-all duration-300">
             <div className="flex flex-col items-center justify-center h-full">
                 <div className="flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4 mt-4">
                     <img src="https://via.placeholder.com/150" alt="Admin" className="w-full h-full rounded-full" />
@@ -39,7 +40,7 @@ const AdminLeftBar: React.FC = () => {
                     </Link>
 
                     {/* Menu Groups */}
-                    <MenuGroup title="Product" icon={FaBoxOpen} submenus={productSubmenus} />
+                    <MenuGroup title="Quản lý sản phẩm" icon={FaBoxOpen} submenus={productSubmenus} />
                     <MenuGroup title="User" icon={FaUser} submenus={userSubmenus} />
 
                     <Link to={"/admin/orders"} className="flex items-center hover:text-gray-500 cursor-pointer duration-300 ease-in-out p-2">
