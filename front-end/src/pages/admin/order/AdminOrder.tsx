@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getAllOrder } from "../../../apis/order";
 import { PiFileCsvBold } from "react-icons/pi";
-import OrderConfigModal from "../../../components/modals/OrderConfigModal";
+// import OrderConfigModal from "../../../components/modals/OrderConfigModal";
 import { BsSearch } from "react-icons/bs";
 import { BiSelectMultiple } from "react-icons/bi";
 
@@ -57,7 +57,7 @@ interface Order {
 
 const AdminOrder = () => {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10; // Orders per page
   const [filteredOrders, setFilteredOrders] = useState<Order[]>(orders);
@@ -68,13 +68,6 @@ const AdminOrder = () => {
   const [sortField, setSortField] = useState<keyof Order>("id");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -236,10 +229,10 @@ const AdminOrder = () => {
         </div>
         <h2 className="text-xl font-semibold text-white mb-2">Thao tác</h2>
         <div className="flex p-2 gap-3">
-        <button onClick={openModal} className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-2">
+        <button  className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-2">
             <BiSelectMultiple className="mr-2" /> Cập nhật trạng thái
           </button>
-          <button onClick={openModal} className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-2">
+          <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-2">
             <BiSelectMultiple className="mr-2" /> Xử lý hàng loạt
           </button>
           <button
