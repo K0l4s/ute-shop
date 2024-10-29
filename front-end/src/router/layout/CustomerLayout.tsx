@@ -4,9 +4,11 @@ import Footer from "../../components/footer/Footer"
 
 const CustomerLayout = () => {
     return (
-        <>
+        <><div className="bg-gray-900">
             <Navbar />
+
             <Outlet />
+        </div>
             <Footer />
         </>
     )
