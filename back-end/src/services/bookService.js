@@ -10,6 +10,7 @@ const Image = db.Image;
 const Review = db.Review;
 const sequelize = db.sequelize;
 const { Op } = require("sequelize");
+
 const getTop10BooksByOrderQuantity = async () => {
   try {
     const topBooksQuery = `
@@ -234,11 +235,34 @@ const getBookDetailById = async (id) => {
     throw error;
   }
 };
-const createNewBook = async (newBook) => {
+const createNewBook = async ({ISBN,
+  title,
+  desc,
+  price,
+  salePrice,
+  year,
+  age,
+  stock,cover_img_url}) => {
   try {
-    // Create a new book
-    const book = await Book.create(newBook);
-    return book;
+    // Check if required fields are provided
+    // if (!ISBN || !title || !price || !salePrice || !year || !age || !stock) {
+    //   throw new Error("ISBN, title, price, salePrice, year, age, stock are required");
+    // }
+    // Create new book
+    console.log(ISBN);
+    const book = {
+      ISBN,
+      title,
+      desc,
+      price,
+      salePrice,
+      year,
+      age,
+      stock,
+      cover_img_url
+    }
+    const newBook = await Book.create(book);
+    return newBook;
   } catch (error) {
     throw error;
   }
@@ -267,6 +291,7 @@ module.exports = {
   // searchBooksByTitle,
   getTop10BooksByOrderQuantity,
   getBooks,
-  getBookDetailById
+  getBookDetailById,
+  createNewBook,
 };
 

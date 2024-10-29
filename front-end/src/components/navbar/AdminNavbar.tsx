@@ -19,7 +19,7 @@ const AdminNavbar = () => {
     const navigate = useNavigate();
     const [activeCategory] = useState<string>('');
     const [isVisible] = useState<boolean>(false);
-    
+
     // const [searchQuery, setSearchQuery] = useState<string>('');
     // const handleCategoryClick = (category: string) => {
     //     setActiveCategory(category);
@@ -53,7 +53,7 @@ const AdminNavbar = () => {
     return (
         // navbar using tailwindcss
         <>
-            <nav className="bg-gray-800 p-2 sticky top-0 z-80 shadow">
+            <nav className="bg-white/10 backdrop-blur-md border border-white/20 p-1 sticky top-0 z-80 shadow-lg">
                 <div className="justify-between mx-auto flex items-center">
                     <div className='justify-between flex items-center'>
                         {/* <img className='h-10 mr-20' src={logo} alt="" /> */}
@@ -65,12 +65,12 @@ const AdminNavbar = () => {
                                     {/* User icon with dropdown menu */}
                                     <li className="relative group">
                                         <Link className='flex items-center' to="/account/profile">
-                                        <p className='mr-2 font-bold text-white'>Xin chào, {firstname}</p>
+                                            <p className='mr-2 font-bold text-white'>Xin chào, {firstname}</p>
                                             <div className="py-2">
 
                                                 <FaRegUserCircle size={34} className="text-white cursor-pointer" />
                                             </div>
-                                            
+
                                         </Link>
 
                                         {/* Dropdown menu */}

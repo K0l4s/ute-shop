@@ -3,6 +3,7 @@ import { searchBooks } from "../../../apis/book";
 // import { useLocation } from "react-router-dom";
 import { FaEdit, FaEye, FaTrash, FaSortUp, FaSortDown, FaPlus } from "react-icons/fa";
 import Pagination from "../../../components/pagination/Pagination";
+import ModalCreateBook from "../../../components/modals/ModalCreateBook";
 
 interface Book {
     Author: { Id: number; name: string };
@@ -124,18 +125,25 @@ const AdminProduct = () => {
         });
         setBooks(sortedBooks);
     };
+    const [isOpenCreateBook, setIsOpenCreateBook] = useState(false);
+    const openModal = () => {
+        setIsOpenCreateBook(true);
+    }
+    const closeModal = () => {
+        setIsOpenCreateBook(false);
+    }
 
     return (
         <div className="p-8 text-white">
-            <h1 className="text-2xl font-semibold mb-4">Product Management</h1>
+            <h1 className="text-2xl font-semibold mb-4">Quản lý sách</h1>
 
             {/* Filter Inputs */}
-            <h2 className="text-lg font-semibold mb-2">Filters</h2>
+            {/* <h2 className="text-lg font-semibold mb-2">Lọc sách the</h2> */}
             <div className="flex space-x-4 mb-6">
                 <input
                     type="text"
                     name="title"
-                    placeholder="Filter by Title"
+                    placeholder="Lọc sách theo tiêu đề"
                     className="border px-4 py-2 rounded-full w-10/12 bg-gradient-to-r from-violet-800 to-blue-900 border-none
                     focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:ring-opacity-50"
 
@@ -146,17 +154,19 @@ const AdminProduct = () => {
                     onChange={handleFilterChange}
                     className="focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:ring-opacity-50 border px-4 py-2 rounded text-black bg-gradient-to-r from-violet-800 to-blue-900 text-white rounded-full border-none"
                 >
-                    <option value="" className="text-black">All Prices</option>
-                    <option value="< 50.000" className="text-black">Less than 50,000</option>
+                    <option value="" className="text-black">Tất cả các mức giá</option>
+                    <option value="< 50.000" className="text-black">Thấp hơn 50,000</option>
                     <option value="50.000 - 100.000" className="text-black">50,000 - 100,000</option>
-                    <option value="> 100.000" className="text-black">Greater than 100,000</option>
+                    <option value="> 100.000" className="text-black">Lớn hơn 100,000</option>
                 </select>
 
             </div>
-            <h2 className="text-lg font-semibold mb-2">Actions</h2>
+            <h2 className="text-lg font-semibold mb-2">Thao tác</h2>
             <div className="flex flex-cols gap-3">
-                <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5"><FaPlus className="mr-2" />Thêm sách</button>
-                <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5"><FaPlus className="mr-2" />Nhập hàng</button>
+                <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5" onClick={openModal}>
+                    <FaPlus className="mr-2" />Thêm sách</button>
+                <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5">
+                    <FaPlus className="mr-2" />Nhập hàng hàng loạt</button>
             </div>
             {/* Table */}
             <div className="overflow-x-auto rounded-xl">
@@ -168,28 +178,28 @@ const AdminProduct = () => {
                             </th>
                             <th className="px-5 py-4">Cover</th>
                             <th className="px-5 py-4 cursor-pointer" onClick={() => handleSort('title')}>
-                                Title {sortField === 'title' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                                Tiêu đề {sortField === 'title' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                             </th>
                             <th className="px-5 py-4 cursor-pointer" onClick={() => handleSort('Author')}>
-                                Author {sortField === 'Author' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                                Tác giả {sortField === 'Author' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                             </th>
                             <th className="px-5 py-4 cursor-pointer" onClick={() => handleSort('Publisher')}>
-                                Publisher {sortField === 'Publisher' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                                NXB {sortField === 'Publisher' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                             </th>
                             <th className="px-5 py-4 cursor-pointer" onClick={() => handleSort('price')}>
-                                Price {sortField === 'price' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                                Giá {sortField === 'price' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                             </th>
                             <th className="px-5 py-4 cursor-pointer" onClick={() => handleSort('salePrice')}>
-                                Sale Price {sortField === 'salePrice' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                                Giảm giá {sortField === 'salePrice' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                             </th>
                             <th className="px-5 py-4 cursor-pointer" onClick={() => handleSort('total_sold')}>
-                                Sold {sortField === 'total_sold' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                                Bán {sortField === 'total_sold' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                             </th>
                             <th className="px-5 py-4 cursor-pointer" onClick={() => handleSort('stock')}>
-                                Stock {sortField === 'stock' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                                Kho {sortField === 'stock' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                             </th>
-                            <th className="px-5 py-4">Status</th>
-                            <th className="px-5 py-4">Actions</th>
+                            <th className="px-5 py-4">Trạng thái</th>
+                            <th className="px-5 py-4">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -201,16 +211,16 @@ const AdminProduct = () => {
                                     <img src={book.cover_img_url} alt={book.title} className="h-12 object-fit object-cover rounded-lg shadow-5xl" />
                                 </td>
                                 <td className="px-5 py-4 ">{book.title}</td>
-                                <td className="px-5 py-4 ">{book.Author.name}</td>
-                                <td className="px-5 py-4 ">{book.Publisher.name}</td>
+                                <td className="px-5 py-4 ">{book.Author?.name}</td>
+                                <td className="px-5 py-4 ">{book.Publisher?.name}</td>
                                 <td className="px-5 py-4 ">{formatMoney(Number(book.price))}</td>
                                 <td className="px-5 py-4 ">{formatMoney(Number(book.salePrice))}</td>
                                 <td className="px-5 py-4">{book.total_sold}</td>
                                 <td className="px-5 py-4 ">{book.stock}</td>
                                 <td className="px-5 py-4 ">{book.total_sold < book.stock ?
-                                    <p className="bg-green-200 rounded-xl p-1 text-black">Available</p>
+                                    <p className="bg-green-200 rounded-xl p-1 text-black text-center">Còn hàng</p>
                                     :
-                                    <p className="bg-red-200 rounded-xl p-1">Sold out</p>}</td>
+                                    <p className="bg-red-200 rounded-xl p-1 text-center">Hết hàng</p>}</td>
                                 <td className="px-5 py-4 flex items-center space-x-2">
                                     <button className="text-blue-500 hover:text-blue-700"><FaEye /></button>
                                     <button className="text-yellow-500 hover:text-yellow-700"><FaEdit /></button>
@@ -224,6 +234,7 @@ const AdminProduct = () => {
 
             {/* Pagination */}
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
+            {isOpenCreateBook && <ModalCreateBook onClose={closeModal} />}
         </div>
     );
 };

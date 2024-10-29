@@ -34,8 +34,28 @@ const uploadImageService = (req, res) => {
     });
   });
 };
+const uploadBookImage = (req, res) => {
+  return new Promise((resolve, reject) => {
+    if (!req.file) {
+      return reject(new Error('No file provided'));
+    }
 
+    const stream = cloudinary.uploader.upload_stream(
+      { folder: 'book', public_id: `book-${Date.now()}` },
+      (error, result) => {
+        if (error) {
+          return reject(error);
+        }
+        resolve(result.secure_url);
+      }
+    );
+
+    // Sử dụng buffer của file để upload lên Cloudinary
+    stream.end(req.file.buffer);
+  });
+}
 module.exports = {
   uploadAvatarService,
-  uploadImageService
+  uploadImageService,
+  uploadBookImage
 };
