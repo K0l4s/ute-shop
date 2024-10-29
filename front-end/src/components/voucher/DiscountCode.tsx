@@ -6,6 +6,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { useDispatch } from 'react-redux';
 import { deselectVoucher, setAvailableVouchers } from '../../redux/reducers/voucherSlice';
+import { BiSolidDiscount } from 'react-icons/bi';
+import { TbMapDiscount } from 'react-icons/tb';
 
 const DiscountCode: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,16 +61,30 @@ const DiscountCode: React.FC = () => {
           </li>
         )}
         {selectedDiscountVoucher && (
-          <li className="flex justify-between items-center p-2 rounded font-semibold">
-            <span>{selectedDiscountVoucher.name}</span>
+          <li className="flex justify-between items-center p-2 rounded font-semibold bg-yellow-100">
+            <div className="flex gap-4 items-center">
+              <BiSolidDiscount size={32} />
+              <div className="flex flex-col">
+                <span>{selectedDiscountVoucher.name}</span>
+                {selectedDiscountVoucher.discount_val ? <span>Giảm: {selectedDiscountVoucher.discount_val} VND</span> 
+                  : <span>Giảm: {selectedDiscountVoucher.discount_perc}%</span>}
+              </div>
+            </div>
             <IoMdClose size={24} 
               className='cursor-pointer text-violet-700' 
               onClick={() => handleDeselectVoucher('discount') }/>
           </li>
         )}
         {selectedFreeshipVoucher && (
-          <li className="flex justify-between items-center p-2 rounded font-semibold">
-            <span>{selectedFreeshipVoucher.name}</span>
+          <li className="flex justify-between items-center p-2 rounded font-semibold bg-green-200">
+            <div className="flex gap-4 items-center">
+              <TbMapDiscount size={32} />
+              <div className="flex flex-col">
+                <span>{selectedFreeshipVoucher.name}</span>
+                {selectedFreeshipVoucher.discount_val ? <span>Giảm: {selectedFreeshipVoucher.discount_val} VND</span> 
+                  : <span>Giảm: {selectedFreeshipVoucher.discount_perc}%</span>}
+              </div>
+            </div>
             <IoMdClose size={24} 
               className='cursor-pointer text-violet-700' 
               onClick={() => handleDeselectVoucher('freeship') }/>

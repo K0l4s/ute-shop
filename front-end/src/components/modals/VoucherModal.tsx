@@ -6,6 +6,8 @@ import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { applyVoucher, deselectVoucher } from '../../redux/reducers/voucherSlice';
+import { animated } from '@react-spring/web';
+import { useModalOpenAnimation } from '../../animations/useModalOpenAnimation';
 
 Modal.setAppElement('#root');
 
@@ -57,6 +59,7 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose, dis
     return discountB - discountA;
   });
 
+  const animation = useModalOpenAnimation(isOpen);
   return (
     <Modal
       isOpen={isOpen}
@@ -64,7 +67,7 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose, dis
       overlayClassName="fixed inset-0 bg-gray-600 bg-opacity-75"
       className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] bg-white rounded shadow-lg"
     >
-      <div className="p-6">
+      <animated.div style={animation} className="p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-4 border-b-2">
           <h2 className="text-xl font-bold mb-2 text-violet-700">CHỌN MÃ KHUYẾN MÃI</h2>
@@ -115,7 +118,7 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose, dis
           ))}
         </div>
 
-      </div>
+      </animated.div>
     </Modal>
   );
 };
