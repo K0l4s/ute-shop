@@ -169,7 +169,7 @@ const ProductDetail: React.FC = () => {
                 <span className="text-xl text-red-600 font-semibold">{formatMoney(book.salePrice || 0)}vnđ</span>
                 <span className="line-through text-gray-500">{formatMoney(book.price || 0)}vnđ</span>
               </div>
-              <p>Nhà xuất bản: {book.Publisher.name}</p>
+              <p>Nhà xuất bản: {book.Publisher?.name}</p>
               <p>Năm xuất bản: {book.year || "----"}</p>
               <p>Tình trạng: {book.stock > book.sold_count + 1 ? 'Còn hàng' : 'Hết hàng'}</p>
               <div className="flex items-center space-x-2">
