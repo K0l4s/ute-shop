@@ -5,9 +5,9 @@ import Orders from './Order';
 import FavoriteBooks from './FavoriteBooks';
 import PurchasedBooks from './PurchasedBooks';
 import { Link, useLocation } from 'react-router-dom';
-
 const AccountPage = () => {
   const location = useLocation();
+  
 
   // State to keep track of which section is selected
   const [selectedSection, setSelectedSection] = useState('account'); // Default section

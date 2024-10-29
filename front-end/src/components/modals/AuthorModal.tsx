@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { createAuthor } from '../../apis/author';
 
 // Interface for Author and Modal Props
 interface Author {
     id: number;
     name: string;
-    description: string;
+    // description: string;
     book_count: number;
-    books: { id: number; title: string }[]; // Danh sách sách của tác giả
+    // books: { id: number; title: string }[]; // Danh sách sách của tác giả
 }
 
 interface AuthorModalProps {
@@ -17,28 +18,35 @@ interface AuthorModalProps {
 
 const AuthorModal: React.FC<AuthorModalProps> = ({ author, onClose, onSubmit }) => {
     const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
+    // const [description, setDescription] = useState('');
 
     useEffect(() => {
         if (author) {
             setName(author.name);
-            setDescription(author.description);
+            // setDescription(author.description);
         } else {
             setName('');
-            setDescription('');
+            // setDescription('');
         }
     }, [author]);
 
     // Handle form submission
-    const handleSubmit = () => {
-        const newAuthor = {
-            id: author ? author.id : 0,
-            name,
-            description,
-            book_count: 0,
-            books: [],
+    const handleSubmit = async () => {
+        const addAuthor = {
+            name: name,
         };
-        onSubmit(newAuthor);
+        const res = await createAuthor(addAuthor);
+        if (res) {
+            const newAuthor = {
+                id: author ? author.id : 0,
+                name,
+                // description,
+                book_count: 0,
+                books: [],
+            };
+            onSubmit(newAuthor);
+            onClose();
+        }
     };
 
     return (
@@ -58,14 +66,14 @@ const AuthorModal: React.FC<AuthorModalProps> = ({ author, onClose, onSubmit }) 
                 </div>
 
                 {/* Description Input */}
-                <div className="mb-4">
+                {/* <div className="mb-4">
                     <label className="block text-gray-700">Description</label>
                     <textarea
                         className="w-full px-3 py-2 border rounded"
-                        value={description}
+                        // value={description}
                         onChange={(e) => setDescription(e.target.value)}
                     />
-                </div>
+                </div> */}
 
                 {/* Buttons */}
                 <div className="flex justify-end">

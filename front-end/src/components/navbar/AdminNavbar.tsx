@@ -19,6 +19,7 @@ const AdminNavbar = () => {
     const navigate = useNavigate();
     const [activeCategory] = useState<string>('');
     const [isVisible] = useState<boolean>(false);
+    
     // const [searchQuery, setSearchQuery] = useState<string>('');
     // const handleCategoryClick = (category: string) => {
     //     setActiveCategory(category);
@@ -35,7 +36,7 @@ const AdminNavbar = () => {
             });
 
             if (response.ok) {
-                // Nếu logout thành công, cập nhật trạng thái trong Redux
+                // Nếu logout thành công, cập nhật trạnhttp://uteshop.local:3000/account/profileg thái trong Redux
                 dispatch(logout());
                 alert('Đăng xuất thành công!');
                 // Có thể điều hướng về trang đăng nhập hoặc trang chủ
