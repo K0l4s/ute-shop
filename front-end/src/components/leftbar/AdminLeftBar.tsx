@@ -1,5 +1,5 @@
 import React from 'react';
-import { FaTachometerAlt, FaUser, FaBoxOpen, FaShoppingCart, FaTags, FaBook, FaBookOpen } from 'react-icons/fa';
+import { FaTachometerAlt, FaUser, FaBoxOpen, FaShoppingCart, FaTags, FaBookOpen } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import MenuGroup from './MenuGroup';
 
