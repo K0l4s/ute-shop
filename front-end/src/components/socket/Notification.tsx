@@ -11,6 +11,7 @@ const Notification: React.FC<{ setUnreadCount: (count: number) => void }> = ({ s
   const [error, setError] = useState<string | null>(null);
 
   const translations = {
+    "less than a minute ago": "Vừa xong",
     "in about": "khoảng",
     about: "khoảng",
     less: "ít hơn",

@@ -1,4 +1,4 @@
-const { addToCart, updateCartItem, removeFromCart, getUserCart, increaseQuantity, decreaseQuantity } = require("../services/cartService.js");
+const { addToCart, updateCartItem, removeFromCart, getUserCart, increaseQuantity, decreaseQuantity, validateCart, toggleChecked, toggleCheckAll } = require("../services/cartService.js");
 
 // Controller thêm sản phẩm vào giỏ hàng
 const addToCartController = async (req, res) => {
@@ -86,11 +86,55 @@ const decreaseQuantityController = async (req, res) => {
   }
 };
 
+const toggleCheckedController = async (req, res) => {
+  const { bookId } = req.body;
+  const userId = req.user.id;
+  
+  try {
+    const result = await toggleChecked(userId, bookId);
+    return res.status(200).json({ message: result.message });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error", error: error.message });
+  };
+}
+
+const toggleCheckAllController = async (req, res) => {
+  const userId = req.user.id;
+  
+  try {
+    const result = await toggleCheckAll(userId);
+    return res.status(200).json({ message: result.message });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error", error: error.message });
+  };
+};
+
+const validateCartController = async (req, res) => {
+  try {
+    const { cartItems } = req.body;
+    const userId = req.user.id;
+    const result = await validateCart(userId, cartItems);
+    if (result.valid) {
+      return res.status(200).json({ message: "valid" });
+    } else {
+      return res.status(400).json({ message: "Cart validation failed", errors: result.errors });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error", error: error.message });
+  };
+}
+
 module.exports = {
   addToCartController,
   updateCartItemController,
   removeFromCartController,
   getUserCartController,
   increaseQuantityController,
-  decreaseQuantityController
+  decreaseQuantityController,
+  toggleCheckedController,
+  toggleCheckAllController,
+  validateCartController
 };
