@@ -76,7 +76,7 @@ const Navbar = () => {
       try {
         const data = await getNotifications();
         // Count unread notifications
-        const unreadCount = data.filter((notification: NotificationMessage) => !notification.is_read).length;
+        const unreadCount = data?.filter((notification: NotificationMessage) => !notification.is_read).length;
         setUnreadCount(unreadCount);
       } catch (error) {
         console.error("Failed to get notifications", error);
