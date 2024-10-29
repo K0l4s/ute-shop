@@ -1,62 +1,50 @@
 import React, { useEffect, useState } from 'react';
-import { FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaEye, FaSortUp, FaSortDown } from 'react-icons/fa';
 import AuthorModal from '../../../components/modals/AuthorModal';
 import AuthorDetailModal from '../../../components/modals/AuthorDetailModal';
 import { getAllAuthors } from '../../../apis/author';
 
-// Interface for Author
 interface Author {
     id: number;
     name: string;
-    // description: string;
     book_count: number;
-    // books: { id: number; title: string }[]; 
 }
 
-const AdminAuthorPage: React.FC = () => {
-    const [authors, setAuthors] = useState<Author[]>([
-        // { id: 1, name: 'Author 1', description: 'Description 1', book_count: 10, books: [{ id: 1, title: 'Book A' }, { id: 2, title: 'Book B' }] },
-        // { id: 2, name: 'Author 2', description: 'Description 2', book_count: 20, books: [{ id: 3, title: 'Book C' }, { id: 4, title: 'Book D' }] },
-    ]);
+type SortOrder = 'asc' | 'desc';
 
+const AdminAuthorPage: React.FC = () => {
+    const [authors, setAuthors] = useState<Author[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
     const [selectedAuthor, setSelectedAuthor] = useState<Author | null>(null);
+    const [sortField, setSortField] = useState<keyof Author | null>(null);
+    const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
-    // Handle opening modal
     const openModal = (author: Author | null) => {
         setSelectedAuthor(author);
         setIsModalOpen(true);
     };
 
-    // Handle opening detail modal
     const openDetailModal = (author: Author) => {
         setSelectedAuthor(author);
         setIsDetailModalOpen(true);
     };
 
-    // Handle closing modals
     const closeModal = () => {
         setSelectedAuthor(null);
         setIsModalOpen(false);
         setIsDetailModalOpen(false);
     };
 
-    // Handle form submission (create or update)
     const handleFormSubmit = (newAuthor: Author) => {
         if (selectedAuthor) {
-            // Update existing author
             setAuthors(authors.map((author) => (author.id === newAuthor.id ? newAuthor : author)));
         } else {
-            // Create new author
-            setAuthors([...authors, { ...newAuthor, id: authors.length + 1,
-                //  books: [] 
-                }]); // Khởi tạo sách rỗng
+            setAuthors([...authors, { ...newAuthor, id: authors.length + 1 }]);
         }
         closeModal();
     };
 
-    // Handle delete author
     const handleDelete = (id: number) => {
         setAuthors(authors.filter((author) => author.id !== id));
     };
@@ -64,65 +52,90 @@ const AdminAuthorPage: React.FC = () => {
     useEffect(() => {
         const fetchAuthors = async () => {
             const data = await getAllAuthors();
-            console.log(data);
             setAuthors(data);
-        }
+        };
         fetchAuthors();
     }, []);
 
+    const handleSort = (field: keyof Author) => {
+        const order = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
+        setSortField(field);
+        setSortOrder(order);
+
+        const sortedAuthors = [...authors].sort((a, b) => {
+            if (a[field] < b[field]) return order === 'asc' ? -1 : 1;
+            if (a[field] > b[field]) return order === 'asc' ? 1 : -1;
+            return 0;
+        });
+        setAuthors(sortedAuthors);
+    };
+
     return (
-        <div className="p-6">
-            <h1 className="text-2xl font-bold mb-6">Quản lý tác giả</h1>
-            <button
-                className="bg-blue-500 text-white py-2 px-4 rounded flex items-center mb-4"
-                onClick={() => openModal(null)}
-            >
-                <FaPlus className="mr-2" /> Thêm tác giả mới
-            </button>
-            <table className="min-w-full bg-white">
-                <thead>
-                    <tr className='bg-blue-600 text-white'>
-                    <th className="border px-4 py-2">ID</th>
-                        <th className="border px-4 py-2">Tên tác giả</th>
-                        {/* <th className="py-2">Mô tả</th> */}
-                        <th className="border px-4 py-2">Tổng số sách đã viết</th>
-                        <th className="border px-4 py-2">Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {authors.map((author) => (
-                        <tr key={author.id}>
-                            <td className="border px-4 py-2">{author.id}</td>
-                            <td className="border px-4 py-2">{author.name}</td>
-                            {/* <td className="border px-4 py-2">{author.description}</td> */}
-                            <td className="border px-4 py-2">{author.book_count}</td>
-                            <td className="border px-4 py-2">
-                                <button
-                                    className="text-blue-500 hover:text-blue-700 mr-2"
-                                    onClick={() => openDetailModal(author)}
-                                >
-                                    <FaEye />
-                                </button>
-                                <button
-                                    className="text-yellow-500 hover:text-yellow-700 mr-2"
-                                    onClick={() => openModal(author)}
-                                >
-                                    <FaEdit />
-                                </button>
+        <div className="p-8">
+            <h1 className="text-2xl font-semibold mb-6">Author Management</h1>
 
-                                <button
-                                    className="text-red-500 hover:text-red-700"
-                                    onClick={() => handleDelete(author.id)}
-                                >
-                                    <FaTrash />
-                                </button>
-                            </td>
+            <button onClick={() => openModal(null)} className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5"><FaPlus className="mr-2" /> Add New Author</button>
+
+            <div className="bg-white shadow-md rounded-lg overflow-hidden">
+                <table className="min-w-full text-sm text-left">
+                    <thead className="bg-gray-200 text-gray-600 uppercase text-xs font-semibold">
+                        <tr>
+                            <th
+                                className="px-6 py-3 cursor-pointer"
+                                onClick={() => handleSort('id')}
+                            >
+                                ID
+                                {sortField === 'id' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                            </th>
+                            <th
+                                className="px-6 py-3 cursor-pointer"
+                                onClick={() => handleSort('name')}
+                            >
+                                Author Name
+                                {sortField === 'name' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                            </th>
+                            <th
+                                className="px-6 py-3 cursor-pointer"
+                                onClick={() => handleSort('book_count')}
+                            >
+                                Total Books
+                                {sortField === 'book_count' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                            </th>
+                            <th className="px-6 py-3">Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {authors.map((author) => (
+                            <tr key={author.id} className="border-b hover:bg-gray-50">
+                                <td className="px-6 py-4 text-gray-700">{author.id}</td>
+                                <td className="px-6 py-4 font-medium text-gray-900">{author.name}</td>
+                                <td className="px-6 py-4 text-gray-700">{author.book_count}</td>
+                                <td className="px-6 py-4 flex items-center space-x-2">
+                                    <button
+                                        className="text-blue-500 hover:text-blue-700"
+                                        onClick={() => openDetailModal(author)}
+                                    >
+                                        <FaEye />
+                                    </button>
+                                    <button
+                                        className="text-yellow-500 hover:text-yellow-700"
+                                        onClick={() => openModal(author)}
+                                    >
+                                        <FaEdit />
+                                    </button>
+                                    <button
+                                        className="text-red-500 hover:text-red-700"
+                                        onClick={() => handleDelete(author.id)}
+                                    >
+                                        <FaTrash />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
-            {/* Modal for create/update */}
             {isModalOpen && (
                 <AuthorModal
                     author={selectedAuthor}
@@ -131,7 +144,6 @@ const AdminAuthorPage: React.FC = () => {
                 />
             )}
 
-            {/* Modal for author details */}
             {isDetailModalOpen && selectedAuthor && (
                 <AuthorDetailModal
                     author={selectedAuthor}
@@ -143,3 +155,4 @@ const AdminAuthorPage: React.FC = () => {
 };
 
 export default AdminAuthorPage;
+
