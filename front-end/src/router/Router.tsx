@@ -20,6 +20,7 @@ import Dashboard from '../pages/admin/dashboard/Dashboard'
 import AdminOrder from '../pages/admin/order/AdminOrder'
 import AdminAuthorPage from '../pages/admin/author/AdminAuthorPage'
 import { RequireAuth } from './RequireAuth'
+import AdminProduct from '../pages/admin/product/AdminProduct'
 // import OrderDetailModal from '../components/modals/OrderDetailModal'
 
 
@@ -58,7 +59,7 @@ const Router = () => {
           <Route path="/admin" element={<Dashboard />} />
           <Route path="/admin/categories" element={<Cart />} />
           <Route path="/admin/categories/:id" element={<Cart />} />
-          <Route path="/admin/products" element={<Cart />} />
+          <Route path="/admin/products" element={<AdminProduct />} />
           <Route path="/admin/products/:id" element={<Cart />} />
           <Route path="/admin/orders" element={<AdminOrder />} />
           {/* <Route path="/admin/orders/:id" element={<Order />} /> */}

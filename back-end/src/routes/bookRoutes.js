@@ -8,5 +8,4 @@ router.get("/search", getBooksController);
 // Endpoint để lấy chi tiết sách
 router.get("/:id", getBookDetailByIdController);
 router.get('/top/10', getTop10Books);
-
 module.exports = router;
