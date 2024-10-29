@@ -3,12 +3,13 @@ import AdminNavbar from "../../components/navbar/AdminNavbar";
 import AdminLeftBar from "../../components/leftbar/AdminLeftBar";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
+import BlockPermissionPage from "../../pages/errorPage/BlockPermissionPage";
 
 const AdminAccess = ({ children }: { children: JSX.Element }) => {
     const userRole = useSelector((state: RootState) => state.auth.user?.role || "customer");
 
     if (userRole !== "admin") {
-        return <h1>You don't have permission</h1>;
+        return <BlockPermissionPage/>;
     }
 
     return children;
