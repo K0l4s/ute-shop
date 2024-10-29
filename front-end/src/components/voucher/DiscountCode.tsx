@@ -1,12 +1,45 @@
 import React, { useState } from 'react';
-import { IoIosArrowForward } from 'react-icons/io';
+import { IoIosArrowForward, IoMdClose } from 'react-icons/io';
 import VoucherModal from '../modals/VoucherModal';
+import { getDiscountVouchers, getFreeshipVouchers } from '../../apis/voucher';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../redux/store';
+import { useDispatch } from 'react-redux';
+import { deselectVoucher, setAvailableVouchers } from '../../redux/reducers/voucherSlice';
 
 const DiscountCode: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [discountVouchers, setDiscountVouchers] = useState([]);
+  const [freeshipVouchers, setFreeshipVouchers] = useState([]);
+  const selectedDiscountVoucherId = useSelector((state: RootState) => state.voucher.selectedDiscountVoucherId);
+  const selectedFreeshipVoucherId = useSelector((state: RootState) => state.voucher.selectedFreeshipVoucherId);
+  const availableVouchers = useSelector((state: RootState) => state.voucher.availableVouchers);
+  const dispatch = useDispatch();
 
-  const handleOpenModal = () => setIsModalOpen(true);
+  const handleOpenModal = async () => {
+    setIsModalOpen(true)
+
+    try {
+      const discountData = await getDiscountVouchers();
+      const freeshipData = await getFreeshipVouchers();
+      const discountVouchersWithType = discountData.data.map((voucher: any) => ({ ...voucher, type: 'discount' }));
+      const freeshipVouchersWithType = freeshipData.data.map((voucher: any) => ({ ...voucher, type: 'freeship' }));
+      setDiscountVouchers(discountVouchersWithType);
+      setFreeshipVouchers(freeshipVouchersWithType);
+      dispatch(setAvailableVouchers([...discountVouchersWithType, ...freeshipVouchersWithType]));
+    } catch (error) {
+      console.error("Error fetching vouchers:", error);
+    }
+  };
+
   const handleCloseModal = () => setIsModalOpen(false);
+
+  const selectedDiscountVoucher = availableVouchers.find(voucher => voucher.id === selectedDiscountVoucherId && voucher.type === 'discount');
+  const selectedFreeshipVoucher = availableVouchers.find(voucher => voucher.id === selectedFreeshipVoucherId && voucher.type === 'freeship');
+
+  const handleDeselectVoucher = (type: 'discount' | 'freeship') => {
+    dispatch(deselectVoucher(type));
+  };
 
   return (
     <div className='rounded bg-white p-4 shadow-lg'>
@@ -20,14 +53,35 @@ const DiscountCode: React.FC = () => {
       
       
       <ul className="space-y-2 mt-2">
-        <li className="flex justify-between items-center p-2 rounded font-semibold">
-          <span>MÃ GIẢM GIÁ 20K - ĐƠN HÀNG TỪ 200K</span>
-        </li>
-        {/* Additional Discount Codes */}
+        {!selectedDiscountVoucher && !selectedFreeshipVoucher && (
+          <li className="flex justify-between items-center p-2 rounded font-semibold">
+            <span>Ấn xem thêm để chọn mã đi nào!!</span>
+          </li>
+        )}
+        {selectedDiscountVoucher && (
+          <li className="flex justify-between items-center p-2 rounded font-semibold">
+            <span>{selectedDiscountVoucher.name}</span>
+            <IoMdClose size={24} 
+              className='cursor-pointer text-violet-700' 
+              onClick={() => handleDeselectVoucher('discount') }/>
+          </li>
+        )}
+        {selectedFreeshipVoucher && (
+          <li className="flex justify-between items-center p-2 rounded font-semibold">
+            <span>{selectedFreeshipVoucher.name}</span>
+            <IoMdClose size={24} 
+              className='cursor-pointer text-violet-700' 
+              onClick={() => handleDeselectVoucher('freeship') }/>
+          </li>
+        )}
       </ul>
 
       {/* Modal for selecting vouchers */}
-      <VoucherModal isOpen={isModalOpen} onRequestClose={handleCloseModal} />
+      <VoucherModal 
+        isOpen={isModalOpen} 
+        onRequestClose={handleCloseModal}  
+        discountVouchers={discountVouchers}
+        freeshipVouchers={freeshipVouchers} />
     </div>
   );
 };

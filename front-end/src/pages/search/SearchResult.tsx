@@ -5,7 +5,7 @@ import SortFilter from '../../components/filter/SortFilter';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import { useDispatch } from 'react-redux';
 import { addItem } from '../../redux/reducers/cartSlice';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { searchBooks } from '../../apis/book';
 import { getPublisher } from '../../apis/publisher';
 import { addToCart } from '../../apis/cart';
@@ -34,10 +34,13 @@ const SearchResults: React.FC = () => {
   const [publishers, setPublishers] = useState<Publisher[]>([]);
 
   const location = useLocation();
-  
+  const navigate = useNavigate();
+
   // Extract search query from the URL
   const searchParams = new URLSearchParams(location.search);
   const query = searchParams.get('query') || '';
+  const page = parseInt(searchParams.get('page') || '1', 10);
+
   type Filters = {
     [key: string]: string | undefined;
     price?: string;
@@ -45,7 +48,7 @@ const SearchResults: React.FC = () => {
   };
 
   const [filters, setFilters] = useState<Filters>({});
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(page);
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
@@ -74,7 +77,7 @@ const SearchResults: React.FC = () => {
           ...filters,
           title: query,
           page: currentPage,
-          limit: 16,
+          limit: 1,
           minPrice: minPrice,
           maxPrice: maxPrice,
         };
@@ -153,6 +156,7 @@ const SearchResults: React.FC = () => {
   const handlePageChange = (pageNumber: number) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
+      navigate(`/search?query=${query}&page=${pageNumber}`);
     }
   };
   

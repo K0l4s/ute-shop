@@ -60,7 +60,7 @@ const Navbar = () => {
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
-      navigate(`/search?query=${searchQuery.trim()}`);
+      navigate(`/search?query=${searchQuery.trim()}&page=1`);
     }
   };
 
