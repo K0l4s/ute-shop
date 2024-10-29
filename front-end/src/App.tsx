@@ -36,6 +36,7 @@ function App() {
               address: userData["address"],
               birthday: userData["birthday"],
               avatar_url: userData["avatar_url"],
+              role: userData["role"],
             }))
           } else {
             const userData = await getProfileApi();
@@ -51,6 +52,7 @@ function App() {
               address: userData.data["address"],
               birthday: userData.data["birthday"],
               avatar_url: userData.data["avatar_url"],
+              role: userData.data["role"],
             }));
           }
         } else {

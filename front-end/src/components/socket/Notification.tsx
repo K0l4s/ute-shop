@@ -105,7 +105,7 @@ const Notification: React.FC<{ setUnreadCount: (count: number) => void }> = ({ s
       <h2 className="text-lg font-semibold mb-2">Thông báo</h2>
       {error && <p className="text-red-500">{error}</p>}
       <ul className="space-y-2 max-h-128 overflow-y-auto">
-        {notifications.map((notification) => (
+        {notifications?.map((notification) => (
           <li
             key={notification.id}
             className={`p-3 flex items-center space-x-4 rounded-lg shadow-sm ${
