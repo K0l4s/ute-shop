@@ -3,6 +3,7 @@ import { FaPlus, FaEdit, FaTrash, FaEye, FaSortUp, FaSortDown } from 'react-icon
 import AuthorModal from '../../../components/modals/AuthorModal';
 import AuthorDetailModal from '../../../components/modals/AuthorDetailModal';
 import { getAllAuthors } from '../../../apis/author';
+import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 
 interface Author {
     id: number;
@@ -89,9 +90,10 @@ const AdminAuthorPage: React.FC = () => {
 
     return (
         <div className="p-8">
-            <h1 className="text-2xl font-semibold mb-6 text-white">Author Management</h1>
+            <h1 className="text-2xl font-semibold mb-6 text-white">Quản lý tác giả</h1>
 
-            <button onClick={() => openModal(null)} className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5"><FaPlus className="mr-2" /> Add New Author</button>
+            <button onClick={() => openModal(null)} className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5">
+                <FaPlus className="mr-2" /> Thêm mới</button>
 
             <div className="bg-gradient-to-r from-violet-800 to-blue-900 text-white shadow-md rounded-lg overflow-hidden">
                 <table className="min-w-full text-sm text-left">
@@ -102,14 +104,14 @@ const AdminAuthorPage: React.FC = () => {
                                 {sortField === 'id' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                             </th>
                             <th className="px-6 py-3 cursor-pointer" onClick={() => handleSort('name')}>
-                                Author Name
+                                Tên tác giả
                                 {sortField === 'name' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                             </th>
                             <th className="px-6 py-3 cursor-pointer" onClick={() => handleSort('book_count')}>
-                                Total Books
+                                Số sách trên trang
                                 {sortField === 'book_count' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                             </th>
-                            <th className="px-6 py-3">Actions</th>
+                            <th className="px-6 py-3">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -157,17 +159,17 @@ const AdminAuthorPage: React.FC = () => {
                     disabled={currentPage === 1}
                     className={`px-4 py-2 ${currentPage === 1 ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-700'} text-white rounded-md`}
                 >
-                    Previous
+                    <BiLeftArrow/>
                 </button>
                 <span className="text-white">
-                    Page {currentPage} of {totalPages}
+                    Trang {currentPage}/{totalPages}
                 </span>
                 <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
                     className={`px-4 py-2 ${currentPage === totalPages ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-700'} text-white rounded-md`}
                 >
-                    Next
+                    <BiRightArrow/>
                 </button>
             </div>
         </div>

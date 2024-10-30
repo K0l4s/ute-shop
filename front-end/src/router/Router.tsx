@@ -21,6 +21,7 @@ import AdminOrder from '../pages/admin/order/AdminOrder'
 import AdminAuthorPage from '../pages/admin/author/AdminAuthorPage'
 import { RequireAuth } from './RequireAuth'
 import AdminProduct from '../pages/admin/product/AdminProduct'
+import NotFoundPage from '../pages/errorPage/NotFoundPage'
 // import OrderDetailModal from '../components/modals/OrderDetailModal'
 
 
@@ -75,6 +76,7 @@ const Router = () => {
           {/* Cashier */}
           <Route path="admin/cashier" element={<Cart />} />
         </Route>
+        <Route path="/*" element={<NotFoundPage />} />
       </Routes>
 
     </>

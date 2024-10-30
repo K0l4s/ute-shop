@@ -31,7 +31,7 @@ const updateUserProfile = async (req, res) => {
 
   try {
     const { firstname, lastname, birthday, gender, phone } = req.body;
-
+ 
     // Kiểm tra và upload avatar nếu có
     let avatar_url = null;
     if (req.file) {

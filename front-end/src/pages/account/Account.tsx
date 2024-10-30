@@ -10,7 +10,7 @@ import ChangePassword from '../../components/modals/ChangePassword';
 
 const Account = () => {
   const dispatch = useDispatch();
-  
+
   // Get user data from Redux
   const user = useSelector((state: RootState) => state.auth.user);
   const localStorageUser = JSON.parse(localStorage.getItem('userData') || '{}');
@@ -39,7 +39,8 @@ const Account = () => {
       setGender(localStorageUser.gender === true ? 'male' : 'female');
       setBirthday(user.birthday ? new Date(user.birthday).toISOString().split('T')[0] : '');
       setAvatarUrl(user.avatar_url);
-    }  }, [user]);
+    }
+  }, [user]);
 
   // Clean up avatar URL when component unmounts
   useEffect(() => {
@@ -116,7 +117,7 @@ const Account = () => {
   };
 
   return (
-    <div className="flex justify-center relative">
+    <div className="flex justify-center relative text-black">
       {/* Loading overlay */}
       {loading && (
         <div className="absolute inset-0 z-50 rounded flex items-center justify-center bg-black bg-opacity-50">
@@ -125,7 +126,7 @@ const Account = () => {
         </div>
       )}
 
-      <div className={`bg-white shadow-md rounded-lg p-8 w-full max-w-5xl ${loading ? 'opacity-50' : ''}`}>
+      <div className={`bg-gray-800 shadow-md rounded-lg p-8 w-full max-w-5xl ${loading ? 'opacity-50' : ''}`}>
         <h2 className="text-lg text-purple-700 font-bold mb-6">THÔNG TIN TÀI KHOẢN</h2>
 
         <div className="flex flex-col items-center mb-8">
@@ -155,7 +156,7 @@ const Account = () => {
         <form onSubmit={handleSaveChanges}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Họ *</label>
+              <label className="block text-white font-semibold mb-2">Họ *</label>
               <input
                 type="text"
                 value={lastname}
@@ -166,7 +167,7 @@ const Account = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Tên *</label>
+              <label className="block text-white font-semibold mb-2">Tên *</label>
               <input
                 type="text"
                 value={firstname}
@@ -177,7 +178,7 @@ const Account = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Số điện thoại *</label>
+              <label className="block text-white font-semibold mb-2">Số điện thoại *</label>
               <input
                 type="text"
                 value={phone}
@@ -187,7 +188,7 @@ const Account = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Email</label>
+              <label className="block text-white font-semibold mb-2">Email</label>
               <input
                 type="email"
                 value={email}
@@ -197,7 +198,7 @@ const Account = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Ngày sinh</label>
+              <label className="block text-white font-semibold mb-2">Ngày sinh</label>
               <input
                 type="date"
                 value={birthday}
@@ -207,39 +208,41 @@ const Account = () => {
               />
             </div>
             <div>
-              <label className="block text-gray-700 font-semibold mb-2">Giới tính</label>
+              <label className="block text-white font-semibold mb-2">Giới tính</label>
               <div className="flex items-center space-x-4">
-                <label>
+                <label className="flex items-center cursor-pointer">
                   <input
                     type="radio"
                     name="gender"
                     value="male"
                     checked={gender === 'male'}
                     onChange={() => setGender('male')}
-                    className="mr-2"
+                    className="form-radio text-purple-600 focus:ring-purple-500"
                   />
-                  Nam
+                  <span className="ml-2 text-white">Nam</span>
                 </label>
-                <label>
+                <label className="flex items-center cursor-pointer">
                   <input
                     type="radio"
                     name="gender"
                     value="female"
                     checked={gender === 'female'}
                     onChange={() => setGender('female')}
-                    className="mr-2"
+                    className="form-radio text-purple-600 focus:ring-purple-500"
                   />
-                  Nữ
+                  <span className="ml-2 text-white">Nữ</span>
                 </label>
+
+
               </div>
             </div>
           </div>
 
-          <div onClick={() => setShowPasswordModal(true)} 
-              className='flex px-4 py-2 bg-red-600 text-white rounded w-fit 
+          <div onClick={() => setShowPasswordModal(true)}
+            className='flex px-4 py-2 bg-red-600 text-white rounded w-fit 
                 items-center cursor-pointer hover:bg-red-500'>
-            <BsKey size={24} className='mr-2' 
-          />
+            <BsKey size={24} className='mr-2'
+            />
             Đổi mật khẩu
           </div>
           {showPasswordModal && (

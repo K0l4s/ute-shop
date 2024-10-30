@@ -76,29 +76,29 @@ const Navbar = () => {
   return (
     // navbar using tailwindcss
     <>
-    <nav className="bg-gray-800 p-4 sticky top-0 z-80">
-      <div className="justify-between mx-auto flex items-center">
+            <nav className="bg-white/10 backdrop-blur-md border border-white/20 p-1 sticky top-0 z-80 shadow-lg text-white">
+            <div className="justify-between mx-auto flex items-center">
         <div className='justify-between flex items-center'>
           <img className='h-10 mr-20' src={logo} alt="" />
-          <BsMenuButtonWideFill onClick={() => handleCategoryClick('Sách trong nước')} size={30} className='mr-2' color='white' />
+          <BsMenuButtonWideFill onClick={() => handleCategoryClick('Sách trong nước')} size={30} className='mr-2' color='black' />
           {/* searchBox */}
           <div className="flex items-center w-100">
             <input 
               type="text" 
               placeholder="Search" 
-              className="bg-white p-1 h-8 rounded-l-lg w-80" 
+              className="bg-white p-1 h-8 rounded-l-lg w-80 bg-white/50 backdrop-blur-md" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleKeyDown}/>
-            <button onClick={handleSearch} className="bg-white p-1 h-8 rounded-r-lg"><BiSearch size={24} /></button>
+            <button onClick={handleSearch} className="bg-white p-1 h-8 rounded-r-lg bg-white/50 backdrop-blur-md"><BiSearch size={24} /></button>
           </div>
         </div>
         <div className="flex items-center">
           <ul className="flex space-x-4">
-            <li><Link to="/" className="text-white">Sách</Link></li>
-            <li><Link to="/about" className="text-white">Nhà xuất bản</Link></li>
-            <li><Link to="/contact" className="text-white">Về chúng tôi</Link></li>
-            <li><Link to="/contact" className="text-white">Voucher</Link></li>
+            <li><Link to="/" >Sách</Link></li>
+            <li><Link to="/about" >Nhà xuất bản</Link></li>
+            <li><Link to="/contact" >Về chúng tôi</Link></li>
+            <li><Link to="/contact">Voucher</Link></li>
           </ul>
         </div>
         <div>
@@ -132,7 +132,7 @@ const Navbar = () => {
                         exit={{ opacity: 0, y: 15 }}
                         style={{ translateX: "-90%", willChange: 'transform, opacity', backfaceVisibility: 'hidden' }}
                         transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute right bg-white rounded-lg shadow-lg group-hover:block"
+                        className="absolute right rounded-lg shadow-lg group-hover:block"
                       >
                         <Notification setUnreadCount={setUnreadCount}/>
                       </motion.div>
@@ -170,7 +170,7 @@ const Navbar = () => {
                         className="absolute right-0 bg-white rounded-lg shadow-lg group-hover:block"
                       >
                         {/* Dropdown menu */}
-                        <div className="absolute right-0 w-48 bg-white rounded-lg shadow-lg group-hover:block">
+                        <div className="absolute right-0 w-48 backdrop-blur-md bg-white/50 border-white/20 rounded-lg shadow-lg group-hover:block">
                           <Link to="/account/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-t-lg">
                             Tài khoản của tôi
                           </Link>
