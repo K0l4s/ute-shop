@@ -1,3 +1,5 @@
+const db = require('../models');
+const Notification = db.Notification;
 const WebSocket = require('ws');
 
 // Tạo WebSocket server dựa trên server HTTP của Express
@@ -5,7 +7,7 @@ const setupWebSocket = (server) => {
   const wss = new WebSocket.Server({ server });
 
   // Lắng nghe các kết nối WebSocket
-  wss.on('connection', (ws) => {
+  wss.on('connection', async (ws) => {
     console.log('Client connected');
 
     // Nhận tin nhắn từ client
@@ -14,8 +16,13 @@ const setupWebSocket = (server) => {
     });
 
     // Gửi thông báo cho client
-    // ws.send(JSON.stringify({ message: 'Welcome to the notification system' }));
-    // ws.send(JSON.stringify({ message: 'Don hang sap duoc giao den ban, vui long chu y dien' }));
+    // const newNotification = await Notification.create({
+    //   user_id: 1, // Thay thế bằng ID người dùng thực tế
+    //   message: 'This is a test notification',
+    //   is_read: false
+    // });
+
+    // ws.send(JSON.stringify(newNotification));
 
     // Đóng kết nối
     ws.on('close', () => {
