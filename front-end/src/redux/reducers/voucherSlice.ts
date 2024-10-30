@@ -1,10 +1,15 @@
-// store/voucherSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Voucher {
   id: number;
-  title: string;
+  code: string;
+  name: string;
+  discount_val: number;
+  discount_perc: number;
+  min_order_val: number;
   desc: string;
+  stock: number;
+  is_active: boolean;
   type: "discount" | "freeship";
 }
 
@@ -16,18 +21,7 @@ interface VoucherState {
 }
 
 const initialState: VoucherState = {
-  availableVouchers: [
-    { id: 1, title: 'MÃ GIẢM GIÁ 30K - ĐƠN HÀNG TỪ 200K - ĐƠN HÀNG TỪ 200K - ĐƠN HÀNG TỪ 200K', desc: 'Áp dụng cho tất cả các loại sách- ĐƠN HÀNG TỪ 200K', type: "discount" },
-    { id: 3, title: 'MÃ GIẢM GIÁ 50K - ĐƠN HÀNG TỪ 300K', desc: 'Áp dụng cho sách tiếng Anh, tiếng Trung, tiếng Đức, tiếng Việt', type: "discount" },
-    { id: 5, title: 'MÃ GIẢM GIÁ 50K - ĐƠN HÀNG TỪ 300K', desc: 'Áp dụng cho sách tiếng Anh- ĐƠN HÀNG TỪ 200K', type: "discount" },
-    { id: 6, title: 'MÃ GIẢM GIÁ 50K - ĐƠN HÀNG TỪ 300K', desc: 'Áp dụng cho sách tiếng Anh- ĐƠN HÀNG TỪ 200K', type: "discount" },
-    { id: 7, title: 'MÃ GIẢM GIÁ 50K - ĐƠN HÀNG TỪ 300K', desc: 'Áp dụng cho sách tiếng Anh- ĐƠN HÀNG TỪ 200K', type: "discount" },
-    { id: 2, title: 'MÃ FREESHIP 30K - ĐƠN HÀNG TỪ 200K', desc: 'Áp dụng cho tất cả các loại sách- ĐƠN HÀNG TỪ 200K', type: "freeship" },
-    { id: 4, title: 'MÃ FREESHIP 30K - ĐƠN HÀNG TỪ 200K', desc: 'Áp dụng cho tất cả các loại sách- ĐƠN HÀNG TỪ 200K', type: "freeship" },
-    { id: 8, title: 'MÃ FREESHIP 30K - ĐƠN HÀNG TỪ 200K', desc: 'Áp dụng cho tất cả các loại sách- ĐƠN HÀNG TỪ 200K', type: "freeship" },
-    { id: 9, title: 'MÃ FREESHIP 30K - ĐƠN HÀNG TỪ 200K', desc: 'Áp dụng cho tất cả các loại sách- ĐƠN HÀNG TỪ 200K', type: "freeship" },
-    { id: 10, title: 'MÃ FREESHIP 30K - ĐƠN HÀNG TỪ 200K', desc: 'Áp dụng cho tất cả các loại sách- ĐƠN HÀNG TỪ 200K', type: "freeship" },
-  ],
+  availableVouchers: [],
   selectedDiscountVoucherId: null,
   selectedFreeshipVoucherId: null,
   viewedVoucherId: null,
@@ -37,6 +31,9 @@ const voucherSlice = createSlice({
   name: 'voucher',
   initialState,
   reducers: {
+    setAvailableVouchers(state, action: PayloadAction<Voucher[]>) {
+      state.availableVouchers = action.payload;
+    },
     applyVoucher(state, action: PayloadAction<{ id: number; type: 'discount' | 'freeship' }>) {
       const { id, type } = action.payload;
       if (type === 'discount') {
@@ -62,5 +59,5 @@ const voucherSlice = createSlice({
   },
 });
 
-export const { applyVoucher, deselectVoucher, viewVoucherDetail, clearViewedVoucher } = voucherSlice.actions;
+export const { setAvailableVouchers, applyVoucher, deselectVoucher, viewVoucherDetail, clearViewedVoucher } = voucherSlice.actions;
 export default voucherSlice.reducer;
