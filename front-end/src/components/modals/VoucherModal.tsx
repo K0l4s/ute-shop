@@ -1,49 +1,65 @@
-// components/VoucherModal.tsx
 import React from 'react';
 import Modal from 'react-modal';
 import { IoClose } from 'react-icons/io5';
-// import { IoIosArrowDown } from 'react-icons/io';
 import VoucherItem from '../voucher/VoucherItem';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { applyVoucher, deselectVoucher } from '../../redux/reducers/voucherSlice';
+import { animated } from '@react-spring/web';
+import { useModalOpenAnimation } from '../../animations/useModalOpenAnimation';
 
 Modal.setAppElement('#root');
 
 interface VoucherModalProps {
   isOpen: boolean;
   onRequestClose: () => void;
+  discountVouchers: any[];
+  freeshipVouchers: any[];
 }
 
-// const vouchers = [
-//   { id: 1, title: 'MÃ GIẢM GIÁ 30K - ĐƠN HÀNG TỪ 200K', desc: 'Áp dụng cho tất cả các loại sách...' },
-//   { id: 2, title: 'MÃ FREESHIP 30K - ĐƠN HÀNG TỪ 200K', desc: 'Áp dụng cho tất cả các loại sách...' },
-//   { id: 3, title: 'MÃ GIẢM GIÁ 50K - ĐƠN HÀNG TỪ 300K', desc: 'Áp dụng cho sách tiếng Anh...' },
-// ];
-
-const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose }) => {
+const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose, discountVouchers, freeshipVouchers }) => {
   const dispatch = useDispatch();
-  const vouchers = useSelector((state: RootState) => state.voucher.availableVouchers);
+  // const vouchers = useSelector((state: RootState) => state.voucher.availableVouchers);
   const selectedDiscountVoucherId = useSelector((state: RootState) => state.voucher.selectedDiscountVoucherId);
   const selectedFreeshipVoucherId = useSelector((state: RootState) => state.voucher.selectedFreeshipVoucherId);
-  
-  // Chia voucher thành 2 loại dựa trên type
-  const discountVouchers = vouchers.filter(voucher => voucher.type === 'discount');
-  const freeshipVouchers = vouchers.filter(voucher => voucher.type === 'freeship');
+  const totalPrice = useSelector((state: RootState) => state.cart.items.reduce((total, book) => {
+    if (book.checked) {
+      return total + (book.salePrice || book.price) * book.quantity;
+    }
+    return total;
+  }, 0));
 
-  const handleApply = (id: number, type: any) => {
-    dispatch(applyVoucher({ id, type }));
+  const handleApply = (id: number, type: 'discount' | 'freeship', min_order_val: number) => {
+    if (totalPrice >= min_order_val) {
+      dispatch(applyVoucher({ id, type }));
+    } else {
+      alert(`Đơn hàng phải có giá trị tối thiểu là ${min_order_val} để áp dụng voucher này.`);
+    }
   };
 
-  const handleDeselect = (type: any) => {
+  const handleDeselect = (type: 'discount' | 'freeship') => {
     dispatch(deselectVoucher(type));
   };
 
-  const handleViewDetail = (id: number) => {
-    alert(`Chi tiết voucher ${id}`);
-  };
+  // const handleViewDetail = (id: number) => {
+  //   alert(`Chi tiết voucher ${id}`);
+  // };
 
+  // Sắp xếp các voucher theo giá trị giảm giá hoặc phần trăm giảm giá theo thứ tự giảm dần
+  const sortedDiscountVouchers = discountVouchers.sort((a, b) => {
+    const discountA = totalPrice >= a.min_order_val ? (a.discount_val || (a.discount_perc / 100) * totalPrice) : -Infinity;
+    const discountB = totalPrice >= b.min_order_val ? (b.discount_val || (b.discount_perc / 100) * totalPrice) : -Infinity;
+    return discountB - discountA;
+  });
+
+  const sortedFreeshipVouchers = freeshipVouchers.sort((a, b) => {
+    const discountA = totalPrice >= a.min_order_val ? (a.discount_val || (a.discount_perc / 100) * totalPrice) : -Infinity;
+    const discountB = totalPrice >= b.min_order_val ? (b.discount_val || (b.discount_perc / 100) * totalPrice) : -Infinity;
+    return discountB - discountA;
+  });
+
+  const animation = useModalOpenAnimation(isOpen);
   return (
     <Modal
       isOpen={isOpen}
@@ -51,7 +67,7 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose }) =
       overlayClassName="fixed inset-0 bg-gray-600 bg-opacity-75"
       className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] bg-white rounded shadow-lg"
     >
-      <div className="p-6">
+      <animated.div style={animation} className="p-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-4 border-b-2">
           <h2 className="text-xl font-bold mb-2 text-violet-700">CHỌN MÃ KHUYẾN MÃI</h2>
@@ -66,17 +82,17 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose }) =
             <h3 className="font-semibold">Mã giảm giá</h3>
             <h3>Áp dụng tối đa 1</h3>
           </div>
-          {discountVouchers.map((voucher) => (
+          {sortedDiscountVouchers.map((voucher) => (
             <VoucherItem
               key={voucher.id}
-              id={voucher.id}
-              title={voucher.title}
+              name={voucher.name}
               desc={voucher.desc}
-              type={voucher.type}
-              isSelected={voucher.id === selectedDiscountVoucherId}
-              onApply={() => handleApply(voucher.id, 'discount')}
+              type="discount"
+              isSelected={selectedDiscountVoucherId === voucher.id}
+              isApplicable={totalPrice >= voucher.min_order_val}
+              onApply={() => handleApply(voucher.id, 'discount', voucher.min_order_val)}
               onDeselect={() => handleDeselect('discount')}
-              onViewDetail={() => handleViewDetail(voucher.id)}
+              onViewDetail={() => {}}
             />
           ))}
         </div>
@@ -87,22 +103,22 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose }) =
             <h3 className="font-semibold">Mã vận chuyển</h3>
             <h3>Áp dụng tối đa 1</h3>
           </div>
-          {freeshipVouchers.map((voucher) => (
+          {sortedFreeshipVouchers.map((voucher) => (
             <VoucherItem
               key={voucher.id}
-              id={voucher.id}
-              title={voucher.title}
+              name={voucher.name}
               desc={voucher.desc}
-              type={voucher.type}
-              isSelected={voucher.id === selectedFreeshipVoucherId}
-              onApply={() => handleApply(voucher.id, 'freeship')}
+              type="freeship"
+              isSelected={selectedFreeshipVoucherId === voucher.id}
+              isApplicable={totalPrice >= voucher.min_order_val}
+              onApply={() => handleApply(voucher.id, 'freeship', voucher.min_order_val)}
               onDeselect={() => handleDeselect('freeship')}
-              onViewDetail={() => handleViewDetail(voucher.id)}
+              onViewDetail={() => {}}
             />
           ))}
         </div>
 
-      </div>
+      </animated.div>
     </Modal>
   );
 };

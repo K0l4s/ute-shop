@@ -12,6 +12,8 @@ import { showToast } from "../../utils/toastUtils";
 const Cart: React.FC = () => {
   // Lấy item từ store
   const books = useSelector((state: RootState) => state.cart.items);
+  const selectedDiscountVoucherId = useSelector((state: RootState) => state.voucher.selectedDiscountVoucherId);
+  const availableVouchers = useSelector((state: RootState) => state.voucher.availableVouchers);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [selectAll, setSelectAll] = useState(false);
@@ -103,6 +105,13 @@ const Cart: React.FC = () => {
     return total;
   }, 0);
 
+  // Lấy thông tin voucher đã chọn
+  const selectedDiscountVoucher = availableVouchers.find(voucher => voucher.id === selectedDiscountVoucherId && voucher.type === 'discount');
+
+  // Tính toán lại tổng tiền sau khi áp dụng discount
+  const discountAmount = selectedDiscountVoucher ? (selectedDiscountVoucher.discount_val || (selectedDiscountVoucher.discount_perc / 100) * totalPrice) : 0;
+  const finalTotalPrice = totalPrice - discountAmount;
+
   // Kiểm tra xem có sách nào được check không
   const isAnyBookChecked = books.some((book) => book.checked);
   
@@ -115,7 +124,7 @@ const Cart: React.FC = () => {
     const selectedItems = books.filter(book => book.checked);
     const shipping_method = "STANDARD";
     const payment_method = "COD";
-    const totalAmount = totalPrice;
+    const totalAmount = finalTotalPrice;
 
     try {
       const response = await encodeCartData({ selectedItems, shipping_method, payment_method, totalAmount});
@@ -178,7 +187,7 @@ const Cart: React.FC = () => {
             <h2 className="text-lg font-bold mb-4 text-violet-700">THÀNH TIỀN</h2>
             <div className="flex justify-between mb-4">
               <span className="font-semibold">Tổng số tiền</span>
-              <span className="font-bold text-red-500">{totalPrice.toLocaleString()} đ</span>
+              <span className="font-bold text-red-500">{finalTotalPrice.toLocaleString()} đ</span>
             </div>
             <button 
               className="w-full bg-red-600 text-white font-bold py-2 rounded hover:bg-red-700"
