@@ -4,7 +4,8 @@ import { searchBooks } from "../../../apis/book";
 import { FaEdit, FaEye, FaTrash, FaSortUp, FaSortDown, FaPlus } from "react-icons/fa";
 import Pagination from "../../../components/pagination/Pagination";
 import ModalCreateBook from "../../../components/modals/ModalCreateBook";
-
+import Papa, { ParseError, ParseResult } from 'papaparse';
+import * as XLSX from 'xlsx';
 interface Book {
     Author: { Id: number; name: string };
     ISBN: string;
@@ -25,8 +26,12 @@ interface Book {
     sold_count: number;
     stock: number;
     title: string;
-    total_sold: number;
+    total_sold: string;
     year: number;
+}
+interface BookData {
+    isbn: string;
+    quantity: number;
 }
 
 type SortOrder = 'asc' | 'desc';
@@ -132,7 +137,61 @@ const AdminProduct = () => {
     const closeModal = () => {
         setIsOpenCreateBook(false);
     }
-
+    const importMultiBook = () => {
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = '.csv, .xlsx';
+        
+        fileInput.onchange = (e: Event) => {
+            const file = (e.target as HTMLInputElement).files?.[0];
+            if (!file) return;
+    
+            const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    
+            // Handle CSV files
+            if (fileExtension === 'csv') {
+                Papa.parse<BookData>(file, {
+                    header: true,
+                    complete: (results: ParseResult<BookData>) => {
+                        // Extract "isbn" and "quantity" columns
+                        results.data.forEach((row: BookData) => {
+                            console.log(`ISBN: ${row.isbn}, Quantity: ${row.quantity}`);
+                        });
+                    },
+                    error: (error: Error) => {
+                        console.error("Error parsing CSV:", error.message);
+                    }
+                });
+            }
+            // Handle XLSX files
+            else if (fileExtension === 'xlsx') {
+                const reader = new FileReader();
+    
+                reader.onload = (e) => {
+                    const data = new Uint8Array(e.target?.result as ArrayBuffer);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json<BookData>(firstSheet);
+    
+                    // Extract "isbn" and "quantity" columns
+                    jsonData.forEach((row: BookData) => {
+                        console.log(`ISBN: ${row.isbn}, Quantity: ${row.quantity}`);
+                    });
+                };
+    
+                reader.onerror = (ev: ProgressEvent<FileReader>) => {
+                    console.error("Error reading XLSX file:", ev.target?.error?.message);
+                };
+    
+                reader.readAsArrayBuffer(file);
+            } else {
+                console.error("Unsupported file format");
+            }
+        };
+    
+        // Trigger file input dialog
+        fileInput.click();
+    };
     return (
         <div className="p-8 text-white">
             <h1 className="text-2xl font-semibold mb-4">Quản lý sách</h1>
@@ -165,7 +224,7 @@ const AdminProduct = () => {
             <div className="flex flex-cols gap-3">
                 <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5" onClick={openModal}>
                     <FaPlus className="mr-2" />Thêm sách</button>
-                <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5">
+                <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5" onClick={importMultiBook}>
                     <FaPlus className="mr-2" />Nhập hàng hàng loạt</button>
             </div>
             {/* Table */}
@@ -196,7 +255,7 @@ const AdminProduct = () => {
                                 Bán {sortField === 'total_sold' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                             </th>
                             <th className="px-5 py-4 cursor-pointer" onClick={() => handleSort('stock')}>
-                                Kho {sortField === 'stock' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                                Tồn kho {sortField === 'stock' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
                             </th>
                             <th className="px-5 py-4">Trạng thái</th>
                             <th className="px-5 py-4">Thao tác</th>
@@ -215,9 +274,9 @@ const AdminProduct = () => {
                                 <td className="px-5 py-4 ">{book.Publisher?.name}</td>
                                 <td className="px-5 py-4 ">{formatMoney(Number(book.price))}</td>
                                 <td className="px-5 py-4 ">{formatMoney(Number(book.salePrice))}</td>
-                                <td className="px-5 py-4">{book.total_sold}</td>
-                                <td className="px-5 py-4 ">{book.stock}</td>
-                                <td className="px-5 py-4 ">{book.total_sold < book.stock ?
+                                <td className="px-5 py-4">{book.total_sold ? book.total_sold : "0"}</td>
+                                <td className="px-5 py-4 ">{book.stock - Number(book.total_sold)}</td>
+                                <td className="px-5 py-4 ">{Number(book.total_sold) < book.stock ?
                                     <p className="bg-green-200 rounded-xl p-1 text-black text-center">Còn hàng</p>
                                     :
                                     <p className="bg-red-200 rounded-xl p-1 text-center">Hết hàng</p>}</td>

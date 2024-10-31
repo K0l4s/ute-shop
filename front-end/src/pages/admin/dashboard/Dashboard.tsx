@@ -3,6 +3,7 @@ import { getTop10BooksAPI } from "../../../apis/book";
 import { getReportAPI } from "../../../apis/report";
 import LineChart from "./LineChart";
 import useIntersectionObserver from "../../../hook/useIntersectionObserver";
+import PieChart from "./PieChart";
 
 interface Book {
   id: number;
@@ -38,7 +39,7 @@ const Dashboard = () => {
   const { isVisible: isOrdersVisible, elementRef: ordersRef } = useIntersectionObserver();
   const { isVisible: isBooksVisible, elementRef: booksRef } = useIntersectionObserver();
   const { isVisible: isSoldBooksVisible, elementRef: soldBooksRef } = useIntersectionObserver();
-
+  const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
   const [top10Books, setTop10Books] = useState<Book[]>([]);
   const [report, setReport] = useState<ReportProps>({
     totalUsers: 0,
@@ -57,9 +58,9 @@ const Dashboard = () => {
     }
   };
 
-  const getReport = async () => {
+  const getReport = async (currentYear: number) => {
     try {
-      const res = await getReportAPI();
+      const res = await getReportAPI(currentYear);
       setReport(res);
     } catch (err) {
       console.error("Error fetching report data: ", err);
@@ -68,7 +69,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     getTop10Books();
-    getReport();
+    getReport(2024);
   }, []);
 
   const chartData = {
@@ -77,7 +78,22 @@ const Dashboard = () => {
       {
         label: "Revenue (VND)",
         data: report.monthlyData.map((data) => data.revenue) || [],
-        backgroundColor: "linear-gradient(90deg, #3B82F6, #10B981)", // Gradient cho biểu đồ
+        backgroundColor: "linear-gradient(90deg, #3B82E6, #10B981)",
+        fill: true,
+      },
+    ],
+  };
+
+  const pieChartData = {
+    labels: top10Books.map((book) => book.title),
+    datasets: [
+      {
+        label: "Top 10 Books",
+        data: top10Books.map((book) => book.totalSell),
+        backgroundColor: [
+          "#3B82E6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6",
+          "#F472B6", "#34D399", "#FBBF24", "#6B7280", "#4B5563",
+        ],
       },
     ],
   };
@@ -89,86 +105,110 @@ const Dashboard = () => {
   const totalSoldBooks = report.monthlyData
     .reduce((acc, month) => acc + Number(month.totalSold || 0), 0)
     .toLocaleString();
+
   const formatDateTime = (date: string) => {
     const d = new Date(date);
     return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()} ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
-  }
+  };
+
+  useEffect(() => {
+    getReport(currentYear);
+  }, [currentYear]);
+
   return (
-    <div className="p-5">
-      <h2 className="text-2xl font-semibold text-center text-white">Dashboard Overview</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 my-6 min-h-[120px]">
-        <div
-          ref={totalUsersRef}
-          className={`bg-gradient-to-r from-blue-400 to-blue-600 p-4 rounded-lg text-center shadow-lg flex flex-col items-center justify-center transition-opacity duration-700 ${
-            isTotalUsersVisible ? 'opacity-100' : 'opacity-0'
-          }`}
+    <div className="p-5 space-y-6">
+      <h2 className="text-2xl font-semibold text-center text-white">TỔNG QUAN UTESHOP TRONG NĂM {currentYear}</h2>
+      <div className="text-center">
+        <label htmlFor="year" className="text-white font-bold mr-2">Chọn năm:</label>
+        <select
+          value={currentYear}
+          onChange={(e) => setCurrentYear(Number(e.target.value))}
+          className="bg-gradient-to-r from-violet-400 to-violet-600 text-white p-2 rounded-lg focus:outline-none font-bold"
         >
-          <h3 className="font-semibold text-white">Total Users</h3>
-          <p className="text-4xl font-bold text-white">{report.totalUsers}</p>
-        </div>
-
-        <div
-          ref={revenueRef}
-          className={`bg-gradient-to-r from-purple-400 to-purple-600 p-4 rounded-lg text-center shadow-lg flex flex-col items-center justify-center transition-opacity duration-700 ${
-            isRevenueVisible ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <h3 className="font-semibold text-white">Total Revenue</h3>
-          <p className="text-4xl font-bold text-white">{totalRevenue}</p>
-        </div>
-
-        <div
-          ref={ordersRef}
-          className={`bg-gradient-to-r from-green-400 to-green-600 p-4 rounded-lg text-center shadow-lg flex flex-col items-center justify-center transition-opacity duration-700 ${
-            isOrdersVisible ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <h3 className="font-semibold text-white">Total Orders</h3>
-          <p className="text-4xl font-bold text-white">{report.totalOrders}</p>
-        </div>
-
-        <div
-          ref={booksRef}
-          className={`bg-gradient-to-r from-purple-500 to-purple-700 p-4 rounded-lg text-center shadow-lg flex flex-col items-center justify-center transition-opacity duration-700 ${
-            isBooksVisible ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <h3 className="font-semibold text-white">Total Books</h3>
-          <p className="text-4xl font-bold text-white">{report.totalBooks}</p>
-        </div>
-
-        <div
-          ref={soldBooksRef}
-          className={`bg-gradient-to-r from-pink-400 to-pink-600 p-4 rounded-lg text-center shadow-lg flex flex-col items-center justify-center transition-opacity duration-700 ${
-            isSoldBooksVisible ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <h3 className="font-semibold text-white">Total Sold Books</h3>
-          <p className="text-4xl font-bold text-white">{totalSoldBooks}</p>
-        </div>
+          {Array.from({ length: 12 }).map((_, index) => (
+            <option
+              key={index}
+              value={new Date().getFullYear() - index}
+              className="text-black font-bold"
+            >
+              {new Date().getFullYear() - index}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <div className="flex flex-col lg:flex-row">
-        <div className="lg:w-2/3 p-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {/* Info Cards */}
+        {[
+          { ref: totalUsersRef, title: 'NGƯỜI DÙNG', value: report.totalUsers, visible: isTotalUsersVisible },
+          { ref: revenueRef, title: 'DOANH THU', value: totalRevenue, visible: isRevenueVisible },
+          { ref: ordersRef, title: 'HÓA ĐƠN', value: report.totalOrders, visible: isOrdersVisible },
+          { ref: booksRef, title: 'SÁCH', value: report.totalBooks, visible: isBooksVisible },
+          { ref: soldBooksRef, title: 'SÁCH BÁN RA', value: totalSoldBooks, visible: isSoldBooksVisible },
+        ].map((card, index) => (
+          <div
+            key={index}
+            ref={card.ref}
+            className={`bg-gradient-to-r p-4 rounded-lg text-center shadow-lg flex flex-col items-center justify-center transition-opacity duration-700 ${
+              card.visible ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{
+              background: `linear-gradient(to right, ${index % 2 === 0 ? '#4F46E5' : '#D946EF'}, ${
+                index % 2 === 0 ? '#9333EA' : '#EC4899'
+              })`,
+            }}
+          >
+            <h3 className="font-semibold text-white">{card.title}</h3>
+            <p className="text-4xl font-bold text-white">{card.value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 space-y-4">
           <LineChart data={chartData} />
+          <PieChart data={pieChartData} />
+          <div>
+        <h3 className="font-semibold text-center text-white">NGƯỜI DÙNG MỚI</h3>
+        <ul className="flex flex-wrap gap-4 mt-4 justify-center">
+          {report.newUsers.map((user) => (
+            <li key={user.id} className="bg-gradient-to-r from-green-400 to-green-600 rounded-lg p-4 text-center shadow-lg">
+              <img src={user.avatar_url} alt={user.firstname} className="w-24 h-24 rounded-full mx-auto mb-2 object-cover shadow-lg" />
+              <p className="font-bold text-white">{user.firstname} {user.lastname}</p>
+              <p className="text-white">{formatDateTime(user.createAt)}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
         </div>
-        <div className="lg:w-1/3 p-4">
-          <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-lg shadow-lg p-4 mb-4 text-black">
-            <h3 className="font-semibold text-center">Top 10 Bestselling Books</h3>
+
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-lg shadow-lg p-4">
+            <h3 className="font-semibold text-center text-black">TOP 10 SÁCH BÁN CHẠY HIỆN TẠI</h3>
             <ul className="mt-4 space-y-2">
               {top10Books.map((book, index) => (
-                <li
-                  key={book.id}
-                  className="flex justify-between cursor-pointer 
-                           transition-colors 
-                           hover:text-white
-                           duration-300
-                           ease-in-out
-                           hover:font-bold hover:bg-gradient-to-r 
-                           hover:from-yellow-900 hover:to-transparent p-2 rounded-full"
-                >
+                <li key={book.id} className="flex justify-between p-2 rounded-full hover:bg-yellow-700 hover:text-white transition">
                   <span>{index + 1}. {book.title}</span>
-                  <span>{book.totalSell || 0}</span>
+                  <span>{book.totalSell} quyển</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg shadow-lg p-4">
+            <h3 className="font-semibold text-center text-black">DOANH THU THEO THÁNG</h3>
+            <ul className="mt-4 space-y-2">
+              {report.monthlyData.map((data, index) => (
+                <li key={data.month} className="flex justify-between p-2 rounded-full hover:bg-blue-700 hover:text-white transition">
+                  <span>Tháng {data.month}</span>
+                  <span>{data.revenue.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</span>
+                  <span className={`text-sm font-semibold ${
+                    index > 0
+                      ? data.revenue > report.monthlyData[index - 1].revenue ? "text-green-500" : "text-red-500"
+                      : "text-white"
+                  }`}>
+                    {index > 0 && (data.revenue > report.monthlyData[index - 1].revenue ? "▲" : "▼")}
+                  </span>
                 </li>
               ))}
             </ul>
@@ -176,24 +216,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="mt-6">
-        <h3 className="text-xl font-semibold text-white">New Users</h3>
-        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-          {report.newUsers.map((user) => (
-            <li key={user.id} className="flex items-center bg-gradient-to-r from-green-400 to-green-600 rounded-lg p-4 shadow-md text-white">
-              <img
-                src={user.avatar_url || "default-avatar-url"}
-                alt="avatar"
-                className="w-10 h-10 rounded-full mr-4"
-              />
-              <div>
-                <p className="font-medium">{user.firstname} {user.lastname}</p>
-                <p className="text-gray-200 text-sm">Joined: {formatDateTime(user.createAt)}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+      
     </div>
   );
 };
