@@ -4,7 +4,8 @@ const Detail_Order = db.Detail_Order;
 const Book = db.Book;
 const Payment = db.Payment;
 const Notification = db.Notification;
-
+const User = db.User;
+const orderStatus = require('../enums/orderStatus');
 // Hàm WebSocket để gửi thông báo
 const sendNotificationToClient = (wss, userId, message) => {
   if (!wss || !wss.clients) {
@@ -30,7 +31,7 @@ const createOrder = async (userId, orderData, transaction, wss) => {
       shipping_method: shipping_method,
       shipping_fee: shipping_fee,
       status: 'PENDING', // Đơn hàng mới tạo sẽ có trạng thái mặc định là PENDING
-    }, {transaction});
+    }, { transaction });
 
     // Thêm chi tiết đơn hàng
     for (const item of orderItems) {
@@ -49,7 +50,7 @@ const createOrder = async (userId, orderData, transaction, wss) => {
         book_id: item.book_id,
         quantity: item.quantity,
         price: item.unit_price
-      }, {transaction});
+      }, { transaction });
     }
 
     let payment_date = null;
@@ -65,14 +66,14 @@ const createOrder = async (userId, orderData, transaction, wss) => {
       payment_date: payment_date,
       payment_method, // COD hoặc VNPAY
       status: 'PENDING'
-    }, {transaction});
+    }, { transaction });
 
     // Tạo một thông báo mới trong database
-  
+
     if (payment_method === "COD") {
       const newNotification = await Notification.create({
         user_id: userId,
-        order_id: newOrder.id? newOrder.id : null,
+        order_id: newOrder.id ? newOrder.id : null,
         message: `Đơn hàng #${newOrder.id} của bạn đã được đặt thành công và đang chờ xử lý.`,
         type: 'ORDER_UPDATE',
         createdAt: new Date(),
@@ -92,14 +93,14 @@ const getOrderById = async (orderId) => {
   try {
     const order = await Order.findByPk(orderId, {
       include: [
-      {
-        model: Detail_Order,
-        as: 'orderDetails',
-        include: {
-          model: Book,
-          as: 'book'
+        {
+          model: Detail_Order,
+          as: 'orderDetails',
+          include: {
+            model: Book,
+            as: 'book'
+          }
         }
-      }
       ],
     });
 
@@ -128,18 +129,18 @@ const getOrdersByUserId = async (id) => {
     const orders = await Order.findAll({
       where: { user_id: id },
       include: [
-      {
-        model: Detail_Order,
-        as: 'orderDetails',
-        include: {
-          model: Book,
-          as: 'book'
-        },
-      }
+        {
+          model: Detail_Order,
+          as: 'orderDetails',
+          include: {
+            model: Book,
+            as: 'book'
+          },
+        }
       ],
       order: [['order_date', 'DESC']]
     });
-    if(!orders) {
+    if (!orders) {
       throw new Error('No orders found');
     }
     return orders;
@@ -151,18 +152,23 @@ const getAllOrders = async () => {
   try {
     const orders = await Order.findAll({
       include: [
-      {
-        model: Detail_Order,
-        as: 'orderDetails',
-        include: {
-          model: Book,
-          as: 'book'
+        {
+          model: Detail_Order,
+          as: 'orderDetails',
+          include: {
+            model: Book,
+            as: 'book'
+          },
         },
-      }
+        {
+          model: User,
+          as: 'user'
+        }
+
       ],
       order: [['order_date', 'DESC']]
     });
-    if(!orders) {
+    if (!orders) {
       throw new Error('No orders found');
     }
     return orders;
@@ -176,17 +182,20 @@ const shipOrder = async (orderId) => {
     if (!order) {
       throw new Error(`Order with ID ${orderId} not found`);
     }
-    if(order.status == 'PENDING') {
-      throw new Error(`Order with ID ${orderId} has not been confirmed yet`);
+    if (order.status == orderStatus.PENDING) {
+      throw new Error(`Order with ID ${orderId} must be confirmed first`);
     }
-    if(order.status == 'SHIPPED') {
+    else if (order.status == orderStatus.SHIPPED) {
       throw new Error(`Order with ID ${orderId} has been shipped`);
     }
-    if(order.status == 'CANCELLED') {
+    else if (order.status == orderStatus.CANCELLED) {
       throw new Error(`Order with ID ${orderId} has been cancelled`);
     }
-    if (order.status !== 'PROCESSING') {
+    else if (order.status === orderStatus.PROCESSING) {
       throw new Error(`Order with ID ${orderId} has been processed`);
+    }
+    else if (order.status === orderStatus.RETURNED) {
+      throw new Error(`Order with ID ${orderId} has been returned`);
     }
 
     await order.update({ status: 'SHIPPED' });
@@ -202,18 +211,29 @@ const cancelOrder = async (orderId) => {
     if (!order) {
       throw new Error(`Order with ID ${orderId} not found`);
     }
-    if(order.status == 'PENDING') {
-      throw new Error(`Order with ID ${orderId} has not been confirmed yet`);
-    }
-    if(order.status == 'CANCELLED') {
-      throw new Error(`Order with ID ${orderId} has been cancelled yet`);
-    }
-    if(order.status == 'SHIPPED') {
+    else if (order.status == orderStatus.SHIPPED) {
       throw new Error(`Order with ID ${orderId} has been shipped`);
     }
-    if (order.status !== 'PROCESSING') {
+    else if (order.status == orderStatus.CANCELLED) {
+      throw new Error(`Order with ID ${orderId} has been cancelled`);
+    }
+    else if (order.status !== orderStatus.PROCESSING) {
       throw new Error(`Order with ID ${orderId} has been processed`);
     }
+    else if (order.status !== orderStatus.DELIVERED) {
+      throw new Error(`Order with ID ${orderId} has been delivered`);
+    }
+    else if (order.status !== orderStatus.RETURNED) {
+      throw new Error(`Order with ID ${orderId} has been returned`);
+    }
+    // cho phép hủy đơn trong vòng 30 phút
+    const currentTime = new Date();
+    const orderTime = order.order_date;
+    const diff = (currentTime - orderTime) / 60000;
+    if (diff > 30) {
+      throw new Error('Order cannot be cancelled after 30 minutes');
+    }
+
 
     await order.update({ status: 'CANCELLED' });
 
@@ -222,10 +242,179 @@ const cancelOrder = async (orderId) => {
     throw new Error(error.message);
   }
 }
+const returnOrder = async (orderId) => {
+  // đơn hàng phải delivered hoặc shipped mới được trả lại. 
+  // trường hợp shipped thì được trả hàng trong vòng 7 ngày
+  // trường hợp delivered thì được trả hàng trong vòng 24 giờ
+  try {
+    const order = await Order.findByPk(orderId);
+    if (!order) {
+      throw new Error(`Order with ID ${orderId} not found`);
+    }
+    if (order.status == orderStatus.CONFIRMED) {
+      throw new Error(`Order with ID ${orderId} was confirmed`);
+    }
+    else if (order.status == orderStatus.CANCELLED) {
+      throw new Error(`Order with ID ${orderId} has been cancelled`);
+    }
+    else if (order.status === orderStatus.RETURNED) {
+      throw new Error(`Order with ID ${orderId} has been returned`);
+    }
+    else if (order.status === orderStatus.PROCESSING) {
+      throw new Error(`Order with ID ${orderId} has been processed`);
+    }else if (order.status === orderStatus.PENDING) {
+      throw new Error(`Order with ID ${orderId} was not confirmed`);
+    }
+
+    const currentTime = new Date();
+    const orderTime = order.order_date;
+    const diff = (currentTime - orderTime) / 60000;
+    if (diff > 7 * 24 * 60 && order.status == orderStatus.SHIPPED) {
+      throw new Error('Order cannot be returned after 7 days');
+    }
+    else if (diff > 24 * 60 && order.status == orderStatus.DELIVERED) {
+      throw new Error('Order cannot be returned after 24 hours');
+    }
+    await order.update({ status: 'RETURNED' });
+
+    return order;
+  }
+  catch (error) {
+    throw new Error(error.message);
+  }
+}
+
+const confirmOrder = async (orderId) => {
+  try {
+    const order = await Order.findByPk(orderId);
+    if (!order) {
+      throw new Error(`Order with ID ${orderId} not found`);
+    }
+    if (order.status == orderStatus.CONFIRMED) {
+      throw new Error(`Order with ID ${orderId} was confirmed`);
+    }
+    else if (order.status == orderStatus.CANCELLED) {
+      throw new Error(`Order with ID ${orderId} has been cancelled`);
+    }
+    else if (order.status === orderStatus.RETURNED) {
+      throw new Error(`Order with ID ${orderId} has been returned`);
+    }
+    else if (order.status === orderStatus.PROCESSING) {
+      throw new Error(`Order with ID ${orderId} has been processed`);
+    }
+    else if (order.status === orderStatus.DELIVERED) {
+      throw new Error(`Order with ID ${orderId} has been delivered`);
+    }
+    await order.update({ status: 'CONFIRMED' });
+
+    return order;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+const processOrder = async (orderId) => {
+  try {
+    const order = await Order.findByPk(orderId);
+    if (!order) {
+      throw new Error(`Order with ID ${orderId} not found`);
+    }
+    else if (order.status == orderStatus.CANCELLED) {
+      throw new Error(`Order with ID ${orderId} has been cancelled`);
+    }
+    else if (order.status === orderStatus.RETURNED) {
+      throw new Error(`Order with ID ${orderId} has been returned`);
+    }
+    else if (order.status === orderStatus.PROCESSING) {
+      throw new Error(`Order with ID ${orderId} has been processed`);
+    }
+    else if (order.status === orderStatus.DELIVERED) {
+      throw new Error(`Order with ID ${orderId} has been delivered`);
+    }
+    else if (order.status === orderStatus.SHIPPED) {
+      throw new Error(`Order with ID ${orderId} has been shipped`);
+    }
+    await order.update({ status: 'PROCESSING' });
+
+    return order;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+const deliverOrder = async (orderId) => {
+  try {
+    const order = await Order.findByPk(orderId);
+    if (!order) {
+      throw new Error(`Order with ID ${orderId} not found`);
+    }
+    else if (order.status === orderStatus.CANCELLED) {
+      throw new Error(`Order with ID ${orderId} has been cancelled`);
+    }
+    else if (order.status === orderStatus.RETURNED) {
+      throw new Error(`Order with ID ${orderId} has been returned`);
+    }
+    else if (order.status === orderStatus.DELIVERED) {
+      throw new Error(`Order with ID ${orderId} has been delivered`);
+    }
+    else if (order.status === orderStatus.SHIPPED) {
+      throw new Error(`Order with ID ${orderId} has been shipped`);
+    }
+    await order.update({ status: 'DELIVERED' });
+
+    return order;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+const updateOrder = async (orderId, status, userId) => {
+  try {
+    let order = null;
+    if ((status == orderStatus.CANCELLED ||
+      status == orderStatus.RETURNED ||
+      status == orderStatus.PENDING 
+    ) && isUser(orderId, userId)) {
+      throw new Error('You do not have permission to perform this action');
+    }
+    if (status == orderStatus.CANCELLED ) {
+      order = await cancelOrder(orderId);
+    }
+    else if (status == orderStatus.RETURNED ) {
+      order = await returnOrder(orderId);
+    }
+    else if (status == orderStatus.CONFIRMED) {
+      order = await confirmOrder(orderId);
+    }
+    else if (status == orderStatus.PROCESSING) {
+      order = await processOrder(orderId);
+    }
+    else if (status == orderStatus.DELIVERED) {
+      order = await deliverOrder(orderId);
+    }
+    else if (status == orderStatus.SHIPPED) {
+      order = await shipOrder(orderId);
+    }
+    else {
+      throw new Error('Invalid status');
+    }
+    return order;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+const isUser = async (orderId, userId) => {
+  // kiểm tra user_id của order có là userId không
+  const order = await Order.findByPk(orderId)
+  console.log(order.user_id)
+  console.log(userId)
+  console.log(order.user_id === userId)
+  if (order.user_id === userId) {
+    return true;
+  }
+  return false;
+}
 module.exports = {
   createOrder,
   getOrderById,
   getOrdersByUserId,
   getAllOrders,
-  shipOrder
+  updateOrder
 };
