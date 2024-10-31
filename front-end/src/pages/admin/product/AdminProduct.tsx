@@ -4,7 +4,7 @@ import { searchBooks } from "../../../apis/book";
 import { FaEdit, FaEye, FaTrash, FaSortUp, FaSortDown, FaPlus } from "react-icons/fa";
 import Pagination from "../../../components/pagination/Pagination";
 import ModalCreateBook from "../../../components/modals/ModalCreateBook";
-import Papa, { ParseError, ParseResult } from 'papaparse';
+import Papa, { ParseResult } from 'papaparse';
 import * as XLSX from 'xlsx';
 interface Book {
     Author: { Id: number; name: string };
