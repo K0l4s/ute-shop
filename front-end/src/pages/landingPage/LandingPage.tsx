@@ -3,7 +3,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
+import { Navigation, Pagination, Scrollbar, A11y, Autoplay } from 'swiper/modules';
 import { useNavigate } from "react-router-dom";
 import { getTop10BooksAPI } from "../../apis/book";
 import lifechangingbooks from "../../assets/images/life-changing-books.jpg";
@@ -39,7 +39,10 @@ const LandingPage = () => {
   useEffect(() => {
     getTop10Books();
   }, []);
-
+  // formatPrioce to locale string vn-Vn
+  const formatPrice = (price: string) => {
+    return parseInt(price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+  };
   return (
     <div className=" min-h-screen">
       {/* Hero Section */}
@@ -73,21 +76,25 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold mb-6 text-center text-white">Sách bán chạy</h2>
           <Swiper
-            modules={[Navigation, Pagination, Scrollbar, A11y]}
+            modules={[Navigation, Pagination, Scrollbar, A11y, Autoplay]}
             spaceBetween={20}
             slidesPerView={1} // Thay đổi để phù hợp với màn hình nhỏ
             navigation
             pagination={{ clickable: true }}
             scrollbar={{ draggable: true }}
+            autoplay={{
+              delay: 2000, // thời gian giữa các lần cuộn (3000ms = 3 giây)
+              disableOnInteraction: false, // tiếp tục autoplay sau khi người dùng tương tác
+            }}
             breakpoints={{
               640: {
-                slidesPerView: 2, // 2 slides cho màn hình từ 640px
+                slidesPerView: 2,
               },
               768: {
-                slidesPerView: 3, // 3 slides cho màn hình từ 768px
+                slidesPerView: 3,
               },
               1024: {
-                slidesPerView: 4, // 4 slides cho màn hình từ 1024px
+                slidesPerView: 4,
               },
             }}
           >
@@ -95,39 +102,43 @@ const LandingPage = () => {
               top10Books.map((book) => (
                 <SwiperSlide key={book.id}>
                   <div
-                    className="bg-gradient-to-b from-green-400 to-green-600 p-4 shadow-lg rounded-lg cursor-pointer"
+                    className="bg-gradient-to-b from-green-400 to-green-600 p-4 shadow-lg rounded-lg cursor-pointer h-full grid justify-between"
                     onClick={() => navigate("/products/" + book.id)}
                   >
-                    <img
-                      src={book.cover_img_url}
-                      alt={book.title}
-                      className="w-42 h-42 mb-4 object-cover object-fit rounded-xl shadow-xl mx-auto"
-                    />
-                    <h3 className="font-semibold text-center">{book.title}</h3>
-                    <div className="text-center">
-                      <p className="text-xl text-red-500 font-semibold">{book.salePrice ? `$${book.salePrice}` : ''}</p>
-                      <p className="line-through text-gray-500">{book.price ? `$${book.price}` : ''}</p>
+                    <div>
+                      <img
+                        src={book.cover_img_url}
+                        alt={book.title}
+                        className="w-42 min-h-[450px] max-h-[450px] mb-4 object-cover object-fit rounded-xl shadow-xl mx-auto"
+                      />
+                      <h3 className="font-semibold text-center min-h-[48px]">{book.title}</h3>
+                      <div className="text-center">
+                        <p className="text-xl text-red-500 font-semibold min-h-[24px]">
+                          {book.salePrice ? `${formatPrice(book.salePrice)}` : ''}
+                        </p>
+                        <p className="line-through text-gray-500 min-h-[24px]">
+                          {book.price ? `${formatPrice(book.price)}` : ''}
+                        </p>
+                      </div>
                     </div>
                     <p className="text-center mt-2">Tổng số lượt bán: {book.totalSell || 0}/{book.stock} cuốn</p>
-                    {/* Thanh progress */}
                     <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
                       <div
-                        className="bg-gradient-to-l from-red-600 to-blue-600  h-2.5 rounded-full"
+                        className="bg-gradient-to-l from-red-600 to-blue-600 h-2.5 rounded-full"
                         style={{ width: `${Math.min((book.totalSell / book.stock) * 100, 100)}%` }}
                       ></div>
                     </div>
                   </div>
                 </SwiperSlide>
               ))
-            ) :
-              (
-                <SwiperSlide>
-                  <div className="bg-white p-4 shadow-lg rounded-lg text-center">
-                    <h3 className="font-semibold">KHÔNG CÓ DỮ LIỆU</h3>
-                    <img src="https://entail-assets.com/egnition/oos-1650365564937.jpg" alt="No Data" className="h-48 mb-4" />
-                  </div>
-                </SwiperSlide>
-              )}
+            ) : (
+              <SwiperSlide>
+                <div className="bg-white p-4 shadow-lg rounded-lg text-center">
+                  <h3 className="font-semibold">KHÔNG CÓ DỮ LIỆU</h3>
+                  <img src="https://entail-assets.com/egnition/oos-1650365564937.jpg" alt="No Data" className="h-48 mb-4" />
+                </div>
+              </SwiperSlide>
+            )}
           </Swiper>
         </div>
       </section>

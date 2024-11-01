@@ -65,9 +65,11 @@ const LineChart: React.FC<LineChartProps> = ({ data, width, height }) => {
           const { ctx, chartArea } = context.chart;
           if (!chartArea) return '#1E3A8A'; // Fallback color
           const gradient = createGradient(ctx, chartArea);
-          context.dataset.backgroundColor = gradient; // Fill the area under the line
+          context.dataset.backgroundColor = gradient;
+           // Fill the area under the line
           return gradient;
         },
+        
         borderWidth: 2,
         fill: true,
       },
