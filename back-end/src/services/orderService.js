@@ -217,13 +217,13 @@ const cancelOrder = async (orderId) => {
     else if (order.status == orderStatus.CANCELLED) {
       throw new Error(`Order with ID ${orderId} has been cancelled`);
     }
-    else if (order.status !== orderStatus.PROCESSING) {
+    else if (order.status == orderStatus.PROCESSING) {
       throw new Error(`Order with ID ${orderId} has been processed`);
     }
-    else if (order.status !== orderStatus.DELIVERED) {
+    else if (order.status == orderStatus.DELIVERED) {
       throw new Error(`Order with ID ${orderId} has been delivered`);
     }
-    else if (order.status !== orderStatus.RETURNED) {
+    else if (order.status == orderStatus.RETURNED) {
       throw new Error(`Order with ID ${orderId} has been returned`);
     }
     // cho phép hủy đơn trong vòng 30 phút
@@ -371,8 +371,8 @@ const updateOrder = async (orderId, status, userId) => {
     if ((status == orderStatus.CANCELLED ||
       status == orderStatus.RETURNED ||
       status == orderStatus.PENDING 
-    ) && isUser(orderId, userId)) {
-      throw new Error('You do not have permission to perform this action');
+    ) && !isUser(orderId, userId)) {
+      throw new Error('Invalid user');
     }
     if (status == orderStatus.CANCELLED ) {
       order = await cancelOrder(orderId);

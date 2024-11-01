@@ -31,6 +31,7 @@ const Login: React.FC<LoginProps> = () => {
         gender: data.data.gender,
         birthday: data.data.birthday,
         avatar_url: data.data.avatar_url,
+        role: data.data.role,
       }));
       localStorage.setItem('userData', JSON.stringify(data.data));
       navigate('/');
