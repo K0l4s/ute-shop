@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import MenuGroup from './MenuGroup';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
+import { BiCalendarEvent } from 'react-icons/bi';
 
 // Define the type for a submenu item
 interface Submenu {
@@ -18,7 +19,7 @@ const AdminLeftBar: React.FC = () => {
         { title: 'Sách', link: '/admin/products', icon: FaBookOpen },
         { title: 'Tác giả', link: '/admin/authors', icon: FaBoxOpen },
         { title: 'Phân loại', link: '/admin/categories', icon: FaBoxOpen },
-        { title: 'Nhà xuất bản', link: '/admin/brands', icon: FaBoxOpen },
+        { title: 'Nhà xuất bản', link: '/admin/publishers', icon: FaBoxOpen },
     ];
 
     const userSubmenus: Submenu[] = [
@@ -53,6 +54,10 @@ const AdminLeftBar: React.FC = () => {
                     <Link to={"/admin/vouchers"} className="flex items-center hover:text-gray-500 cursor-pointer duration-300 ease-in-out p-2">
                         <FaTags className="mr-2" />
                         <span className="hidden lg:block">Mã giảm giá</span>
+                    </Link>
+                    <Link to={"/admin/event"} className="flex items-center hover:text-gray-500 cursor-pointer duration-300 ease-in-out p-2">
+                        <BiCalendarEvent className="mr-2" />
+                        <span className="hidden lg:block">Sự kiện</span>
                     </Link>
                 </ul>
             </div>
