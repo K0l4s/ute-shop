@@ -126,7 +126,7 @@ const Cart: React.FC = () => {
     const shipping_method = "STANDARD";
     const payment_method = "COD";
 
-<!--     const totalAmount = totalPrice; -->
+    //  const totalAmount = totalPrice; 
 
     const totalAmount = finalTotalPrice;
 

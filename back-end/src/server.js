@@ -14,8 +14,6 @@ const checkoutRoutes = require('./routes/checkoutRoutes.js');
 
 const voucherRoutes = require('./routes/voucherRoutes.js');
 
-const checkoutRoutes = require('./routes/checkoutRoutes.js');
-
 const uploadRouter = require('./routes/upload.js');
 
 
@@ -60,8 +58,6 @@ app.use('/api/v1/checkout', checkoutRoutes);
 
 app.use('/api/v1/voucher', voucherRoutes);
 // app.use('/api/v1/payment', paymentRoutes);
-
-app.use('/api/v1/checkout', checkoutRoutes);
 
 app.use('/api/v1/upload', uploadRouter);
 
