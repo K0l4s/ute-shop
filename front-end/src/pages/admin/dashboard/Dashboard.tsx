@@ -1,21 +1,13 @@
 import { useEffect, useState } from "react";
-import BarChart from "./BarChart";
 import { getTop10BooksAPI } from "../../../apis/book";
 import { getReportAPI } from "../../../apis/report";
+import LineChart from "./LineChart";
+import useIntersectionObserver from "../../../hook/useIntersectionObserver";
+import PieChart from "./PieChart";
 
 interface Book {
   id: number;
-  ISBN: string;
   title: string;
-  desc: string;
-  price: string;
-  salePrice: string;
-  year: string;
-  stock: number;
-  cover_img_url: string;
-  publisher_id: number;
-  author_id: number;
-  category_id: number;
   totalSell: number;
 }
 
@@ -25,21 +17,29 @@ interface MonthlyData {
   revenue: number;
 }
 
+interface User {
+  id: number;
+  avatar_url: string;
+  createAt: string;
+  firstname: string;
+  lastname: string;
+}
+
 interface ReportProps {
   totalUsers: number;
   totalOrders: number;
   totalBooks: number;
   monthlyData: MonthlyData[];
-  newUsers: {
-    avatar_url: string;
-    createAt: string;
-    firstname: string;
-    lastname: string;
-    id: number;
-  }[];
+  newUsers: User[];
 }
 
 const Dashboard = () => {
+  const { isVisible: isTotalUsersVisible, elementRef: totalUsersRef } = useIntersectionObserver();
+  const { isVisible: isRevenueVisible, elementRef: revenueRef } = useIntersectionObserver();
+  const { isVisible: isOrdersVisible, elementRef: ordersRef } = useIntersectionObserver();
+  const { isVisible: isBooksVisible, elementRef: booksRef } = useIntersectionObserver();
+  const { isVisible: isSoldBooksVisible, elementRef: soldBooksRef } = useIntersectionObserver();
+  const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
   const [top10Books, setTop10Books] = useState<Book[]>([]);
   const [report, setReport] = useState<ReportProps>({
     totalUsers: 0,
@@ -58,11 +58,10 @@ const Dashboard = () => {
     }
   };
 
-  const getReport = async () => {
+  const getReport = async (currentYear: number) => {
     try {
-      const res = await getReportAPI();
+      const res = await getReportAPI(currentYear);
       setReport(res);
-      console.log(res);
     } catch (err) {
       console.error("Error fetching report data: ", err);
     }
@@ -70,7 +69,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     getTop10Books();
-    getReport();
+    getReport(2024);
   }, []);
 
   const chartData = {
@@ -79,103 +78,146 @@ const Dashboard = () => {
       {
         label: "Revenue (VND)",
         data: report.monthlyData.map((data) => data.revenue) || [],
+        backgroundColor: "linear-gradient(90deg, #3B82E6, #10B981)",
+        fill: true,
+      },
+    ],
+  };
+
+  const pieChartData = {
+    labels: top10Books.map((book) => book.title),
+    datasets: [
+      {
+        label: "Top 10 Books",
+        data: top10Books.map((book) => book.totalSell),
         backgroundColor: [
-          "#3B82F6",
-          "#EF4444",
-          "#F59E0B",
-          "#10B981",
-          "#6366F1",
-          "#8B5CF6",
+          "#3B82E6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6",
+          "#F472B6", "#34D399", "#FBBF24", "#6B7280", "#4B5563",
         ],
       },
     ],
   };
 
-  // Tính tổng doanh thu
-  const totalRevenue = report.monthlyData.reduce(
-    (acc, month) => acc + Number(month.revenue || 0),
-    0
-  ).toLocaleString("vi-VN", { style: "currency", currency: "VND" });
+  const totalRevenue = report.monthlyData
+    .reduce((acc, month) => acc + Number(month.revenue || 0), 0)
+    .toLocaleString("vi-VN", { style: "currency", currency: "VND" });
 
-  // Tính tổng số sách đã bán ra
-  const totalSoldBooks = report.monthlyData.reduce(
-    (acc, month) => acc + Number(month.totalSold || 0),
-    0
-  ).toLocaleString();
+  const totalSoldBooks = report.monthlyData
+    .reduce((acc, month) => acc + Number(month.totalSold || 0), 0)
+    .toLocaleString();
+
+  const formatDateTime = (date: string) => {
+    const d = new Date(date);
+    return `${d.getHours()}:${d.getMinutes()}:${d.getSeconds()} ${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+  };
+
+  useEffect(() => {
+    getReport(currentYear);
+  }, [currentYear]);
 
   return (
-    <>
-      <h2 className="text-2xl font-semibold text-center">
-        Welcome to Admin Dashboard
-      </h2>
-      <div className="w-full h-0.5 bg-gray-300 my-4"></div>
+    <div className="p-5 space-y-6">
+      <h2 className="text-2xl font-semibold text-center text-white">TỔNG QUAN UTESHOP TRONG NĂM {currentYear}</h2>
+      <div className="text-center">
+        <label htmlFor="year" className="text-white font-bold mr-2">Chọn năm:</label>
+        <select
+          value={currentYear}
+          onChange={(e) => setCurrentYear(Number(e.target.value))}
+          className="bg-gradient-to-r from-violet-400 to-violet-600 text-white p-2 rounded-lg focus:outline-none font-bold"
+        >
+          {Array.from({ length: 12 }).map((_, index) => (
+            <option
+              key={index}
+              value={new Date().getFullYear() - index}
+              className="text-black font-bold"
+            >
+              {new Date().getFullYear() - index}
+            </option>
+          ))}
+        </select>
+      </div>
 
-      <h1 className="text-xl font-bold">Tổng doanh thu: {totalRevenue}</h1>
-      <div className="flex flex-col sm:flex-row mb-4">
-        <p className="mr-3">Tính từ</p>
-        <input type="date" className="border rounded p-1" />
-        <p className="ml-3 mr-3">đến</p>
-        <input type="date" className="border rounded p-1" />
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {/* Info Cards */}
+        {[
+          { ref: totalUsersRef, title: 'NGƯỜI DÙNG', value: report.totalUsers, visible: isTotalUsersVisible },
+          { ref: revenueRef, title: 'DOANH THU', value: totalRevenue, visible: isRevenueVisible },
+          { ref: ordersRef, title: 'HÓA ĐƠN', value: report.totalOrders, visible: isOrdersVisible },
+          { ref: booksRef, title: 'SÁCH', value: report.totalBooks, visible: isBooksVisible },
+          { ref: soldBooksRef, title: 'SÁCH BÁN RA', value: totalSoldBooks, visible: isSoldBooksVisible },
+        ].map((card, index) => (
+          <div
+            key={index}
+            ref={card.ref}
+            className={`bg-gradient-to-r p-4 rounded-lg text-center shadow-lg flex flex-col items-center justify-center transition-opacity duration-700 ${
+              card.visible ? 'opacity-100' : 'opacity-0'
+            }`}
+            style={{
+              background: `linear-gradient(to right, ${index % 2 === 0 ? '#4F46E5' : '#D946EF'}, ${
+                index % 2 === 0 ? '#9333EA' : '#EC4899'
+              })`,
+            }}
+          >
+            <h3 className="font-semibold text-white">{card.title}</h3>
+            <p className="text-4xl font-bold text-white">{card.value}</p>
+          </div>
+        ))}
       </div>
-      <div className="flex flex-col lg:flex-row">
-        <div className="w-full lg:w-1/2 p-2">
-          <BarChart data={chartData} />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 space-y-4">
+          <LineChart data={chartData} />
+          <PieChart data={pieChartData} />
+          <div>
+        <h3 className="font-semibold text-center text-white">NGƯỜI DÙNG MỚI</h3>
+        <ul className="flex flex-wrap gap-4 mt-4 justify-center">
+          {report.newUsers.map((user) => (
+            <li key={user.id} className="bg-gradient-to-r from-green-400 to-green-600 rounded-lg p-4 text-center shadow-lg">
+              <img src={user.avatar_url} alt={user.firstname} className="w-24 h-24 rounded-full mx-auto mb-2 object-cover shadow-lg" />
+              <p className="font-bold text-white">{user.firstname} {user.lastname}</p>
+              <p className="text-white">{formatDateTime(user.createAt)}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
         </div>
-        <div className="w-full lg:w-1/2 p-2 grid grid-cols-1 sm:grid-cols-2 text-center gap-4">
-          <div className="bg-blue-200 rounded-xl shadow-xl p-4">
-            <h3 className="font-semibold">Tổng số đơn hàng</h3>
-            <p className="font-bold text-5xl">{report.totalOrders}</p>
+
+        <div className="space-y-4">
+          <div className="bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-lg shadow-lg p-4">
+            <h3 className="font-semibold text-center text-black">TOP 10 SÁCH BÁN CHẠY HIỆN TẠI</h3>
+            <ul className="mt-4 space-y-2">
+              {top10Books.map((book, index) => (
+                <li key={book.id} className="flex justify-between p-2 rounded-full hover:bg-yellow-700 hover:text-white transition">
+                  <span>{index + 1}. {book.title}</span>
+                  <span>{book.totalSell} quyển</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="bg-blue-200 rounded-xl shadow-xl p-4">
-            <h3 className="font-semibold">Tổng số sản phẩm</h3>
-            <p className="font-bold text-5xl">{report.totalBooks}</p>
-          </div>
-          <div className="bg-blue-200 rounded-xl shadow-xl p-4">
-            <h3 className="font-semibold">Tổng số khách hàng</h3>
-            <p className="font-bold text-5xl">{report.totalUsers}</p>
-          </div>
-          <div className="bg-blue-200 rounded-xl shadow-xl p-4">
-            <h3 className="font-semibold">Tổng số sách đã bán ra</h3>
-            <p className="font-bold text-5xl">{totalSoldBooks}</p>
+
+          <div className="bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg shadow-lg p-4">
+            <h3 className="font-semibold text-center text-black">DOANH THU THEO THÁNG</h3>
+            <ul className="mt-4 space-y-2">
+              {report.monthlyData.map((data, index) => (
+                <li key={data.month} className="flex justify-between p-2 rounded-full hover:bg-blue-700 hover:text-white transition">
+                  <span>Tháng {data.month}</span>
+                  <span>{data.revenue.toLocaleString("vi-VN", { style: "currency", currency: "VND" })}</span>
+                  <span className={`text-sm font-semibold ${
+                    index > 0
+                      ? data.revenue > report.monthlyData[index - 1].revenue ? "text-green-500" : "text-red-500"
+                      : "text-white"
+                  }`}>
+                    {index > 0 && (data.revenue > report.monthlyData[index - 1].revenue ? "▲" : "▼")}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
-      <div className="flex flex-col lg:flex-row">
-        <div className="w-full lg:w-2/3 p-4 shadow-xl rounded-lg bg-white m-2">
-          <h3 className="font-semibold">Người dùng mới</h3>
-          <ul className="mt-5">
-            {report.newUsers.map((user) => (
-              <li key={user.id} className="flex items-center mb-2">
-                <img
-                  src={
-                    user.avatar_url ||
-                    "https://cdn.tuoitre.vn/zoom/700_525/2019/5/8/avatar-publicitystill-h2019-1557284559744252594756-crop-15572850428231644565436.jpg"
-                  }
-                  alt="avatar"
-                  className="w-10 h-10 rounded-full"
-                />
-                <p className="ml-2">
-                  {user.firstname} {user.lastname}
-                </p>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="w-full lg:w-1/3 p-4 shadow-xl rounded-lg bg-white m-2">
-          <h3 className="font-semibold">Top 10 sản phẩm bán chạy nhất</h3>
-          <ul>
-            {top10Books.map((book, index) => (
-              <li key={book.id} className="flex justify-between items-center">
-                <p>
-                  {index + 1}. {book.title}
-                </p>
-                <p>{book.totalSell || 0}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </>
+
+      
+    </div>
   );
 };
 

@@ -1,6 +1,7 @@
 const orderService = require('../services/orderService.js');
 const userService = require('../services/userService.js');
 const Role = require('../enums/role.js');
+const orderStatus = require('../enums/orderStatus.js');
 const placeOrder = async (req, res) => {
   const userId = req.user.id;
   const orderData = req.body;
@@ -49,10 +50,33 @@ const getAllOrdersController = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 }
-
+const updateOrderController = async (req, res) => {
+  const orderId = req.params.id;
+  const status = req.body;
+  const user = req.user;
+  const userDetail = await userService.getUserById(user.id);
+  try {
+    if(!status) {
+      throw new Error('Status is required');
+    }
+    if(userDetail.role!==Role.ADMIN && (
+      status === orderStatus.CONFIRMED ||
+       status === orderStatus.PROCESSING ||
+        status === orderStatus.SHIPPED ||
+         status === orderStatus.DELIVERED 
+    )) {
+      throw new Error('You do not have permission to perform this action');
+    }
+    const updatedOrder = await orderService.updateOrder(orderId, status.status,user.id);
+    res.status(200).json(updatedOrder);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
 module.exports = {
   placeOrder,
   getOrder,
   getAllOrdersByUser,
-  getAllOrdersController
+  getAllOrdersController,
+  updateOrderController
 };

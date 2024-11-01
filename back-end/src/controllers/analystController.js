@@ -2,9 +2,11 @@ const Role = require('../enums/role.js');
 const { getDashboardInformation } = require('../services/analystService.js');
 const userService = require('../services/userService.js');
 const getDashboard = async (req, res) => {
-    const { startDay, endDay } = req.body;
+    // get year from params
+    const year = req.query.year;
+    console.log(year);
     try {
-        const response = await getDashboardInformation({ startDay, endDay });
+        const response = await getDashboardInformation({ year });
         const userToken = req.user;
         const user = await userService.getUserById(userToken.id);
         if (user.role !== Role.ADMIN) {
@@ -16,6 +18,6 @@ const getDashboard = async (req, res) => {
     }
 };
 
-module.exports = {
+module.exports = { 
     getDashboard
 }

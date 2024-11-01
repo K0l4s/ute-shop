@@ -10,6 +10,7 @@ const Image = db.Image;
 const Review = db.Review;
 const sequelize = db.sequelize;
 const { Op } = require("sequelize");
+
 const getTop10BooksByOrderQuantity = async () => {
   try {
     const topBooksQuery = `
@@ -99,38 +100,61 @@ const getBooks = async (filters, page = 1, limit = 16) => {
       include: [
         {
           model: Genre,
-          as: 'genres',
+          as: 'genres', // Alias for Genre association
           attributes: ['name'],
-          through: { attributes: [] },
+          through: { attributes: [] } // Don't include the join table data
         },
-        includePublisher,
+        {
+          model: Author,
+          as: 'Author' // Ensure this matches the association alias
+        },
+        {
+          model: Publisher,
+          as: 'Publisher' // Ensure this matches the association alias
+        },
+        {
+          model: Review,
+          as: 'Reviews', // Ensure this matches the association alias
+          include: [
+            {
+              model: User,
+              attributes: ['firstName', 'lastName']
+            }
+          ]
+        },
+        {
+          model: Image,
+          as: 'Images', // Ensure this matches the association alias
+          attributes: ['url']
+        },
+        // Add any other includes as necessary
       ],
+      attributes: {
+        include: [
+          [
+            db.sequelize.literal(`(
+                      SELECT COUNT(*)
+                      FROM Books AS BookSold
+                      WHERE BookSold.author_id = Book.author_id
+                  )`),
+            'sold_count'
+          ],
+          [
+            db.sequelize.literal(`(
+                      SELECT SUM(detail_orders.quantity)
+                      FROM detail_orders
+                      WHERE detail_orders.book_id = Book.id
+                  )`),
+            'total_sold'
+          ]
+        ]
+      },
       order: order,
       offset: offset,
       limit: limit,
     });
-
-    // Định dạng lại dữ liệu trước khi trả về
-    const formattedBooks = books.map((book) => {
-      return {
-        id: book.id,
-        ISBN: book.ISBN,
-        title: book.title,
-        desc: book.desc,
-        price: book.price,
-        salePrice: book.salePrice,
-        year: book.year,
-        age: book.age,
-        sold: book.sold,
-        stock: book.stock,
-        cover_img_url: book.cover_img_url,
-        genres: book.genres.map((genre) => genre.name),
-        publisher: book.Publisher?.name || null,
-      };
-    });
-
     return {
-      books: formattedBooks,
+      books: books,
       currentPage: page,
       totalPages,
     };
@@ -182,16 +206,16 @@ const getBookDetailById = async (id) => {
       ],
       attributes: {
         include: [
-            [
-                db.sequelize.literal(`(
+          [
+            db.sequelize.literal(`(
                     SELECT COUNT(*)
                     FROM Books
                     WHERE Books.author_id = Author.id
                 )`),
-                'sold_count'
-            ]
+            'sold_count'
+          ]
         ]
-    }
+      }
     });
     const totalSold = await Detail_Order.sum('quantity', {
       where: {
@@ -211,31 +235,63 @@ const getBookDetailById = async (id) => {
     throw error;
   }
 };
-
-const getTotalSoldBookById = async (id) => {
+const createNewBook = async ({ISBN,
+  title,
+  desc,
+  price,
+  salePrice,
+  year,
+  age,
+  stock,cover_img_url}) => {
   try {
-    // Check if ID is provided
-    if (!id) {
-      throw new Error("Id is required");
+    // Check if required fields are provided
+    // if (!ISBN || !title || !price || !salePrice || !year || !age || !stock) {
+    //   throw new Error("ISBN, title, price, salePrice, year, age, stock are required");
+    // }
+    // Create new book
+    console.log(ISBN);
+    const book = {
+      ISBN,
+      title,
+      desc,
+      price,
+      salePrice,
+      year,
+      age,
+      stock,
+      cover_img_url
     }
-
-    // Fetch total sold book by ID
-    const totalSold = await Detail_Order.sum('quantity', {
-      where: {
-        book_id: id
-      }
-    });
-
-    return totalSold;
+    const newBook = await Book.create(book);
+    return newBook;
   } catch (error) {
     throw error;
   }
-}
+};
+// const getTotalSoldBookById = async (id) => {
+//   try {
+//     // Check if ID is provided
+//     if (!id) {
+//       throw new Error("Id is required");
+//     }
+
+//     // Fetch total sold book by ID
+//     const totalSold = await Detail_Order.sum('quantity', {
+//       where: {
+//         book_id: id
+//       }
+//     });
+
+//     return totalSold;
+//   } catch (error) {
+//     throw error;
+//   }
+// }
 
 module.exports = {
   // searchBooksByTitle,
   getTop10BooksByOrderQuantity,
   getBooks,
-  getBookDetailById
+  getBookDetailById,
+  createNewBook,
 };
 

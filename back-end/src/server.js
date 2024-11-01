@@ -9,8 +9,15 @@ const reviewRoutes = require('./routes/reviewRoutes.js');
 const publisherRoutes = require('./routes/publisherRoutes.js');
 const orderRoutes = require('./routes/orderRoutes.js');
 const cartRoutes = require('./routes/cartRoutes.js');
-const voucherRoutes = require('./routes/voucherRoutes.js');
+
 const checkoutRoutes = require('./routes/checkoutRoutes.js');
+
+const voucherRoutes = require('./routes/voucherRoutes.js');
+
+const checkoutRoutes = require('./routes/checkoutRoutes.js');
+
+const uploadRouter = require('./routes/upload.js');
+
 
 const paymentRoutes = require('./routes/paymentRoutes.js');
 const analystRoutes = require('./routes/analystRoutes.js');
@@ -48,9 +55,16 @@ app.use('/api/v1/review', reviewRoutes);
 app.use('/api/v1/publisher', publisherRoutes);
 app.use('/api/v1/order', orderRoutes);
 app.use('/api/v1/cart', cartRoutes);
+
+app.use('/api/v1/checkout', checkoutRoutes);
+
 app.use('/api/v1/voucher', voucherRoutes);
 // app.use('/api/v1/payment', paymentRoutes);
+
 app.use('/api/v1/checkout', checkoutRoutes);
+
+app.use('/api/v1/upload', uploadRouter);
+
 app.use('/api/v1/payment', (req, res, next) => {
   req.wss = wss;
   next();

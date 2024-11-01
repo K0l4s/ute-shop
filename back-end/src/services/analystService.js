@@ -5,15 +5,44 @@ const Order = db.Order;
 const Book = db.Book;
 const Detail_Order = db.Detail_Order;
 const Sequelize = require('sequelize');
+const orderStatus = require('../enums/orderStatus');
+const order = require('../models/order');
 
-const getDashboardInformation = async ({ startDay, endDay }) => {
-    const year = new Date().getFullYear();
-
+const getDashboardInformation = async ({ year }) => {
+    // console.log(year);
+    if (!year) {
+        year = new Date().getFullYear();
+    }
+    
+    // const year = new Date().getFullYear();
+    // const
     // 1. Lấy tổng số người dùng
-    const totalUsers = await User.count();
+    const totalUsers = await User.count(
+        // trong thời gian year
+        {
+            where: {
+                createAt: {
+                    [Op.between]: [`${year}-01-01`, `${year}-12-31`]
+                }
+            }
+        }
+    );
 
     // 2. Lấy tổng số orders
-    const totalOrders = await Order.count();
+    const totalOrders = await Order.count(
+        // trong thời gian year
+        {
+            where: {
+                order_date: {
+                    [Op.between]: [`${year}-01-01`, `${year}-12-31`]
+                },
+                // status not is cancel and return
+                status: {
+                    [Op.notIn]: [orderStatus.CANCELLED, orderStatus.RETURNED]
+                }
+            }
+        }
+    );
 
     // 3. Lấy tổng số sản phẩm (books)
     const totalBooks = await Book.count();
@@ -28,7 +57,7 @@ const getDashboardInformation = async ({ startDay, endDay }) => {
         where: {
             updatedAt: {
                 [Op.between]: [`${year}-01-01`, `${year}-12-31`], // Lọc theo năm hiện tại
-            }
+            },
         },
         group: [Sequelize.fn('MONTH', Sequelize.col('updatedAt'))], // Nhóm theo tháng
         order: [[Sequelize.fn('MONTH', Sequelize.col('updatedAt')), 'ASC']]

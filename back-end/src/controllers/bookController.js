@@ -1,5 +1,7 @@
-const { getBooks, getBookDetailById, getTop10BooksByOrderQuantity  } = require("../services/bookService.js");
-
+const { getBooks, getBookDetailById, getTop10BooksByOrderQuantity, createNewBook } = require("../services/bookService.js");
+const { uploadBookImage } = require("../services/uploadService.js");
+// const { createBook } = require("../services/bookService.js");
+const { uploadBookService } = require("../services/uploadService.js");
 // Controller tìm kiếm và lọc sách với phân trang
 const getBooksController = async (req, res) => {
   const { title, minPrice, maxPrice, publisher, minAge, maxAge, sortByPrice, page, limit } = req.query;
@@ -21,8 +23,32 @@ const getBooksController = async (req, res) => {
     return res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+const multer = require('multer');
 
+// Khởi tạo multer để xử lý file upload
+const upload = multer({
+  storage: multer.memoryStorage() // hoặc bạn có thể tùy chỉnh nếu cần
+});
 
+const createBookController = async (req, res) => {
+  // getdata form FromData
+  const { ISBN, title, desc, price, salePrice, year, age, stock } = req.body;
+     console.log(req.body);
+  try {
+    let cover_img_url = null;
+    if (req.file) {
+      cover_img_url = await uploadBookImage(req, res); // Nhận URL từ Cloudinary
+    }
+    const book = await createNewBook({ISBN, title, desc, price, salePrice, year, age, stock,cover_img_url});
+    return res.status(201).json({
+      message: "success",
+      data: book
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
 const getBookDetailByIdController = async (req, res) => {
   const { id } = req.params;
   try {
@@ -56,5 +82,6 @@ const getTop10Books = async (req, res) => {
 module.exports = {
   getBooksController,
   getBookDetailByIdController,
-  getTop10Books
+  getTop10Books,
+  createBookController
 };

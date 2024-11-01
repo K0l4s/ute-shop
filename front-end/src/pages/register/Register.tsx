@@ -59,7 +59,7 @@ const Register: React.FC<RegisterProps> = () => {
           <img
             src="./logo.svg"
             alt="shop"
-            className="w-40 h-40 m-auto"
+            className=" h-40 m-auto"
           />
           <p className="text-sm text-gray-600 font-bold pt-4 pb-4">Mua sắm thoải mái - Tính tiền hết hồn!</p>
         </div>

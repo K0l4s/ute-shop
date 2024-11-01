@@ -114,20 +114,20 @@ const Address: React.FC = () => {
 
   return (
     <div className="flex justify-center relative">
-      <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-5xl">
+      <div className="bg-gray-800 text-black shadow-md rounded-lg p-8 w-full max-w-5xl">
         <h2 className="text-lg text-purple-700 font-bold mb-6">SỔ ĐỊA CHỈ</h2>
         <div className="border border-black rounded mb-4">
           <div className="relative">
-            <label className="text-base font-semibold mb-4 absolute -top-4 left-2 bg-white px-2">Địa chỉ nhận hàng</label>
+            <label className="text-base font-semibold mb-4 absolute -top-4 left-2 bg-gray-800 px-2 text-white">Địa chỉ nhận hàng</label>
           </div>
-          <h4 className="italic p-4">{shipping_address}</h4>
+          <h4 className="italic p-4 text-white">{shipping_address}</h4>
         </div>
-        <span className="text-sm text-red-600">Bạn có thể thay đổi địa chỉ nhận hàng bên dưới.</span>
+        <span className="text-sm text-red-400">Bạn có thể thay đổi địa chỉ nhận hàng bên dưới.</span>
         {/* Form Fields */}
         <form onSubmit={handleSaveChanges}>
           {/* Province Select */}
           <div className="mb-4">
-            <label className="block font-medium mb-2">Tỉnh/Thành phố *</label>
+            <label className="block font-medium mb-2 text-white">Tỉnh/Thành phố *</label>
             <select
               value={selectedProvince ?? ""}
               onChange={(e) => setSelectedProvince(Number(e.target.value))}
@@ -145,7 +145,7 @@ const Address: React.FC = () => {
 
           {/* District Select */}
           <div className="mb-4">
-            <label className="block font-medium mb-2">Quận/Huyện *</label>
+            <label className="block font-medium mb-2 text-white">Quận/Huyện *</label>
             <select
               value={selectedDistrict ?? ""}
               onChange={(e) => setSelectedDistrict(Number(e.target.value))}
@@ -164,7 +164,7 @@ const Address: React.FC = () => {
 
           {/* Ward Select */}
           <div className="mb-4">
-            <label className="block font-medium mb-2">Phường/Xã *</label>
+            <label className="block font-medium mb-2 text-white">Phường/Xã *</label>
             <select
               value={selectedWard ?? ""}
               onChange={(e) => setSelectedWard(Number(e.target.value))}
@@ -183,7 +183,7 @@ const Address: React.FC = () => {
 
           {/* Specific Address */}
           <div className="mb-4">
-            <label className="block font-medium mb-2">Địa chỉ nhận *</label>
+            <label className="block font-medium mb-2 text-white">Địa chỉ nhận *</label>
             <input
               type="text"
               value={specificAddress}
