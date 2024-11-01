@@ -308,9 +308,9 @@ const AdminOrder = () => {
         <label htmlFor="txtABillIds" className="text-white font-bold m-5" >Danh sách MÃ HÓA ĐƠN</label>
         <div className="flex items-center gap-2">
 
-          <textarea name="txtABillIds" id="txtABillIds" className="resize-none w-full h-36 p-3 rounded-xl bg-white/10 text-white focus:outline-none" 
-          placeholder="Mã hóa đơn cần xử lý (Thêm tay hoặc nhấn chọn hóa đơn có trong bảng)"
-          onChange={txtABillIdsCondition}></textarea>
+          <textarea name="txtABillIds" id="txtABillIds" className="resize-none w-full h-36 p-3 rounded-xl bg-white/10 text-white focus:outline-none"
+            placeholder="Mã hóa đơn cần xử lý (Thêm tay hoặc nhấn chọn hóa đơn có trong bảng)"
+            onChange={txtABillIdsCondition}></textarea>
 
           <div className="grid ">
             <button className="flex items-center px-4 py-2 bg-red-900 text-white rounded-xl mb-2" onClick={deleteAlltxtABillIds}>
@@ -350,6 +350,8 @@ const AdminOrder = () => {
               <PiFileCsvBold className="ease-in-out" /> Thêm tất cả vào Danh sách MÃ HÓA ĐƠN
             </button>
           </div>
+          
+
           <div className="table-container max-h-[650px] overflow-y-auto rounded-lg border-none shadow-lg">
             <table id="order-table" className="min-w-full bg-gradient-to-r from-violet-800 to-blue-900 text-white">
               <thead className="sticky top-0 bg-gradient-to-b from-yellow-400 to-yellow-600 text-black">
@@ -444,9 +446,9 @@ const AdminOrder = () => {
                     <td className="py-3 px-6">
                       <div className="flex gap-1">
                         <BiDetail className="text-yellow-300" size={20} />
-                        {order.status === "PENDING" && <span onClick={()=>confirmOrd(order.id)} className="text-yellow-500 flex gap-1 items-center ">Xác nhận đơn</span>}
-                      {order.status === "CONFIRMED" && <span  onClick={()=>progress(order.id)} className="text-orange-500 flex gap-1 items-center">Xử lý đơn</span>}
-                      {order.status === "PROCESSING" && <span  onClick={()=>ship(order.id)} className="text-yellow-400 flex gap-1 items-center bg-blue-500 text-center rounded-xl font-bold">Gửi hàng</span>}
+                        {order.status === "PENDING" && <span onClick={() => confirmOrd(order.id)} className="text-yellow-500 flex gap-1 items-center ">Xác nhận đơn</span>}
+                        {order.status === "CONFIRMED" && <span onClick={() => progress(order.id)} className="text-orange-500 flex gap-1 items-center">Xử lý đơn</span>}
+                        {order.status === "PROCESSING" && <span onClick={() => ship(order.id)} className="text-yellow-400 flex gap-1 items-center bg-blue-500 text-center rounded-xl font-bold">Gửi hàng</span>}
                       </div>
                     </td>
                   </tr>
