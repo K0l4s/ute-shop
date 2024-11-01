@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllOrder } from "../../../apis/order";
+import { getAllOrder, updateCartStatus } from "../../../apis/order";
 import { PiFileCsvBold } from "react-icons/pi";
 // import OrderConfigModal from "../../../components/modals/OrderConfigModal";
 import { BsSearch } from "react-icons/bs";
@@ -224,6 +224,32 @@ const AdminOrder = () => {
       txtABillIds.value = txtABillIds.value.replace(/[^0-9,\s]/g, "");
     }
   }
+  const confirmOrd = async (orderId: number) => {
+    updateCartStatus(orderId.toString(), 'CONFIRMED').then(() => {
+      showToast("Đã xác nhận đơn hàng", "success");
+    }).catch((err) => {
+      console.log(err);
+      showToast('Có lỗi xảy ra khi xác nhận đơn hàng: ' + err.message, 'error');
+    });
+
+  }
+  const progress = async (orderId: number) => {
+    updateCartStatus(orderId.toString(), 'PROCESSING').then(() => {
+      showToast("Đã xử lý đơn hàng", "success");
+    }).catch((err) => {
+      console.log(err);
+      showToast('Có lỗi xảy ra khi xử lý đơn hàng: ' + err.message, 'error');
+    });
+
+  }
+  const ship = async (orderId: number) => {
+    updateCartStatus(orderId.toString(), 'DELIVERED').then(() => {
+      showToast("Đã gửi hàng", "success");
+    }).catch((err) => {
+      console.log(err);
+      showToast('Có lỗi xảy ra khi gửi hàng: ' + err.message, 'error');
+    });
+  }
   return (
     <>
       <div className="p-6 min-h-screen from-blue-500 to-purple-600">
@@ -418,6 +444,9 @@ const AdminOrder = () => {
                     <td className="py-3 px-6">
                       <div className="flex gap-1">
                         <BiDetail className="text-yellow-300" size={20} />
+                        {order.status === "PENDING" && <span onClick={()=>confirmOrd(order.id)} className="text-yellow-500 flex gap-1 items-center ">Xác nhận đơn</span>}
+                      {order.status === "CONFIRMED" && <span  onClick={()=>progress(order.id)} className="text-orange-500 flex gap-1 items-center">Xử lý đơn</span>}
+                      {order.status === "PROCESSING" && <span  onClick={()=>ship(order.id)} className="text-yellow-400 flex gap-1 items-center bg-blue-500 text-center rounded-xl font-bold">Gửi hàng</span>}
                       </div>
                     </td>
                   </tr>
