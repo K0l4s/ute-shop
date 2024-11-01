@@ -42,17 +42,17 @@ const AccountPage = () => {
   }, [location.pathname]);
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-black text-white">
+    <div className="flex min-h-screen bg-gray-100">
       {/* Sidebar */}
-      <div className="w-full md:w-1/5 h-auto md:h-auto overflow-auto"> {/* Thêm overflow-auto */}
-        <div className="m-6 p-6 bg-gray-800 shadow-md rounded-lg">
+      <div className="w-1/5 h-auto"> {/* Thêm overflow-auto */}
+        <div className="m-6 p-6 bg-white shadow-md rounded-lg">
           <h2 className="text-xl text-purple-700 font-bold mb-4">TÀI KHOẢN</h2>
           <ul className="space-y-4">
             <li>
               <Link to='/account/profile'>
                 <button
                   onClick={() => setSelectedSection('account')}
-                  className={`w-full text-left py-2 px-4 ${selectedSection === 'account' ? 'bg-gray-600 font-bold' : ''}`}
+                  className={`w-full text-left py-2 px-4 ${selectedSection === 'account' ? 'bg-gray-300 font-bold' : ''}`}
                 >
                   Thông tin tài khoản
                 </button>
@@ -62,7 +62,7 @@ const AccountPage = () => {
               <Link to='/account/address'>
                 <button
                   onClick={() => setSelectedSection('address')}
-                  className={`w-full text-left py-2 px-4 ${selectedSection === 'address' ? 'bg-gray-600 font-bold' : ''}`}
+                  className={`w-full text-left py-2 px-4 ${selectedSection === 'address' ? 'bg-gray-300 font-bold' : ''}`}
                 >
                   Địa chỉ của tôi
                 </button>
@@ -72,7 +72,7 @@ const AccountPage = () => {
               <Link to='/account/orders'> {/* Thêm Link */}
                 <button
                   onClick={() => setSelectedSection('orders')}
-                  className={`w-full text-left py-2 px-4 ${selectedSection === 'orders' ? 'bg-gray-600 font-bold' : ''}`}
+                  className={`w-full text-left py-2 px-4 ${selectedSection === 'orders' ? 'bg-gray-300 font-bold' : ''}`}
                 >
                   Đơn hàng của tôi
                 </button>
@@ -81,7 +81,7 @@ const AccountPage = () => {
             <li>
               <button
                 onClick={() => setSelectedSection('favoriteBooks')}
-                className={`w-full text-left py-2 px-4 ${selectedSection === 'favoriteBooks' ? 'bg-gray-600 font-bold' : ''}`}
+                className={`w-full text-left py-2 px-4 ${selectedSection === 'favoriteBooks' ? 'bg-gray-300 font-bold' : ''}`}
               >
                 Sách yêu thích
               </button>
@@ -89,7 +89,7 @@ const AccountPage = () => {
             <li>
               <button
                 onClick={() => setSelectedSection('purchasedBooks')}
-                className={`w-full text-left py-2 px-4 ${selectedSection === 'purchasedBooks' ? 'bg-gray-600 font-bold' : ''}`}
+                className={`w-full text-left py-2 px-4 ${selectedSection === 'purchasedBooks' ? 'bg-gray-300 font-bold' : ''}`}
               >
                 Sách đã mua
               </button>
