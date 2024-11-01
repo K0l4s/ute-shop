@@ -39,8 +39,7 @@ const Account = () => {
       setGender(localStorageUser.gender === true ? 'male' : 'female');
       setBirthday(user.birthday ? new Date(user.birthday).toISOString().split('T')[0] : '');
       setAvatarUrl(user.avatar_url);
-    }
-  }, [user]);
+    }  }, [user]);
 
   // Clean up avatar URL when component unmounts
   useEffect(() => {

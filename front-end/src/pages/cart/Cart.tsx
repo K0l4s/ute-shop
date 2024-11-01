@@ -105,6 +105,7 @@ const Cart: React.FC = () => {
     return total;
   }, 0);
 
+
   // Lấy thông tin voucher đã chọn
   const selectedDiscountVoucher = availableVouchers.find(voucher => voucher.id === selectedDiscountVoucherId && voucher.type === 'discount');
 
@@ -124,7 +125,11 @@ const Cart: React.FC = () => {
     const selectedItems = books.filter(book => book.checked);
     const shipping_method = "STANDARD";
     const payment_method = "COD";
+
+<!--     const totalAmount = totalPrice; -->
+
     const totalAmount = finalTotalPrice;
+
 
     try {
       const response = await encodeCartData({ selectedItems, shipping_method, payment_method, totalAmount});

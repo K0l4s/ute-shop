@@ -13,7 +13,11 @@ const cartRoutes = require('./routes/cartRoutes.js');
 const checkoutRoutes = require('./routes/checkoutRoutes.js');
 
 const voucherRoutes = require('./routes/voucherRoutes.js');
+
+const checkoutRoutes = require('./routes/checkoutRoutes.js');
+
 const uploadRouter = require('./routes/upload.js');
+
 
 const paymentRoutes = require('./routes/paymentRoutes.js');
 const analystRoutes = require('./routes/analystRoutes.js');
@@ -56,6 +60,9 @@ app.use('/api/v1/checkout', checkoutRoutes);
 
 app.use('/api/v1/voucher', voucherRoutes);
 // app.use('/api/v1/payment', paymentRoutes);
+
+app.use('/api/v1/checkout', checkoutRoutes);
+
 app.use('/api/v1/upload', uploadRouter);
 
 app.use('/api/v1/payment', (req, res, next) => {
