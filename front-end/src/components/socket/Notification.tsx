@@ -1,14 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { getNotifications } from '../../apis/notification';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiPackage, FiTag } from 'react-icons/fi'; // Icons for order update and promotion
 import { formatDistanceToNow } from 'date-fns';
 import { format, toZonedTime } from 'date-fns-tz';
-import { Link } from 'react-router-dom';
-import { NotificationMessage } from '../../models/type';
+import { useWebSocket } from '../../context/WebSocketContext';
 
-const Notification: React.FC<{ setUnreadCount: (count: number) => void }> = ({ setUnreadCount }) => {
-  const [notifications, setNotifications] = useState<NotificationMessage[]>([]);
+const Notification: React.FC<{ setUnreadCount: React.Dispatch<React.SetStateAction<number>> }> = () => {
+  const { notifications, fetchNotifications } = useWebSocket();
+
   const [error, setError] = useState<string | null>(null);
+  const [offset, setOffset] = useState<number>(() => {
+    const savedOffset = localStorage.getItem('notificationOffset');
+    return savedOffset ? parseInt(savedOffset, 10) : 0;
+  });
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 10;
+  const containerRef = useRef<HTMLUListElement | null>(null);
 
   const translations = {
     "less than a minute ago": "Vừa xong",
@@ -31,51 +37,41 @@ const Notification: React.FC<{ setUnreadCount: (count: number) => void }> = ({ s
     ago: "trước",
   };
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const data = await getNotifications();
-        setNotifications(data);
-
-        // Count unread notifications
-        const unreadCount = data.filter((notification: NotificationMessage) => !notification.is_read).length;
-        setUnreadCount(unreadCount);
-      } catch (error) {
-        setError("Failed to get notifications");
+  const handleScroll = () => {
+    if (containerRef.current && hasMore) {
+      const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+      if (scrollTop + clientHeight >= scrollHeight - 5) {
+        setOffset((prevOffset) => prevOffset + limit);
       }
     }
+  };
 
-    fetchNotifications();
-  },[]);
-  
   useEffect(() => {
-    // Connect to websocket server
-    const socket = new WebSocket('ws://localhost:8080');
-    socket.onopen = () => {
-      console.log("WebSocket connected!");
+    if (containerRef.current) {
+      containerRef.current.addEventListener('scroll', handleScroll);
     }
-    socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-    };
-
-    // Lắng nghe sự kiện khi nhận được tin nhắn từ server
-    socket.onmessage = (event: MessageEvent) => {
-      console.log('Received message from WebSocket:', event.data);
-      const newNotification: NotificationMessage = JSON.parse(event.data);
-
-      // Cập nhật danh sách thông báo
-      setNotifications((prevNotifications) => [newNotification, ...prevNotifications]);
-
-      // Update unread notification count
-      const unreadCount = [newNotification, ...notifications].filter(n => !n.is_read).length;
-      setUnreadCount(unreadCount);
-    };
-
-    // Đóng kết nối khi component unmount
     return () => {
-      socket.close();
+      if (containerRef.current) {
+        containerRef.current.removeEventListener('scroll', handleScroll);
+      }
     };
-  }, []);
+  }, [hasMore]);
+
+  useEffect(() => {
+    if (offset > 0 && hasMore) {
+      fetchNotifications(limit, offset).then(({ hasMore: hasMoreNotifications }) => {
+        if (!hasMoreNotifications) {
+          setHasMore(false); // Ngừng gọi API khi hết dữ liệu
+        }
+      }).catch((err) => {
+        setError('Có lỗi xảy ra khi tải thông báo: ' + err.message);
+      });
+    }
+  }, [offset, hasMore]);
+
+  useEffect(() => {
+    localStorage.setItem('notificationOffset', offset.toString());
+  }, [offset]);
 
   const formatNotificationTime = (createdAt: string) => {
     const timeZone = 'Asia/Bangkok';
@@ -105,7 +101,7 @@ const Notification: React.FC<{ setUnreadCount: (count: number) => void }> = ({ s
     <div className="w-full md:w-128 p-4 bg-white/30 backdrop-blur-md border-white/50 rounded-lg shadow-lg flex flex-col justify-center items-center gap-2">
       <h2 className="text-lg font-semibold mb-2">Thông báo</h2>
       {error && <p className="text-red-500">{error}</p>}
-      <ul className="space-y-2 max-h-128 overflow-y-auto">
+      <ul ref={containerRef} className="space-y-2 max-h-128 overflow-y-auto">
         {notifications?.map((notification) => (
           <li
             key={notification.id}
@@ -140,9 +136,7 @@ const Notification: React.FC<{ setUnreadCount: (count: number) => void }> = ({ s
           </li>
         ))}
       </ul>
-      <Link to="/notifications/view">
-        <span className='text-sm mt-2 hover:text-violet-700'>Xem tất cả</span>
-      </Link>
+      <span className='text-violet-700'>Cuộn xuống để xem nhiều hơn</span>
     </div>
   );
 };

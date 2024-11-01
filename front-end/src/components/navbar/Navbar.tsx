@@ -15,8 +15,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import Menu from '../menu/Menu';
 import Notification from '../socket/Notification';
 import { AnimatePresence, motion } from 'framer-motion';
-import { getNotifications } from '../../apis/notification';
-import { NotificationMessage } from '../../models/type';
+import { useWebSocket } from '../../context/WebSocketContext';
 
 const Navbar = () => {
   const dispatch = useDispatch();
@@ -26,7 +25,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [openNoti, setOpenNoti] = useState(false);
   const [openAcc, setOpenAcc] = useState(false);
-  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const { setUnreadCount, unreadCount, fetchNotifications } = useWebSocket();
 
   const handleCategoryClick = (category: string) => {
     setActiveCategory(category);
@@ -70,20 +69,9 @@ const Navbar = () => {
     }
   }
 
-  // Fetch notifications count on mount
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const data = await getNotifications();
-        // Count unread notifications
-        const unreadCount = data.filter((notification: NotificationMessage) => !notification.is_read).length;
-        setUnreadCount(unreadCount);
-      } catch (error) {
-        console.error("Failed to get notifications", error);
-      }
-    };
-
-    fetchNotifications();
+    fetchNotifications(10, 0);
+    localStorage.setItem('notificationOffset', '0');
   }, []);
 
   return (
