@@ -53,6 +53,7 @@ const getAllOrdersController = async (req, res) => {
 const updateOrderController = async (req, res) => {
   const orderId = req.params.id;
   const status = req.body;
+  console.log(status);
   const user = req.user;
   const userDetail = await userService.getUserById(user.id);
   try {

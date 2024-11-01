@@ -2,20 +2,20 @@ import axios from "axios";
 import { BASE_URL } from "./base";
 
 export const getOrderByUser = async () => {
-    try {
-        const response = await axios.get(
-            BASE_URL + '/order/all',
-            { withCredentials: true }
-        );
-        return response.data;
-    } catch (err) {
-        console.error('Error fetching user profile:', err);
-        throw err;
-    }
+  try {
+    const response = await axios.get(
+      BASE_URL + '/order/all',
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (err) {
+    console.error('Error fetching user profile:', err);
+    throw err;
+  }
 };
 export const placeOrder = async (orderData: any) => {
   try {
-    const response = await axios.post(BASE_URL + '/order/place', orderData, {withCredentials: true});
+    const response = await axios.post(BASE_URL + '/order/place', orderData, { withCredentials: true });
     return response.data;
   } catch (error) {
     console.error('Error placing order:', error);
@@ -25,7 +25,7 @@ export const placeOrder = async (orderData: any) => {
 
 export const checkOutByVNPay = async (orderData: any) => {
   try {
-    const response = await axios.post(BASE_URL + '/payment/create_payment_url', orderData, {withCredentials: true});
+    const response = await axios.post(BASE_URL + '/payment/create_payment_url', orderData, { withCredentials: true });
     return response.data;
   } catch (error) {
     console.error('Error checking out:', error);
@@ -36,7 +36,7 @@ export const checkOutByVNPay = async (orderData: any) => {
 export const getDataReturnVNPay = async (queryParams: any) => {
   try {
     const response = await axios.get(BASE_URL + '/payment/vnpay_ipn', {
-      params: queryParams, 
+      params: queryParams,
       withCredentials: true
     });
     return response.data;
@@ -48,7 +48,7 @@ export const getDataReturnVNPay = async (queryParams: any) => {
 
 export const getAllOrder = async () => {
   try {
-    const response = await axios.get(BASE_URL + '/order', {withCredentials: true});
+    const response = await axios.get(BASE_URL + '/order', { withCredentials: true });
     return response.data;
   } catch (error) {
     console.error('Error checking out:', error);
@@ -58,10 +58,42 @@ export const getAllOrder = async () => {
 
 export const getOrder = async (orderId: string) => {
   try {
-    const response = await axios.get(BASE_URL + '/order/get/' + orderId, {withCredentials: true});
+    const response = await axios.get(BASE_URL + '/order/get/' + orderId, { withCredentials: true });
     return response.data;
   } catch (error) {
     console.error('Error checking out:', error);
     throw error;
   }
-} 
+}
+
+export const updateCartStatus = async (orderId: string, status: string) => {
+  try {
+    // Kiểm tra đầu vào
+    if (!orderId) {
+      throw new Error("Order ID is required");
+    }
+    if (!status) {
+      throw new Error("Status is required");
+    }
+
+    console.log("Sending request with:", { orderId, status }); // Log kiểm tra
+
+    const response = await axios.put(
+      `${BASE_URL}/order/status/${orderId}`, // URL với orderId trong params
+      { status }, // Body gửi lên với status
+      {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      console.error('Error checking out:', error.response.data); // Log chi tiết lỗi từ máy chủ
+    } else {
+      console.error('Error checking out:', error);
+    }
+    throw error;
+  }
+};

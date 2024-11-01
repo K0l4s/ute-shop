@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { getOrderByUser } from '../../apis/order';
+import { getOrderByUser, updateCartStatus } from '../../apis/order';
 import { Order } from '../../models/OrderType';
 import OrderDetail from './OrderDetail';
+import { showToast } from '../../utils/toastUtils';
 
 const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -21,6 +22,9 @@ const Orders = () => {
 
   const handleCancelOrder = (orderId: number) => {
     console.log(`Cancel order #${orderId}`);
+    updateCartStatus(orderId.toString(), 'CANCELLED').then(() => {
+      getOrderByUser().then((res) => setOrders(res));
+    });
     // Code để hủy đơn hàng tại đây
   };
 
@@ -31,7 +35,23 @@ const Orders = () => {
 
   const handleConfirmDelivery = (orderId: number) => {
     console.log(`Confirm delivery of order #${orderId}`);
+    updateCartStatus(orderId.toString(), 'SHIPPED').then(() => {
+      getOrderByUser().then((res) => setOrders(res));
+    }).catch((err) => {
+      console.log(err);
+      showToast('Có lỗi xảy ra khi xác nhận nhận hàng: ' + err.message, 'error');
+    });
     // Code để xác nhận nhận hàng tại đây
+  };
+  const handleReturn = (orderId: number) => {
+    console.log(`Request return of order #${orderId}`);
+    updateCartStatus(orderId.toString(), 'RETURNED').then(() => {
+      getOrderByUser().then((res) => setOrders(res));
+    }).catch((err) => {
+      console.log(err);
+      showToast('Có lỗi xảy ra khi yêu cầu trả hàng: ' + err.message, 'error');
+    });
+    // Code để yêu cầu trả hàng tại đây
   };
 
   const isWithinCancelPeriod = (orderDate: string) => {
@@ -40,7 +60,12 @@ const Orders = () => {
     const thirtyMinutes = 30 * 60 * 1000;
     return now - orderTime <= thirtyMinutes;
   };
-
+  const isWithinReturnPeriod = (orderDate: string) => {
+    const orderTime = new Date(orderDate).getTime();
+    const now = Date.now();
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+    return now - orderTime <= sevenDays;
+  };
   const openModal = (order: Order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
@@ -71,7 +96,7 @@ const Orders = () => {
               <div className="flex justify-between items-center border-b pb-2 mb-4">
                 <h3 className="text-lg font-semibold">Đơn hàng #{order.id}</h3>
                 <span className={`text-sm font-medium ${order.status === 'SHIPPED' ? 'text-green-500' : 'text-gray-400'}`}>
-                  {order.status === 'SHIPPED' ? 'Đơn hàng đang giao' : order.status === 'DELIVERED' ? 'Đã hoàn thành' : ''}
+                  {order.status === 'DELIVERED' ? 'Đơn hàng đang giao' : order.status === 'SHIPPED' ? 'Đã hoàn thành' : ''}
                 </span>
               </div>
 
@@ -100,11 +125,14 @@ const Orders = () => {
                   {order.status === 'PENDING' && isWithinCancelPeriod(order.order_date) && (
                     <button onClick={() => handleCancelOrder(order.id)} className="bg-red-500 text-white px-4 py-2 rounded">Hủy đơn</button>
                   )}
-                  {(order.status === 'CONFIRMED' || order.status === 'PROCESSING' || order.status === 'CANCELLED' || order.status === 'RETURNED') && (
+                  {/* {(order.status === 'CONFIRMED' || order.status === 'PROCESSING' || order.status === 'CANCELLED' || order.status === 'RETURNED') && ( */}
                     <button onClick={() => handleReorder(order.id)} className="bg-blue-500 text-white px-4 py-2 rounded">Mua lại</button>
-                  )}
-                  {order.status === 'SHIPPED' && (
+                  {/* )} */}
+                  {order.status === 'DELIVERED' && (
                     <button onClick={() => handleConfirmDelivery(order.id)} className="bg-green-500 text-white px-4 py-2 rounded">Nhận hàng</button>
+                  )}
+                  {order.status === 'SHIPPED' && isWithinReturnPeriod(order.updatedAt) &&(
+                    <button onClick={() => handleReturn(order.id)} className="bg-red-500 text-white px-4 py-2 rounded">Yêu cầu trả hàng</button>
                   )}
                 </div>
               </div>
