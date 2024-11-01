@@ -22,6 +22,11 @@ import AdminAuthorPage from '../pages/admin/author/AdminAuthorPage'
 import { RequireAuth } from './RequireAuth'
 import AdminProduct from '../pages/admin/product/AdminProduct'
 import NotFoundPage from '../pages/errorPage/NotFoundPage'
+import AdminPublisher from '../pages/admin/publisher/AdminPublisher'
+import AdminUser from '../pages/admin/user/AdminUser'
+import AdminVoucher from '../pages/admin/voucher/AdminVoucher'
+import AdminEvent from '../pages/admin/eventPage/AdminEvent'
+import AdminCategory from '../pages/admin/category/AdminCategory'
 // import OrderDetailModal from '../components/modals/OrderDetailModal'
 
 
@@ -58,23 +63,23 @@ const Router = () => {
 
         <Route element={<AdminLayout />}>
           <Route path="/admin" element={<Dashboard />} />
-          <Route path="/admin/categories" element={<Cart />} />
+          <Route path="/admin/categories" element={<AdminCategory />} />
           <Route path="/admin/categories/:id" element={<Cart />} />
           <Route path="/admin/products" element={<AdminProduct />} />
-          <Route path="/admin/products/:id" element={<Cart />} />
+          <Route path="/admin/product/:id" element={<Cart />} />
           <Route path="/admin/orders" element={<AdminOrder />} />
           {/* <Route path="/admin/orders/:id" element={<Order />} /> */}
-    
-          <Route path="/admin/users" element={<Cart />} />
-          <Route path="/admin/users/:id" element={<Cart />} />
+          <Route path="/admin/publishers" element={<AdminPublisher />} />
+          <Route path="/admin/users" element={<AdminUser />} />
+          <Route path="/admin/user/:id" element={<AdminUser />} />
           <Route path="/admin/authors" element={<AdminAuthorPage />} />
           {/* Vouchers */}
-          <Route path="/admin/vouchers" element={<Cart />} />
- 
-          <Route path="/admin/config" element={<Cart />} />
+          <Route path="/admin/vouchers" element={<AdminVoucher />} />
+          <Route path="/admin/event" element={<AdminEvent />} />
+          {/* <Route path="/admin/config" element={<Cart />} /> */}
 
           {/* Cashier */}
-          <Route path="admin/cashier" element={<Cart />} />
+          {/* <Route path="admin/cashier" element={<Cart />} /> */}
         </Route>
         <Route path="/*" element={<NotFoundPage />} />
       </Routes>
