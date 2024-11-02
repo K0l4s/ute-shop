@@ -19,6 +19,9 @@ import { CiDeliveryTruck } from "react-icons/ci";
 import './product.css';
 import { showToast } from '../../utils/toastUtils';
 import { addToCart } from '../../apis/cart';
+import Modal from 'react-modal';
+import ImageViewSwiperModal from '../../components/modals/ImageViewSwiperModal';
+
 interface Reviews {
   id: string,
   content: string,
@@ -47,6 +50,8 @@ interface Book {
   Images: { url: string }[];
 }
 
+Modal.setAppElement('#root');
+
 const ProductDetail: React.FC = () => {
   const [reviewList, setReviewList] = useState<Reviews[]>([]); // Review list
   // user address from redux
@@ -55,6 +60,10 @@ const ProductDetail: React.FC = () => {
   const [book, setBook] = useState<Book | null>(null); // Use 'Book' type or null for initial state
   const [error, setError] = useState<string | null>(null);
   const [totalRating, setTotalRating] = useState<number>(0);
+
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -63,7 +72,7 @@ const ProductDetail: React.FC = () => {
         const response = await getBookById(id);
         // console.log(response);
         const data = await response.json();
-        console.log('Data:', data);
+        // console.log('Data:', data);
         setBook(data.data);
         setReviewList(data.data.Reviews);
       } catch (err) {
@@ -123,6 +132,18 @@ const ProductDetail: React.FC = () => {
         console.error('Error submitting review:', err);
       });
   };
+
+  const openModal = (index: number) => {
+    setSelectedImageIndex(index);
+    setModalIsOpen(true);
+  };
+
+  const closeModal = () => {
+    setModalIsOpen(false);
+  };
+
+  const images = [book.cover_img_url, ...book.Images.map(image => image.url)];
+
   const handleAddToCart = async () => {
     const cartItem = {
       id: book.id,
@@ -161,12 +182,9 @@ const ProductDetail: React.FC = () => {
               scrollbar={{ draggable: true }}
               style={{ height: '100%' }}
             >
-              <SwiperSlide key={0} className='flex justify-center items-center' style={{height: "100%"}}>
-                <img src={book.cover_img_url} alt="Product" className="max-h-96" />
-              </SwiperSlide>
-              {book.Images.map((image, index) => (
-                <SwiperSlide key={index + 1} className='flex justify-center items-center' style={{height: "100%"}}>
-                  <img src={image.url} alt="Product" className="max-h-96" />
+              {images.map((image, index) => (
+                <SwiperSlide key={index} className='flex justify-center items-center' style={{height: "100%"}}>
+                  <img src={image} alt="Product" className="max-h-96" onClick={() => openModal(index)}/>
                 </SwiperSlide>
               ))}
             </Swiper>
@@ -288,6 +306,12 @@ const ProductDetail: React.FC = () => {
           </div>
         </div>
       </main>
+      <ImageViewSwiperModal
+        isOpen={modalIsOpen}
+        onRequestClose={closeModal}
+        images={images}
+        initialSlide={selectedImageIndex}
+      />
     </div>
   );
 };

@@ -77,7 +77,7 @@ const Navbar = () => {
   return (
     // navbar using tailwindcss
     <>
-      <nav className="bg-gray-800 p-2 sticky top-0 z-80">
+      <nav className="bg-gray-800 p-2 sticky top-0 z-30">
         <div className="justify-between mx-auto flex items-center">
           <div className='justify-between flex items-center gap-10'>
             <Link to="/">
