@@ -21,6 +21,7 @@ import { showToast } from '../../utils/toastUtils';
 import { addToCart } from '../../apis/cart';
 import Modal from 'react-modal';
 import ImageViewSwiperModal from '../../components/modals/ImageViewSwiperModal';
+import { formatStar } from '../../utils/formatStar';
 
 interface Reviews {
   id: string,
@@ -59,7 +60,7 @@ const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();  // Get the book ID from route params
   const [book, setBook] = useState<Book | null>(null); // Use 'Book' type or null for initial state
   const [error, setError] = useState<string | null>(null);
-  const [totalRating, setTotalRating] = useState<number>(0);
+  const [averageRating, setAverageRating] = useState<number>(0);
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
@@ -70,11 +71,14 @@ const ProductDetail: React.FC = () => {
     const fetchBook = async () => {
       try {
         const response = await getBookById(id);
-        // console.log(response);
         const data = await response.json();
-        // console.log('Data:', data);
         setBook(data.data);
         setReviewList(data.data.Reviews);
+
+        // Calculate average rating
+        const totalRating = data.data.Reviews.reduce((acc: number, review: Reviews) => acc + review.star, 0) || 0;
+        const averageRating = totalRating / data.data.Reviews.length || 0;
+        setAverageRating(parseFloat(averageRating.toFixed(1)));
       } catch (err) {
         setError((err as Error).message);
       }
@@ -82,8 +86,8 @@ const ProductDetail: React.FC = () => {
 
     fetchBook();
     // add cover to Images
-    setTotalRating(book?.Reviews.reduce((acc, review) => acc + review.star, 0) || 0);
   }, [id]);
+  
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -96,17 +100,7 @@ const ProductDetail: React.FC = () => {
   const formatMoney = (money: number) => {
     return money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
-
-  const formatStar = (rating: number) => {
-    let stars = '';
-    for (let i = 0; i < rating; i++) {
-      stars += '★';
-    }
-    for (let i = rating; i < 5; i++) {
-      stars += '☆';
-    }
-    return stars;
-  }
+  
   const submitReview = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent default form submission
 
@@ -152,7 +146,7 @@ const ProductDetail: React.FC = () => {
       salePrice: book.salePrice,
       // image: book.Images[0].url || "",
       image: book.cover_img_url || "",
-      stars: totalRating,
+      stars: averageRating,
       age: "15",
       publisher: book.Publisher.name,
       quantity: 1, // Mặc định thêm 1 sản phẩm vào giỏ,
@@ -210,20 +204,17 @@ const ProductDetail: React.FC = () => {
                 <span className="line-through text-gray-500">{formatMoney(book.price || 0)} VND</span>
               </div>
               <div className="flex items-center space-x-2">
-                {/* <label className="text-yellow-500 text-2xl">★★★★☆</label> */}
-                <label className={`text-2xl ${reviewList.length === 0 ? 'text-gray-400' : 'text-yellow-500'}`}>
-                  {formatStar(totalRating)}
+                <label className='text-2xl flex'>
+                  {formatStar(averageRating)}
                 </label>
                 <span>({reviewList.length} đánh giá)</span>
-                {/* <span>({book.Reviews.length} reviews)</span> */}
-                {/* <IoCreateOutline className="text-2xl cursor-pointer hover:text-cyan-900"  /> */}
               </div>
               {book.stock > book.sold_count + 1 ?
                 <div className='cursor-pointer text-base'>
-                  <button className={`${book.stock > book.sold_count + 1 ? 'bg-green-600' : 'bg-gray-200'}  w-44 border-green-600 border-2 text-white px-4 py-2 rounded-lg mr-5 hover:bg-green-700`} >Mua ngay</button>
-                  <button className={`${book.stock > book.sold_count + 1 ? 'border-violet-700 border-2' : 'bg-gray-200'}  w-44 text-violet-700 px-4 py-2 rounded-lg hover:bg-violet-700 hover:text-white`} onClick={handleAddToCart}>Thêm vào giỏ hàng</button>
+                  <button className={`${book.stock > book.sold_count + 1 ? 'bg-green-600' : 'bg-gray-200'}  w-44 font-semibold border-green-600 border-2 text-white px-4 py-2 rounded-lg mr-5 hover:bg-green-700`} >Mua ngay</button>
+                  <button className={`${book.stock > book.sold_count + 1 ? 'border-violet-700 border-2' : 'bg-gray-200'}  w-44 font-semibold text-violet-700 px-4 py-2 rounded-lg hover:bg-violet-700 hover:text-white`} onClick={handleAddToCart}>Thêm vào giỏ hàng</button>
                 </div>
-                : <button className="w-44 bg-gray-300 text-black px-4 py-2 rounded-lg mr-5 disabled">Hết hàng</button>}
+                : <button className="w-44 bg-gray-300 font-semibold text-black px-4 py-2 rounded-lg mr-5 cursor-not-allowed">Hết hàng</button>}
             </div>
             <div className="mt-8 flex flex-col">
               <p className='font-semibold text-base'>Thông tin vận chuyển </p>
@@ -248,8 +239,8 @@ const ProductDetail: React.FC = () => {
         <div className="section mt-8 rounded-xl bg-white p-10">
           <h2 className="section__title text-2xl font-semibold">Đánh giá sản phẩm</h2>
           <div className="mt-4 flex items-center space-x-4">
-            <span className="text-5xl font-bold">{totalRating}/5</span>
-            <span className="text-4xl text-yellow-500">{formatStar(totalRating)}</span>
+            <span className="text-5xl font-bold">{averageRating}/5</span>
+            <span className="text-4xl flex">{formatStar(averageRating)}</span>
             {/* <span>({book.Reviews.length} reviews)</span> */}
           </div>
         </div>
@@ -257,34 +248,29 @@ const ProductDetail: React.FC = () => {
         <ReviewSection />
         <div className='section rounded-xl bg-white p-10 mb-8'>
           <div className="flex justify-between items-center">
-            <h2 className="section__title text-2xl font-semibold">Chi tiết review</h2>
-            <IoCreateOutline className="text-2xl cursor-pointer hover:text-cyan-900" />
+            <h2 className="section__title text-2xl font-semibold mb-4">Chi tiết đánh giá</h2>
           </div>
-
-          <Swiper modules={[Navigation, Pagination, Scrollbar, A11y]}
-            spaceBetween={2}
-            slidesPerView={3}
-            navigation
-            pagination={{ clickable: true }}
-            scrollbar={{ draggable: true }}
-          >
-            {reviewList.map((review, index) => (
-              <SwiperSlide key={index}>
-                <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 m-auto w-full bg-gray-100 rounded-lg">
-                  <div className="p-4 ">
-                    <p className="font-bold">{review.User ? (review.User.lastName + " " + review.User.firstName) : "Khách truy cập"}</p>
-                    <p className="text-2xl text-yellow-500">{formatStar(review.star || 0)}</p>
-                    <p>{review.content}</p>
-                  </div>
+          {reviewList.length === 0 ? (
+            <p>Chưa có đánh giá nào cho sản phẩm này.</p>
+          ): (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
+              {reviewList.map((review, index) => (
+                <div key={index} className="bg-gray-100 rounded-lg p-4">
+                  <p className="font-bold">{review.User ? (review.User.lastName + " " + review.User.firstName) : "Khách truy cập"}</p>
+                  <p className="text-2xl flex">{formatStar(review.star || 0)}</p>
+                  <p>{review.content}</p>
                 </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+              ))}
+            </div>
+          )}
         </div>
         <div>
           {/* Thêm review */}
-          <div className="rounded-xl bg-white p-10">
-            <h2 className="text-2xl font-semibold">Thêm review</h2>
+          <div className="rounded-xl bg-white p-8">
+            <div className="flex items-center gap-2">
+              <IoCreateOutline className="text-2xl text-violet-700 mb-1" size={32} />
+              <h2 className="text-2xl font-semibold">Thêm đánh giá</h2>
+            </div>
             <form action="" className="mt-4 space-y-4" onSubmit={submitReview}>
               <div className="flex items-center space-x-4">
                 <label htmlFor="rating" className="text-lg">Đánh giá</label>
@@ -300,7 +286,7 @@ const ProductDetail: React.FC = () => {
                 <label htmlFor="content" className="text-lg">Nội dung</label>
                 <textarea name="content" id="content" className="border border-gray-300 rounded-lg p-2 w-full h-32"></textarea>
               </div>
-              <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg">Gửi</button>
+              <button type="submit" className="w-24 bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-2 rounded-lg">Gửi</button>
             </form>
 
           </div>

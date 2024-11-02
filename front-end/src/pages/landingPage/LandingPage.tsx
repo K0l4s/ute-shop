@@ -7,6 +7,9 @@ import { Navigation, Pagination, Scrollbar, A11y, Autoplay } from 'swiper/module
 import { useNavigate } from "react-router-dom";
 import { getTop10BooksAPI } from "../../apis/book";
 import lifechangingbooks from "../../assets/images/life-changing-books.jpg";
+import { FaChartLine } from "react-icons/fa";
+import { formatStar } from "../../utils/formatStar";
+
 interface Book {
   id: number;
   ISBN: string;
@@ -20,6 +23,8 @@ interface Book {
   publisher_id: number;
   author_id: number;
   category_id: number;
+  avgRating: number;
+  reviewCount: number;
   totalSell: number;
 }
 
@@ -72,18 +77,20 @@ const LandingPage = () => {
       </section>
 
       {/* Best Selling Books */}
-      <section className="py-10 bg-white">
+      <section className="py-10 bg-gradient-to-b from-green-500 to-green-400">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold mb-6 text-center text-black">Sách bán chạy</h2>
+          <h2 className="text-3xl font-bold mb-6 text-center text-white">
+            <FaChartLine style={{display: "inline-block"}} size={40} className="mr-4"/>
+            Top 10 sản phẩm Hot nhất 
+          </h2>
           <Swiper
             modules={[Navigation, Pagination, Scrollbar, A11y, Autoplay]}
             spaceBetween={20}
             slidesPerView={1} // Thay đổi để phù hợp với màn hình nhỏ
             navigation
-            pagination={{ clickable: true }}
             scrollbar={{ draggable: true }}
             autoplay={{
-              delay: 2000, // thời gian giữa các lần cuộn (3000ms = 3 giây)
+              delay: 3000, // thời gian giữa các lần cuộn (3000ms = 3 giây)
               disableOnInteraction: false, // tiếp tục autoplay sau khi người dùng tương tác
             }}
             breakpoints={{
@@ -102,17 +109,18 @@ const LandingPage = () => {
               top10Books.map((book) => (
                 <SwiperSlide key={book.id}>
                   <div
-                    className="bg-gradient-to-b from-green-400 to-green-600 p-4 shadow-lg rounded-lg cursor-pointer h-full grid justify-between"
+                    className="p-4 shadow-lg rounded-lg 
+                      cursor-pointer h-full justify-between bg-white"
                     onClick={() => navigate("/products/" + book.id)}
                   >
                     <div>
                       <img
                         src={book.cover_img_url}
                         alt={book.title}
-                        className="w-42 min-h-[450px] max-h-[450px] mb-4 object-cover object-fit rounded-xl shadow-xl mx-auto"
+                        className="w-42 min-h-[300px] max-h-[300px] mb-4 object-cover object-fit rounded-xl shadow-xl mx-auto"
                       />
-                      <h3 className="font-semibold text-center min-h-[48px]">{book.title}</h3>
-                      <div className="text-center">
+                      <h3 className="font-semibold min-h-[48px]">{book.title}</h3>
+                      <div>
                         <p className="text-xl text-red-500 font-semibold min-h-[24px]">
                           {book.salePrice ? `${formatPrice(book.salePrice)}` : ''}
                         </p>
@@ -121,7 +129,11 @@ const LandingPage = () => {
                         </p>
                       </div>
                     </div>
-                    <p className="text-center mt-2">Tổng số lượt bán: {book.totalSell || 0}/{book.stock} cuốn</p>
+                    <div className="flex items-center">
+                      <label className='text-2xl flex'>{formatStar(book.avgRating)}</label>
+                      <p className="text-xl">({book.reviewCount})</p>
+                    </div>
+                    <p className="text-center mt-4">Đã bán: {book.totalSell || 0} cuốn</p>
                     <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
                       <div
                         className="bg-gradient-to-l from-red-600 to-blue-600 h-2.5 rounded-full"
