@@ -411,10 +411,40 @@ const isUser = async (orderId, userId) => {
   }
   return false;
 }
+const updateMultipleOrderStatus = async (ordersId,userId) => {
+  const messages = [];
+  console.log(ordersId)
+    for (const orderId of ordersId.ordersId) {
+      const order = await Order.findByPk(orderId);
+      let updatedStatus = '';
+      if (!order) {
+        messages.push(`Mã đơn ${orderId} không tồn tại`);
+        break;
+      }
+      else if(order.status == orderStatus.PENDING){
+        updatedStatus = orderStatus.CONFIRMED;
+      }
+      else if(order.status == orderStatus.CONFIRMED){
+        updatedStatus = orderStatus.PROCESSING;
+      }
+      else if(order.status == orderStatus.PROCESSING){
+        updatedStatus = orderStatus.DELIVERED;
+      }
+      await updateOrder(order.id, updatedStatus, userId).then((result) => {
+        messages.push(`Đơn hàng ${orderId} đã được cập nhật thành ${updatedStatus}`);
+      }).catch((error) => {
+        messages.push(error.message);
+      });
+
+      // messages.push(`Order with ID ${orderId} has been updated successfully`);
+    }
+    return messages;
+}
 module.exports = {
   createOrder,
   getOrderById,
   getOrdersByUserId,
   getAllOrders,
-  updateOrder
+  updateOrder,
+  updateMultipleOrderStatus
 };
