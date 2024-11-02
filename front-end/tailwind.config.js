@@ -13,7 +13,8 @@ export default {
         '128': '32rem'
       },
       height: {
-        '112': '28rem'
+        '112': '28rem',
+        '128': '32rem'
       },
       maxHeight: {
         '112': '28rem',

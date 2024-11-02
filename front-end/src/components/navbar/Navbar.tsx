@@ -77,7 +77,7 @@ const Navbar = () => {
   return (
     // navbar using tailwindcss
     <>
-      <nav className="bg-gray-800 p-4 sticky top-0 z-80">
+      <nav className="bg-gray-800 p-2 sticky top-0 z-80">
         <div className="justify-between mx-auto flex items-center">
           <div className='justify-between flex items-center gap-10'>
             <Link to="/">
@@ -173,7 +173,7 @@ const Navbar = () => {
                             className="absolute right-0 bg-white rounded-lg shadow-lg group-hover:block"
                           >
                             {/* Dropdown menu */}
-                            <div className="absolute right-0 w-48 backdrop-blur-md bg-white/50 border-white/20 rounded-lg shadow-lg group-hover:block">
+                            <div className="absolute right-0 w-48 backdrop-blur-md bg-white rounded-lg shadow-lg group-hover:block">
                               <Link to="/account/profile" className="block px-4 py-2 text-gray-800 hover:bg-gray-200 rounded-t-lg">
                                 Tài khoản của tôi
                               </Link>

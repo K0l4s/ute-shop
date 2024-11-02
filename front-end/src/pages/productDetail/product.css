@@ -1,0 +1,12 @@
+.section {
+  position: relative;
+}
+
+.section__title:before {
+  position: absolute;
+  content: "";
+  left: 25px;  
+  width: 5px;
+  height: 30px;
+  background-color: rgb(109 40 217);
+}

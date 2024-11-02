@@ -15,6 +15,10 @@ import { addItem } from '../../redux/reducers/cartSlice';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { createReview } from '../../apis/review';
+import { CiDeliveryTruck } from "react-icons/ci";
+import './product.css';
+import { showToast } from '../../utils/toastUtils';
+import { addToCart } from '../../apis/cart';
 interface Reviews {
   id: string,
   content: string,
@@ -119,7 +123,7 @@ const ProductDetail: React.FC = () => {
         console.error('Error submitting review:', err);
       });
   };
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     const cartItem = {
       id: book.id,
       title: book.title,
@@ -135,76 +139,107 @@ const ProductDetail: React.FC = () => {
       checked: true, // Mặc định là đã chọn sản phẩm
     };
     dispatch(addItem(cartItem));
-    alert(`Book ${book.id} added to cart`);
+    try {
+      await addToCart(book.id, 1);
+      showToast("Thêm vào giỏ hàng thành công", "success");
+    } catch (error) {
+      showToast("Có lỗi xảy ra, vui lòng kiểm tra giỏ hàng", "error");
+    }
   };
   return (
-    <div className="font-sans bg-white">
+    <div className="font-sans">
 
-      <main className="container mx-auto mt-8 bg-white">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <main className="container mx-auto mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
           {/* Left side (Image and Gallery) */}
-          <div className='shadow rounded-xl'>
+          <div className='rounded-xl bg-white md:h-128'>
             <Swiper modules={[Navigation, Pagination, Scrollbar, A11y]}
               spaceBetween={50}
               slidesPerView={1}
               navigation
               pagination={{ clickable: true }}
               scrollbar={{ draggable: true }}
+              style={{ height: '100%' }}
             >
-              <SwiperSlide key={0}>
-                <img src={book.cover_img_url} alt="Product" className="w-7/12 m-auto" />
+              <SwiperSlide key={0} className='flex justify-center items-center' style={{height: "100%"}}>
+                <img src={book.cover_img_url} alt="Product" className="max-h-96" />
               </SwiperSlide>
               {book.Images.map((image, index) => (
-                <SwiperSlide key={index + 1}>
-                  <img src={image.url} alt="Product" className="w-7/12 m-auto" />
+                <SwiperSlide key={index + 1} className='flex justify-center items-center' style={{height: "100%"}}>
+                  <img src={image.url} alt="Product" className="max-h-96" />
                 </SwiperSlide>
               ))}
             </Swiper>
           </div>
           {/* Right side (Product Information) */}
-          <div className='rounded-xl bg-white p-10 shadow-lg shadow-gray-500/50'>
+          <div className='rounded-xl bg-white p-6 px-8'>
             <div className="space-y-4">
               <h1 className="text-3xl font-bold">{book.title}</h1>
-              <div className="flex items-center space-x-2">
-                <span className="text-xl text-red-600 font-semibold">{formatMoney(book.salePrice || 0)}vnđ</span>
-                <span className="line-through text-gray-500">{formatMoney(book.price || 0)}vnđ</span>
+              
+              <div className="grid lg:grid-cols-2">
+                <p className='font-semibold'>Nhà xuất bản: {book.Publisher?.name}</p>
+                <p className='font-semibold'>Xuất bản: {book.year}</p>
               </div>
-              <p>Nhà xuất bản: {book.Publisher?.name}</p>
-              <p>Năm xuất bản: {book.year || "----"}</p>
-              <p>Tình trạng: {book.stock > book.sold_count + 1 ? 'Còn hàng' : 'Hết hàng'}</p>
+              
+              <div className="grid lg:grid-cols-2">
+                <p className='font-semibold'>Tác giả: {book.Author?.name}</p>
+                <p className='font-semibold'>Thể loại: {book.genres.map(genre => genre.name).join(', ')}</p>
+              </div>
+
+              <p className='font-semibold text-green-600'>Tình trạng: {book.stock > book.sold_count + 1 ? 'Còn hàng' : 'Hết hàng'}</p>
               <div className="flex items-center space-x-2">
-                <span className="text-yellow-500">★★★★☆</span>
+                <span className="text-3xl text-red-600 font-semibold">{formatMoney(book.salePrice || 0)} VND</span>
+                <span className="line-through text-gray-500">{formatMoney(book.price || 0)} VND</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                {/* <label className="text-yellow-500 text-2xl">★★★★☆</label> */}
+                <label className={`text-2xl ${reviewList.length === 0 ? 'text-gray-400' : 'text-yellow-500'}`}>
+                  {formatStar(totalRating)}
+                </label>
+                <span>({reviewList.length} đánh giá)</span>
                 {/* <span>({book.Reviews.length} reviews)</span> */}
                 {/* <IoCreateOutline className="text-2xl cursor-pointer hover:text-cyan-900"  /> */}
               </div>
               {book.stock > book.sold_count + 1 ?
-                <>
-                  <button className={`${book.stock > book.sold_count + 1 ? 'bg-green-500' : 'bg-gray-200'} text-black px-4 py-2 rounded-lg mr-5 `} >Mua ngay</button>
-                  <button className={`${book.stock > book.sold_count + 1 ? 'bg-blue-200' : 'bg-gray-200'} text-black px-4 py-2 rounded-lg`} onClick={handleAddToCart}>Thêm vào giỏ hàng</button>
-                </>
-                : <button className="bg-gray-300 text-black px-4 py-2 rounded-lg mr-5">Hết hàng</button>}
+                <div className='cursor-pointer text-base'>
+                  <button className={`${book.stock > book.sold_count + 1 ? 'bg-green-600' : 'bg-gray-200'}  w-44 border-green-600 border-2 text-white px-4 py-2 rounded-lg mr-5 hover:bg-green-700`} >Mua ngay</button>
+                  <button className={`${book.stock > book.sold_count + 1 ? 'border-violet-700 border-2' : 'bg-gray-200'}  w-44 text-violet-700 px-4 py-2 rounded-lg hover:bg-violet-700 hover:text-white`} onClick={handleAddToCart}>Thêm vào giỏ hàng</button>
+                </div>
+                : <button className="w-44 bg-gray-300 text-black px-4 py-2 rounded-lg mr-5 disabled">Hết hàng</button>}
             </div>
-            <div className="mt-8">
-              <p>Thông tin vận chuyển: <Link to="/account/address" className='text-blue-800 underline'>{userAddress || "TP. Hồ Chí Minh"}</Link></p>
-              <p>Ưu đãi: <Link to="/voucher/1" className='text-blue-800 underline'> Mã giảm phí Ship 10k.</Link></p>
+            <div className="mt-8 flex flex-col">
+              <p className='font-semibold text-base'>Thông tin vận chuyển </p>
+              <div className='flex items-center gap-8 mt-2'>
+                <div className=''>
+                  <CiDeliveryTruck style={{display: 'inline-block', verticalAlign: 'middle'}} size={32}/>
+                  <span className='ml-2 text-blue-800'>{userAddress || "TP. Hồ Chí Minh"}</span>
+                </div>
+                <Link to="/account/address" className='font-semibold text-violet-600 hover:text-violet-700'>Thay đổi</Link>
+              </div>
+              {/* <p>Ưu đãi: <Link to="/voucher/1" className='text-blue-800 underline'> Mã giảm phí Ship 10k.</Link></p> */}
             </div>
           </div>
 
         </div>
+        
+        <div className="section bg-white rounded-xl p-10 mt-8 text-lg">
+          <h2 className="section__title text-2xl font-semibold">Mô tả sản phẩm</h2>
+          <pre className="mt-4 whitespace-pre-wrap" style={{ fontFamily: 'inherit', fontSize: 'inherit' }}>{book.desc}</pre>
+        </div>
 
-        <div className="mt-8 rounded-xl bg-white p-10 shadow-lg shadow-gray-500/50">
-          <h2 className="text-2xl font-semibold">Đánh giá sản phẩm</h2>
+        <div className="section mt-8 rounded-xl bg-white p-10">
+          <h2 className="section__title text-2xl font-semibold">Đánh giá sản phẩm</h2>
           <div className="mt-4 flex items-center space-x-4">
-            <span className="text-4xl font-bold">{totalRating}/5</span>
-            <span className="text-yellow-500">{formatStar(totalRating)}</span>
+            <span className="text-5xl font-bold">{totalRating}/5</span>
+            <span className="text-4xl text-yellow-500">{formatStar(totalRating)}</span>
             {/* <span>({book.Reviews.length} reviews)</span> */}
           </div>
         </div>
         {/* Review Section */}
         <ReviewSection />
-        <div className='rounded-xl bg-white p-10 shadow-lg shadow-gray-500/50 mb-8'>
+        <div className='section rounded-xl bg-white p-10 mb-8'>
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold">Chi tiết review</h2>
+            <h2 className="section__title text-2xl font-semibold">Chi tiết review</h2>
             <IoCreateOutline className="text-2xl cursor-pointer hover:text-cyan-900" />
           </div>
 
@@ -220,7 +255,7 @@ const ProductDetail: React.FC = () => {
                 <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 m-auto w-full bg-gray-100 rounded-lg">
                   <div className="p-4 ">
                     <p className="font-bold">{review.User ? (review.User.lastName + " " + review.User.firstName) : "Khách truy cập"}</p>
-                    <p className="text-yellow-500">{formatStar(review.star || 0)}</p>
+                    <p className="text-2xl text-yellow-500">{formatStar(review.star || 0)}</p>
                     <p>{review.content}</p>
                   </div>
                 </div>
@@ -230,7 +265,7 @@ const ProductDetail: React.FC = () => {
         </div>
         <div>
           {/* Thêm review */}
-          <div className="rounded-xl bg-white p-10 shadow-lg shadow-gray-500/50">
+          <div className="rounded-xl bg-white p-10">
             <h2 className="text-2xl font-semibold">Thêm review</h2>
             <form action="" className="mt-4 space-y-4" onSubmit={submitReview}>
               <div className="flex items-center space-x-4">

@@ -218,7 +218,7 @@ const Account = () => {
                     onChange={() => setGender('male')}
                     className="form-radio text-purple-600 focus:ring-purple-500"
                   />
-                  <span className="ml-2 text-white">Nam</span>
+                  <span className="ml-2 text-black">Nam</span>
                 </label>
                 <label className="flex items-center cursor-pointer">
                   <input
@@ -229,7 +229,7 @@ const Account = () => {
                     onChange={() => setGender('female')}
                     className="form-radio text-purple-600 focus:ring-purple-500"
                   />
-                  <span className="ml-2 text-white">Nữ</span>
+                  <span className="ml-2 text-black">Nữ</span>
                 </label>
 
 

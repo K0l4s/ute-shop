@@ -118,7 +118,7 @@ const Address: React.FC = () => {
         <h2 className="text-lg text-purple-700 font-bold mb-6">SỔ ĐỊA CHỈ</h2>
         <div className="border border-black rounded mb-4">
           <div className="relative">
-            <label className="text-base font-semibold mb-4 absolute -top-4 left-2 bg-white px-2 text-white">Địa chỉ nhận hàng</label>
+            <label className="text-base font-semibold mb-4 absolute -top-4 left-2 bg-white px-2 text-black">Địa chỉ nhận hàng</label>
           </div>
           <h4 className="italic p-4">{shipping_address}</h4>
         </div>
