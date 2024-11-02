@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getAllOrder, updateCartStatus } from "../../../apis/order";
+import { getAllOrder, updateCartStatus, updateMultipleCartStatus } from "../../../apis/order";
 import { PiFileCsvBold } from "react-icons/pi";
 // import OrderConfigModal from "../../../components/modals/OrderConfigModal";
 import { BsSearch } from "react-icons/bs";
@@ -227,6 +227,11 @@ const AdminOrder = () => {
   const confirmOrd = async (orderId: number) => {
     updateCartStatus(orderId.toString(), 'CONFIRMED').then(() => {
       showToast("Đã xác nhận đơn hàng", "success");
+      // điều chỉnh trạng thái đơn hàng
+      const updatedOrders = filteredOrders.map((order) =>
+        order.id === orderId ? { ...order, status: "CONFIRMED" } : order
+      );
+      setFilteredOrders(updatedOrders);
     }).catch((err) => {
       console.log(err);
       showToast('Có lỗi xảy ra khi xác nhận đơn hàng: ' + err.message, 'error');
@@ -236,6 +241,11 @@ const AdminOrder = () => {
   const progress = async (orderId: number) => {
     updateCartStatus(orderId.toString(), 'PROCESSING').then(() => {
       showToast("Đã xử lý đơn hàng", "success");
+      // điều chỉnh trạng thái đơn hàng
+      const updatedOrders = filteredOrders.map((order) =>
+        order.id === orderId ? { ...order, status: "PROCESSING" } : order
+      );
+      setFilteredOrders(updatedOrders);
     }).catch((err) => {
       console.log(err);
       showToast('Có lỗi xảy ra khi xử lý đơn hàng: ' + err.message, 'error');
@@ -245,11 +255,38 @@ const AdminOrder = () => {
   const ship = async (orderId: number) => {
     updateCartStatus(orderId.toString(), 'DELIVERED').then(() => {
       showToast("Đã gửi hàng", "success");
+      // điều chỉnh trạng thái đơn hàng
+      const updatedOrders = filteredOrders.map((order) =>
+        order.id === orderId ? { ...order, status: "DELIVERED" } : order
+      );
+      setFilteredOrders(updatedOrders);
     }).catch((err) => {
       console.log(err);
       showToast('Có lỗi xảy ra khi gửi hàng: ' + err.message, 'error');
     });
   }
+  const handleUpdateMultipleStatus = async () => {
+    // lấy thông tin từ txtABillIds
+    const txtABillIds = document.getElementById("txtABillIds") as HTMLTextAreaElement;
+    const billIds = txtABillIds.value.split(",").map((id) => parseInt(id.trim()));
+    console.log("Bill IDs:", billIds);
+    // alert("Exporting multiple bills to PDF: " + billIds);
+    showToast("Đang xử lý hàng loạt đơn hàng: " + billIds, "success");
+    // Call API to export multiple bills to PDF
+    updateMultipleCartStatus(billIds).then(() => {
+      showToast("Đã xử lý hàng loạt đơn hàng", "success");
+      // điều chỉnh trạng thái đơn hàng
+      const updatedOrders = filteredOrders.map((order) =>
+        billIds.includes(order.id) ? { ...order, status: "DELIVERED" } : order
+      );
+      setFilteredOrders(updatedOrders);
+    }
+    ).catch((err) => {
+      console.log(err);
+      showToast('Có lỗi xảy ra khi xử lý hàng loạt đơn hàng: ' + err.message, 'error');
+    });
+  }
+
   return (
     <>
       <div className="p-6 min-h-screen from-blue-500 to-purple-600">
@@ -328,7 +365,7 @@ const AdminOrder = () => {
           <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-2">
             <BiSelectMultiple className="mr-2" /> Cập nhật trạng thái
           </button>
-          <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-2">
+          <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-2" onClick={handleUpdateMultipleStatus}>
             <BiSelectMultiple className="mr-2" /> Xử lý hàng loạt
           </button>
           <button
@@ -350,7 +387,7 @@ const AdminOrder = () => {
               <PiFileCsvBold className="ease-in-out" /> Thêm tất cả vào Danh sách MÃ HÓA ĐƠN
             </button>
           </div>
-          
+
 
           <div className="table-container max-h-[650px] overflow-y-auto rounded-lg border-none shadow-lg">
             <table id="order-table" className="min-w-full bg-gradient-to-r from-violet-800 to-blue-900 text-white">
