@@ -77,14 +77,17 @@ const Orders = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-800 text-white min-h-screen rounded-xl">
-      <h2 className="text-2xl font-bold mb-4 text-purple-700">Đơn hàng của tôi</h2>
-      <div className="flex space-x-2 mb-4 overflow-x-auto text-black rounded-full">
-        {['ALL', 'PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED', 'RETURNED'].map(status => (
-          <button key={status} onClick={() => filterOrders(status as typeof filteredStatus)} className={`px-4 py-2 ${filteredStatus === status ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>
-            {status === 'ALL' ? 'Tất cả' : `Đơn hàng ${status.toLowerCase()}`}
-          </button>
-        ))}
+    <div className="p-6 bg-gray-100 min-h-screen">
+      <h2 className="text-2xl font-bold mb-4">Đơn hàng của tôi</h2>
+      <div className="flex space-x-2 mb-4 overflow-x-auto">
+        <button onClick={() => filterOrders('ALL')} className={`px-4 py-2 ${filteredStatus === 'ALL' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Tất cả</button>
+        <button onClick={() => filterOrders('PENDING')} className={`px-4 py-2 ${filteredStatus === 'PENDING' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đang chờ</button>
+        <button onClick={() => filterOrders('CONFIRMED')} className={`px-4 py-2 ${filteredStatus === 'CONFIRMED' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đã xác nhận</button>
+        <button onClick={() => filterOrders('PROCESSING')} className={`px-4 py-2 ${filteredStatus === 'PROCESSING' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đang xử lý</button>
+        <button onClick={() => filterOrders('SHIPPED')} className={`px-4 py-2 ${filteredStatus === 'SHIPPED' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đang giao hàng</button>
+        <button onClick={() => filterOrders('DELIVERED')} className={`px-4 py-2 ${filteredStatus === 'DELIVERED' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đã hoàn thành</button>
+        <button onClick={() => filterOrders('CANCELLED')} className={`px-4 py-2 ${filteredStatus === 'CANCELLED' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đã hủy</button>
+        <button onClick={() => filterOrders('RETURNED')} className={`px-4 py-2 ${filteredStatus === 'RETURNED' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}>Đã trả hàng</button>
       </div>
 
       {filteredOrders.length === 0 ? (
@@ -92,10 +95,10 @@ const Orders = () => {
       ) : (
         <div>
           {filteredOrders.map(order => (
-            <div key={order.id} className="mb-6 p-4 bg-gray-700 border border-gray-600 rounded-lg">
+            <div key={order.id} className="mb-6 p-4 bg-gray-700 border border-gray-200 rounded-lg">
               <div className="flex justify-between items-center border-b pb-2 mb-4">
                 <h3 className="text-lg font-semibold">Đơn hàng #{order.id}</h3>
-                <span className={`text-sm font-medium ${order.status === 'SHIPPED' ? 'text-green-500' : 'text-gray-400'}`}>
+                <span className={`text-sm font-medium ${order.status === 'SHIPPED' ? 'text-green-500' : 'text-gray-500'}`}>
                   {order.status === 'DELIVERED' ? 'Đơn hàng đang giao' : order.status === 'SHIPPED' ? 'Đã hoàn thành' : ''}
                 </span>
               </div>
@@ -105,8 +108,8 @@ const Orders = () => {
                   <img src={detail.book.cover_img_url} alt={detail.book.title} className="w-16 h-20 mr-4 object-cover rounded" />
                   <div className="flex-1">
                     <h4 className="text-base font-semibold">{detail.book.title}</h4>
-                    <p className="text-sm text-gray-300">Phân loại: {detail.book.category}</p>
-                    <p className="text-sm text-gray-300">Số lượng: {detail.quantity}</p>
+                    <p className="text-sm text-gray-600">Phân loại: {detail.book.category}</p>
+                    <p className="text-sm text-gray-600">Số lượng: {detail.quantity}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-lg font-semibold text-red-500">{detail.price} đ</p>
@@ -121,9 +124,12 @@ const Orders = () => {
                   <span className="text-sm text-gray-500">Ngày đặt: {new Date(order.order_date).toLocaleString()}</span>
                 </div>
                 <div className="flex p-5 space-x-3">
-                  <button onClick={() => openModal(order)} className="bg-green-500 text-white px-4 py-2 rounded">Chi tiết</button>
-                  {order.status === 'PENDING' && isWithinCancelPeriod(order.order_date) && (
-                    <button onClick={() => handleCancelOrder(order.id)} className="bg-red-500 text-white px-4 py-2 rounded">Hủy đơn</button>
+                  <button onClick={() => openModal(order)} className="bg-green-500 text-white px-4 py-2 rounded">Detail</button>
+                  {order.status === 'PENDING'
+                    &&
+                    isWithinCancelPeriod(order.order_date) &&
+                    (
+                      <button onClick={() => handleCancelOrder(order.id)} className="bg-red-500 text-white px-4 py-2 rounded">Hủy đơn</button>
                   )}
                   {/* {(order.status === 'CONFIRMED' || order.status === 'PROCESSING' || order.status === 'CANCELLED' || order.status === 'RETURNED') && ( */}
                     <button onClick={() => handleReorder(order.id)} className="bg-blue-500 text-white px-4 py-2 rounded">Mua lại</button>

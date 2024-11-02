@@ -138,12 +138,12 @@ const ProductDetail: React.FC = () => {
     alert(`Book ${book.id} added to cart`);
   };
   return (
-    <div className="font-sans text-white">
+    <div className="font-sans bg-white">
 
-      <main className="container mx-auto mt-8">
+      <main className="container mx-auto mt-8 bg-white">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Left side (Image and Gallery) */}
-          <div className='shadow-lg rounded-xl bg-gray-800 shadow-gray-500/50'>
+          <div className='shadow rounded-xl'>
             <Swiper modules={[Navigation, Pagination, Scrollbar, A11y]}
               spaceBetween={50}
               slidesPerView={1}
@@ -162,7 +162,7 @@ const ProductDetail: React.FC = () => {
             </Swiper>
           </div>
           {/* Right side (Product Information) */}
-          <div className='rounded-xl bg-white-100 p-10 bg-gray-800 shadow-lg shadow-gray-500/50'>
+          <div className='rounded-xl bg-white p-10 shadow-lg shadow-gray-500/50'>
             <div className="space-y-4">
               <h1 className="text-3xl font-bold">{book.title}</h1>
               <div className="flex items-center space-x-2">
@@ -185,14 +185,14 @@ const ProductDetail: React.FC = () => {
                 : <button className="bg-gray-300 text-black px-4 py-2 rounded-lg mr-5">Hết hàng</button>}
             </div>
             <div className="mt-8">
-              <p>Thông tin vận chuyển: <Link to="/account/address" className='text-blue-600 underline'>{userAddress || "TP. Hồ Chí Minh"}</Link></p>
-              <p>Ưu đãi: <Link to="/voucher/1" className='text-blue-600 underline'> Mã giảm phí Ship 10k.</Link></p>
+              <p>Thông tin vận chuyển: <Link to="/account/address" className='text-blue-800 underline'>{userAddress || "TP. Hồ Chí Minh"}</Link></p>
+              <p>Ưu đãi: <Link to="/voucher/1" className='text-blue-800 underline'> Mã giảm phí Ship 10k.</Link></p>
             </div>
           </div>
 
         </div>
 
-        <div className="mt-8 rounded-xl bg-white-100 p-10 bg-gray-800 bg-gray-800 shadow-lg shadow-gray-500/50">
+        <div className="mt-8 rounded-xl bg-white p-10 shadow-lg shadow-gray-500/50">
           <h2 className="text-2xl font-semibold">Đánh giá sản phẩm</h2>
           <div className="mt-4 flex items-center space-x-4">
             <span className="text-4xl font-bold">{totalRating}/5</span>
@@ -202,7 +202,7 @@ const ProductDetail: React.FC = () => {
         </div>
         {/* Review Section */}
         <ReviewSection />
-        <div className='rounded-xl bg-white-100 p-10 bg-gray-800 shadow-lg shadow-gray-500/50 mb-8'>
+        <div className='rounded-xl bg-white p-10 shadow-lg shadow-gray-500/50 mb-8'>
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-semibold">Chi tiết review</h2>
             <IoCreateOutline className="text-2xl cursor-pointer hover:text-cyan-900" />
@@ -217,7 +217,7 @@ const ProductDetail: React.FC = () => {
           >
             {reviewList.map((review, index) => (
               <SwiperSlide key={index}>
-                <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 m-auto w-full bg-gray-100 rounded-lg text-black">
+                <div key={index} className="grid grid-cols-1 md:grid-cols-3 gap-4 m-auto w-full bg-gray-100 rounded-lg">
                   <div className="p-4 ">
                     <p className="font-bold">{review.User ? (review.User.lastName + " " + review.User.firstName) : "Khách truy cập"}</p>
                     <p className="text-yellow-500">{formatStar(review.star || 0)}</p>
@@ -230,12 +230,12 @@ const ProductDetail: React.FC = () => {
         </div>
         <div>
           {/* Thêm review */}
-          <div className="rounded-xl bg-gray-800 p-10 shadow-lg shadow-gray-500/50">
+          <div className="rounded-xl bg-white p-10 shadow-lg shadow-gray-500/50">
             <h2 className="text-2xl font-semibold">Thêm review</h2>
             <form action="" className="mt-4 space-y-4" onSubmit={submitReview}>
               <div className="flex items-center space-x-4">
                 <label htmlFor="rating" className="text-lg">Đánh giá</label>
-                <select name="rating" id="rating" className="border-none rounded-lg p-2 bg-gray-800 focus:outline-none">
+                <select name="rating" id="rating" className="border border-gray-300 rounded-lg p-2 bg-white focus:outline-none">
                   <option value="5">5 sao</option>
                   <option value="4">4 sao</option>
                   <option value="3">3 sao</option>
@@ -245,7 +245,7 @@ const ProductDetail: React.FC = () => {
               </div>
               <div>
                 <label htmlFor="content" className="text-lg">Nội dung</label>
-                <textarea name="content" id="content" className="border-none focus:outline-none rounded-lg p-2 w-full h-32 bg-gray-800"></textarea>
+                <textarea name="content" id="content" className="border border-gray-300 rounded-lg p-2 w-full h-32"></textarea>
               </div>
               <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg">Gửi</button>
             </form>

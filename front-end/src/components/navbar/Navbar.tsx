@@ -77,31 +77,31 @@ const Navbar = () => {
   return (
     // navbar using tailwindcss
     <>
-      <nav className="bg-white/10 backdrop-blur-md border border-white/20 p-1 sticky top-0 z-80 shadow-lg text-white">
+      <nav className="bg-gray-800 p-4 sticky top-0 z-80">
         <div className="justify-between mx-auto flex items-center">
           <div className='justify-between flex items-center gap-10'>
             <Link to="/">
               <img className='w-20 ml-5' src={logo} alt="" />
             </Link>
-            <BsMenuButtonWideFill onClick={() => handleCategoryClick('Sách trong nước')} size={30} className='mr-2' color='black' />
+            <BsMenuButtonWideFill onClick={() => handleCategoryClick('Sách trong nước')} size={30} className='mr-2' color='white' />
             {/* searchBox */}
             <div className="flex items-center w-100">
               <input
                 type="text"
                 placeholder="Search"
-                className="bg-white p-1 h-8 rounded-l-lg w-80 bg-white/50 backdrop-blur-md"
+                className="bg-white p-1 h-8 rounded-l-lg w-80"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown} />
-              <button onClick={handleSearch} className="bg-white p-1 h-8 rounded-r-lg bg-white/50 backdrop-blur-md"><BiSearch size={24} /></button>
+              <button onClick={handleSearch} className="bg-white p-1 h-8 rounded-r-lg"><BiSearch size={24} /></button>
             </div>
           </div>
           <div className="flex items-center">
             <ul className="flex space-x-4">
-              <li><Link to="/book" >Sách</Link></li>
-              <li><Link to="/publisher" >Nhà xuất bản</Link></li>
-              <li><Link to="/about" >Về chúng tôi</Link></li>
-              <li><Link to="/contact">Voucher</Link></li>
+              <li><Link to="/book" className="text-white">Sách</Link></li>
+              <li><Link to="/publisher" className="text-white">Nhà xuất bản</Link></li>
+              <li><Link to="/about" className="text-white">Về chúng tôi</Link></li>
+              <li><Link to="/contact"className="text-white">Voucher</Link></li>
             </ul>
           </div>
           <div>
