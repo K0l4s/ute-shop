@@ -214,7 +214,7 @@ const Checkout: React.FC = () => {
       <h1 className="text-xl text-violet-700 font-bold mb-4">XÁC NHẬN THANH TOÁN</h1>
       
       {/* Địa Chỉ Giao Hàng */}
-      <div className="border-2 border-black p-4 rounded mb-6">
+      <div className="border-2 border-black p-4 rounded mb-6 bg-white">
         <h3 className="text-lg text-violet-700 font-bold mb-2 border-b border-black pb-2">ĐỊA CHỈ NHẬN HÀNG</h3>
         <div className='flex justify-between'>
           <p className='font-semibold flex'>Địa chỉ cụ thể: { shipping_address ||

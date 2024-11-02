@@ -77,7 +77,7 @@ const SearchResults: React.FC = () => {
           ...filters,
           title: query,
           page: currentPage,
-          limit: 1,
+          limit: 8,
           minPrice: minPrice,
           maxPrice: maxPrice,
         };
@@ -166,7 +166,7 @@ const SearchResults: React.FC = () => {
         <SearchFilter onFilterChange={handleFilterChange} publishers = {publishers} selectedFilters={filters}/>
       </div>
       <div className="w-4/5">
-        <div className="flex border rounded mb-4 items-center">
+        <div className="flex border rounded mb-4 items-center bg-white">
           <span className='w-2/3 pl-4 font-bold'>
             KẾT QUẢ TÌM KIẾM
             ({books.length})

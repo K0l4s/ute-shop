@@ -98,7 +98,7 @@ const Notification: React.FC<{ setUnreadCount: React.Dispatch<React.SetStateActi
   };
 
   return (
-    <div className="w-full md:w-128 p-4 bg-white/30 backdrop-blur-md border-white/50 rounded-lg shadow-lg flex flex-col justify-center items-center gap-2">
+    <div className="w-full md:w-128 p-4 bg-white rounded-lg shadow-lg flex flex-col justify-center items-center gap-2">
       <h2 className="text-lg font-semibold mb-2">Thông báo</h2>
       {error && <p className="text-red-500">{error}</p>}
       <ul ref={containerRef} className="space-y-2 max-h-128 overflow-y-auto">

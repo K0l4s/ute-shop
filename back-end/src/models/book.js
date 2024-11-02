@@ -40,7 +40,7 @@ module.exports = (sequelize) => {
   Book.init({
     ISBN: DataTypes.STRING,
     title: DataTypes.STRING,
-    desc: DataTypes.STRING,
+    desc: DataTypes.STRING(2048),
     price: DataTypes.DECIMAL,
     salePrice: DataTypes.DECIMAL,
     year: DataTypes.DATEONLY,

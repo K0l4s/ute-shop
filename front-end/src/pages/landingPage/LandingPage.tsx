@@ -44,9 +44,9 @@ const LandingPage = () => {
     return parseInt(price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
   };
   return (
-    <div className=" min-h-screen">
+    <div className="bg-gray-100">
       {/* Hero Section */}
-      <section className="py-20 text-white text-center bg-gradient-to-r from-blue-500 to-purple-600">
+      <section className="bg-white py-10">
         <div className="max-w-7xl mx-auto">
           <h1 className="text-4xl font-bold mb-4">BÃO SALE MÙA HẠ GOM SÁCH BAO ĐÃ</h1>
           <p className="text-xl">Khám phá bộ sưu tập sách giảm giá lớn nhất ngay hôm nay!</p>
@@ -56,7 +56,7 @@ const LandingPage = () => {
       {/* Product Collections */}
       <section className="py-10">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold mb-6 text-center text-white">Bộ sưu tập đáng chú ý</h2>
+          <h2 className="text-3xl font-bold mb-6 text-center text-balck">Bộ sưu tập đáng chú ý</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
             {[...Array(4)].map((_, i) => (
               <div key={i} className="bg-gradient-to-b from-yellow-400 to-yellow-600 p-4 
@@ -72,9 +72,9 @@ const LandingPage = () => {
       </section>
 
       {/* Best Selling Books */}
-      <section className="py-10">
+      <section className="py-10 bg-white">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold mb-6 text-center text-white">Sách bán chạy</h2>
+          <h2 className="text-3xl font-bold mb-6 text-center text-black">Sách bán chạy</h2>
           <Swiper
             modules={[Navigation, Pagination, Scrollbar, A11y, Autoplay]}
             spaceBetween={20}
@@ -146,7 +146,7 @@ const LandingPage = () => {
       {/* Partner Publishers */}
       <section className="py-10">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold mb-6 text-center text-white">Nhà xuất bản cộng tác</h2>
+          <h2 className="text-3xl font-bold mb-6 text-center text-balck">Nhà xuất bản cộng tác</h2>
           <div className="flex justify-center flex-wrap gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="bg-white p-4 shadow-lg rounded-lg text-center">
