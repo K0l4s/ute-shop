@@ -74,10 +74,26 @@ const updateOrderController = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 }
+
+const updateMultipleOrderStatusController = async (req, res) => {
+  const ordersId = req.body;
+  const user = req.user;
+  const userDetail = await userService.getUserById(user.id);
+  try {
+    if(userDetail.role!==Role.ADMIN) {
+      throw new Error('You do not have permission to perform this action');
+    }
+    const updatedOrders = await orderService.updateMultipleOrderStatus(ordersId,userDetail.id);
+    res.status(200).json(updatedOrders);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
 module.exports = {
   placeOrder,
   getOrder,
   getAllOrdersByUser,
   getAllOrdersController,
-  updateOrderController
+  updateOrderController,
+  updateMultipleOrderStatusController
 };
