@@ -23,7 +23,7 @@ const AdminAuthorPage: React.FC = () => {
     
     // Thêm các trạng thái cho phân trang
     const [currentPage, setCurrentPage] = useState(1);
-    const [authorsPerPage] = useState(5); // Số lượng tác giả trên mỗi trang
+    const [authorsPerPage] = useState(8); // Số lượng tác giả trên mỗi trang
 
     const openModal = (author: Author | null) => {
         setSelectedAuthor(author);
@@ -95,9 +95,11 @@ const AdminAuthorPage: React.FC = () => {
             <button onClick={() => openModal(null)} className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5">
                 <FaPlus className="mr-2" /> Thêm mới</button>
 
-            <div className="bg-gradient-to-r from-violet-800 to-blue-900 text-white shadow-md rounded-lg overflow-hidden">
+            <div className="
+            bg-white
+            shadow-md rounded-lg overflow-hidden">
                 <table className="min-w-full text-sm text-left">
-                    <thead className="bg-gradient-to-b from-yellow-400 to-yellow-600 text-white uppercase text-xs font-semibold text-black">
+                    <thead className="bg-blue-500 text-white uppercase text-xs font-semibold text-black">
                         <tr>
                             <th className="px-6 py-3 cursor-pointer" onClick={() => handleSort('id')}>
                                 ID
@@ -116,7 +118,7 @@ const AdminAuthorPage: React.FC = () => {
                     </thead>
                     <tbody>
                         {currentAuthors.map((author) => (
-                            <tr key={author.id} className="border-b border-size-2 hover:text-black hover:bg-gradient-to-r hover:from-violet-200 hover:to-violet-300">
+                            <tr key={author.id} className="border-b border-size-2 hover:text-black hover:bg-blue-200">
                                 <td className="px-6 py-4 ">{author.id}</td>
                                 <td className="px-6 py-4 font-medium">{author.name}</td>
                                 <td className="px-6 py-4 ">{author.book_count}</td>

@@ -123,7 +123,7 @@ const Dashboard = () => {
         <select
           value={currentYear}
           onChange={(e) => setCurrentYear(Number(e.target.value))}
-          className="bg-gradient-to-r from-violet-400 to-violet-600 text-white p-2 rounded-lg focus:outline-none font-bold"
+          className="bg-white w-1/5 text-center p-2 rounded-lg focus:outline-none font-bold"
         >
           {Array.from({ length: 12 }).map((_, index) => (
             <option

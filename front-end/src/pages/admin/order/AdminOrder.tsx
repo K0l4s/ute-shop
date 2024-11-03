@@ -12,6 +12,7 @@ import { LiaShippingFastSolid } from "react-icons/lia";
 import { GiConfirmed } from "react-icons/gi";
 import { TbBackpackOff, TbTruckReturn } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
+import Tooltip from "../../../components/tooltip/Tooltip";
 
 const ORDER_STATUSES = {
   PENDING: "Pending",
@@ -390,8 +391,9 @@ const AdminOrder = () => {
 
 
           <div className="table-container max-h-[650px] overflow-y-auto rounded-lg border-none shadow-lg">
-            <table id="order-table" className="min-w-full bg-gradient-to-r from-violet-800 to-blue-900 text-white">
-              <thead className="sticky top-0 bg-gradient-to-b from-yellow-400 to-yellow-600 text-black">
+            <table id="order-table" className="min-w-full 
+            bg-white">
+              <thead className="sticky top-0 bg-blue-500 text-black z-100">
                 <tr>
                   <th
                     className="py-3 px-6 cursor-pointer hover:underline"
@@ -462,30 +464,59 @@ const AdminOrder = () => {
                     <td className="py-3 px-6">{formatPrice(order.total_price)}</td>
                     <td className="py-3 px-6">{formatDate(order.order_date)}</td>
                     <td className="py-3 px-6">{formatAddress(order.shipping_address)}</td>
-                    <td className="py-3 px-6">
-                      {order.shipping_method === "STANDARD" && <span className="text-yellow-500"><FaTruck />Tiêu chuẩn</span>}
-                      {order.shipping_method === "EXPRESS" && <span className="text-green-500"><FaTruckFast />Nhanh</span>}
+                    <td className="py-3 px-6 font-bold">
+                    <Tooltip text="Giao hàng tiêu chuẩn">
+                      {order.shipping_method === "STANDARD" && <span className="text-yellow-700"><FaTruck /></span>}
+                    </Tooltip>
+                    <Tooltip text="Giao hàng nhanh">
+                      {order.shipping_method === "EXPRESS" && <span className="text-green-700"><FaTruckFast /></span>}
+                    </Tooltip>
 
                     </td>
                     {/* <td className="py-3 px-6">{formatPrice(order.shipping_fee)}</td> */}
-                    <td className="py-3 px-6">
+                    <td className="py-3 px-6 font-bold">
                       {/* {order.status} */}
                       {/* { case for order status */}
-                      {order.status === "PENDING" && <span className="text-yellow-500 flex gap-1 items-center"><BiLoaderCircle className="" />Xác thực...</span>}
-                      {order.status === "CONFIRMED" && <span className="text-orange-500 flex gap-1 items-center"><GiConfirmed />Xác nhận đơn...</span>}
-                      {order.status === "PROCESSING" && <span className="text-yellow-400 flex gap-1 items-center"><FaDropbox />Đang đóng hàng...</span>}
-                      {order.status === "SHIPPED" && <span className="text-green-500 flex gap-1 items-center"><LiaShippingFastSolid />Giao thành công</span>}
-                      {order.status === "DELIVERED" && <span className="text-green-600 flex gap-1 items-center"><LiaShippingFastSolid />Vận chuyển...</span>}
-                      {order.status === "CANCELLED" && <span className="text-yellow-500 flex gap-1 items-center"><TbBackpackOff />Đã hủy...</span>}
-                      {order.status === "RETURNED" && <span className="text-yellow-500 flex gap-1 items-center"><TbTruckReturn />Hoàn trả</span>}
+                      <Tooltip text="Đang chờ xác nhận">
+                      {order.status === "PENDING" && <BiLoaderCircle className="" />}
+                      </Tooltip>
 
+                      <Tooltip text="Đơn đã xác nhận">
+                      {order.status === "CONFIRMED" && <GiConfirmed />}
+                      </Tooltip>
+
+                      <Tooltip text="Đơn hàng đang đóng gói">
+                      {order.status === "PROCESSING" && <FaDropbox />}
+                      </Tooltip>
+
+                      <Tooltip text="Giao hàng thành công">
+                      {order.status === "SHIPPED" && <LiaShippingFastSolid />}
+                      </Tooltip>
+
+                      <Tooltip text="Đơn hàng đang vận chuyển">
+                      {order.status === "DELIVERED" && <LiaShippingFastSolid />}
+                      </Tooltip>
+
+                      <Tooltip text="Đã hủy đơn hàng">
+                      {order.status === "CANCELLED" && <TbBackpackOff />}
+                      </Tooltip>
+
+                      <Tooltip text="Yêu cầu hoàn trả">
+                      {order.status === "RETURNED" && <TbTruckReturn />}
+                      </Tooltip>
                     </td>
                     <td className="py-3 px-6">
-                      <div className="flex gap-1">
-                        <BiDetail className="text-yellow-300" size={20} />
-                        {order.status === "PENDING" && <span onClick={() => confirmOrd(order.id)} className="text-yellow-500 flex gap-1 items-center ">Xác nhận đơn</span>}
-                        {order.status === "CONFIRMED" && <span onClick={() => progress(order.id)} className="text-orange-500 flex gap-1 items-center">Xử lý đơn</span>}
-                        {order.status === "PROCESSING" && <span onClick={() => ship(order.id)} className="text-yellow-400 flex gap-1 items-center bg-blue-500 text-center rounded-xl font-bold">Gửi hàng</span>}
+                      <div className="flex gap-1 font-bold ">
+                        <BiDetail className="text-yellow-900 cursor-pointer" size={20} />
+                        <Tooltip text="Xác nhận đơn hàng">
+                        {order.status === "PENDING" && <span onClick={() => confirmOrd(order.id)} className="text-yellow-500 flex gap-1 items-center cursor-pointer"><GiConfirmed /></span>}
+                        </Tooltip>
+                        <Tooltip text="Đóng gói">
+                        {order.status === "CONFIRMED" && <span onClick={() => progress(order.id)} className="text-orange-500 flex gap-1 items-center cursor-pointer"><FaDropbox /></span>}
+                        </Tooltip>
+                        <Tooltip text="Vận chuyển">
+                        {order.status === "PROCESSING" && <span onClick={() => ship(order.id)} className="text-orange-500 flex gap-1 items-center cursor-pointer"><LiaShippingFastSolid /></span>}
+                        </Tooltip>
                       </div>
                     </td>
                   </tr>
