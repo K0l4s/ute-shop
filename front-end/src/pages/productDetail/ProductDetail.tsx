@@ -21,7 +21,7 @@ import { showToast } from '../../utils/toastUtils';
 import { addToCart } from '../../apis/cart';
 import Modal from 'react-modal';
 import ImageViewSwiperModal from '../../components/modals/ImageViewSwiperModal';
-import { formatStar } from '../../utils/formatStar';
+import { formatStar } from '../../utils/bookUtils';
 
 interface Reviews {
   id: string,

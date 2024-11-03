@@ -18,3 +18,15 @@ export const formatStar = (rating: number) => {
   }
   return stars;
 };
+
+export const saveToHistory = (bookId: number) => {
+  const viewedBooks = JSON.parse(localStorage.getItem('viewedBooks') || '[]');
+  const updatedViewedBooks = [bookId, ...viewedBooks.filter((id: number) => id !== bookId)];
+
+  // Limit to the latest 50 IDs
+  if (updatedViewedBooks.length > 50) {
+    updatedViewedBooks.splice(50);
+  }
+
+  localStorage.setItem('viewedBooks', JSON.stringify(updatedViewedBooks));
+};

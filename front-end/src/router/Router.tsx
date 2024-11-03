@@ -53,6 +53,9 @@ const Router = () => {
           <Route path="/account/profile" element={<RequireAuth><AccountPage /></RequireAuth>} />
           <Route path="/account/address" element={<RequireAuth><AccountPage /></RequireAuth>} />
           <Route path="/account/orders" element={<RequireAuth><AccountPage /></RequireAuth>} />
+          <Route path="/account/favoriteBooks" element={<RequireAuth><AccountPage /></RequireAuth>} />
+          <Route path="/account/purchasedBooks" element={<RequireAuth><AccountPage /></RequireAuth>} />
+          <Route path="/account/viewHistory" element={<RequireAuth><AccountPage /></RequireAuth>} />
           {/* <Route path="/profile" element={<Cart />} /> */}
           {/* <Route path="/profile/edit" element={<Cart />} /> */}
           {/* <Route path="/orders" element={<Order />} /> */}

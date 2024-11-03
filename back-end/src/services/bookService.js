@@ -290,11 +290,66 @@ const createNewBook = async ({ISBN,
 //   }
 // }
 
+const getBooksByListId = async (ids) => {
+  try {
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+      throw new Error("A list of IDs is required");
+    }
+
+    const books = await Book.findAll({
+      attributes: {
+        include: [
+          [
+            sequelize.fn('AVG', sequelize.col('Reviews.star')),
+            'avgRating'
+          ],
+          [
+            sequelize.fn('COUNT', sequelize.col('Reviews.id')),
+            'reviewCount'
+          ]
+        ]
+      },
+      where: {
+        id: {
+          [Op.in]: ids
+        }
+      },
+      include: [
+        {
+          model: Genre,
+          as: 'genres',
+          attributes: ['name'],
+          through: { attributes: [] }
+        },
+        {
+          model: Publisher,
+          as: 'Publisher'
+        },
+        {
+          model: Review,
+          as: 'Reviews',
+          attributes: [] // Exclude individual review attributes
+        }
+      ],
+      group: ['Book.id', 'genres.id']
+    });
+
+    // Check if books were found
+    if (!books || books.length === 0) {
+      return [];
+    }
+
+    return books;
+  } catch (error) {
+    throw error;
+  }
+};
 module.exports = {
   // searchBooksByTitle,
   getTop10BooksByOrderQuantity,
   getBooks,
   getBookDetailById,
   createNewBook,
+  getBooksByListId
 };
 
