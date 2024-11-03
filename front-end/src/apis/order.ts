@@ -97,3 +97,33 @@ export const updateCartStatus = async (orderId: string, status: string) => {
     throw error;
   }
 };
+
+
+export const updateMultipleCartStatus = async (orderIds: number[]) => {
+  try {
+    // Kiểm tra đầu vào
+    if (!orderIds || orderIds.length === 0) {
+      throw new Error("Order IDs are required");
+    }
+
+    console.log("Sending request with:", { ordersId: orderIds }); // Log kiểm tra
+
+    const response = await axios.post(
+      `${BASE_URL}/order/multi/status`,
+      { ordersId: orderIds }, // Đảm bảo payload phù hợp với cấu trúc mong đợi ở backend
+      {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      console.error('Error updating cart status:', error.response.data); // Log chi tiết lỗi từ máy chủ
+    } else {
+      console.error('Error updating cart status:', error);
+    }
+    throw error;
+  }
+}
