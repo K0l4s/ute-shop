@@ -26,10 +26,13 @@ const getTop10BooksByOrderQuantity = async () => {
         Books.cover_img_url, 
         Books.publisher_id, 
         Books.author_id, 
-        Books.category_id, 
-        SUM(detail_orders.quantity) AS totalSell 
+        Books.category_id,
+        SUM(detail_orders.quantity) AS totalSell, 
+        AVG(Reviews.star) AS avgRating,
+        COUNT(Reviews.id) AS reviewCount
       FROM Books 
       LEFT JOIN detail_orders ON Books.id = detail_orders.book_id 
+      LEFT JOIN Reviews ON Books.id = Reviews.book_id
       GROUP BY Books.id 
       ORDER BY totalSell DESC 
       LIMIT 10;

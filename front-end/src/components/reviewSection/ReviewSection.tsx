@@ -2,7 +2,7 @@ import React from 'react';
 
 const ReviewSection: React.FC = () => {
   return (
-    <div className="mt-12">
+    <div className="mt-8">
 
       
     </div>
