@@ -129,3 +129,11 @@ export const updateMultipleCartStatus = async (orderIds: number[]) => {
     throw error;
   }
 }
+
+export const searchOrdersByUser = async (status: string, searchQuery: string) => {
+  const response = await axios.get(BASE_URL + '/order/search', {
+    params: { status, searchQuery }, 
+    withCredentials: true
+  });
+  return response.data;
+};

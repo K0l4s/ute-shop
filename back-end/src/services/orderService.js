@@ -453,11 +453,54 @@ const updateMultipleOrderStatus = async (ordersId,userId) => {
     }
     return messages;
 }
+
+const searchOrdersByUserId = async (userId, status, searchQuery) => {
+  try {
+    const whereClause = { user_id: userId };
+    if (status !== 'ALL') {
+      whereClause.status = status;
+    }
+
+    const orders = await Order.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: Detail_Order,
+          as: 'orderDetails',
+          include: {
+            model: Book,
+            as: 'book',
+            where: {
+              title: {
+                [db.Sequelize.Op.like]: `%${searchQuery}%`
+              }
+            },
+            include: {
+              model: Category,
+              as: 'category',
+              attributes: ['name']
+            }
+          },
+        }
+      ],
+      order: [['order_date', 'DESC']]
+    });
+
+    if (!orders) {
+      throw new Error('No orders found');
+    }
+    return orders;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   createOrder,
   getOrderById,
   getOrdersByUserId,
   getAllOrders,
   updateOrder,
-  updateMultipleOrderStatus
+  updateMultipleOrderStatus,
+  searchOrdersByUserId
 };

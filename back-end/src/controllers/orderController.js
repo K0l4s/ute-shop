@@ -92,11 +92,26 @@ const updateMultipleOrderStatusController = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 }
+
+const searchOrdersByUserController = async (req, res) => {
+  const userId = req.user.id;
+  const status = req.query.status || 'ALL';
+  const searchQuery = req.query.searchQuery || '';
+
+  try {
+    const orders = await orderService.searchOrdersByUserId(userId, status, searchQuery);
+    res.status(200).json(orders);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+}
+
 module.exports = {
   placeOrder,
   getOrder,
   getAllOrdersByUser,
   getAllOrdersController,
   updateOrderController,
-  updateMultipleOrderStatusController
+  updateMultipleOrderStatusController,
+  searchOrdersByUserController
 };

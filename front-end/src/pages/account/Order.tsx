@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getOrderByUser, updateCartStatus } from '../../apis/order';
+import { getOrderByUser, searchOrdersByUser, updateCartStatus } from '../../apis/order';
 import { Order } from '../../models/OrderType';
 import OrderDetail from './OrderDetail';
 import { showToast } from '../../utils/toastUtils';
@@ -17,22 +17,36 @@ const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
-  const [totalOrders, setTotalOrders] = useState(0); 
+  // const [totalOrders, setTotalOrders] = useState(0); 
 
   const navigate = useNavigate();
 
   const fetchOrders = async (status: string, limit: number, offset: number) => {
     try {
       const newOrders = await getOrderByUser(status, limit, offset);
-      setOrders(prevOrders => [...prevOrders, ...newOrders]);
-      setOffset(prevOffset => prevOffset + limit);
-      setTotalOrders(prevTotal => prevTotal + newOrders.length);
+      if (Array.isArray(newOrders)) {
+        setOrders(prevOrders => [...prevOrders, ...newOrders]);
+        setOffset(prevOffset => prevOffset + limit);
+        // setTotalOrders(prevTotal => prevTotal + newOrders.length);
 
-      console.log(newOrders.length);
-      console.log("totalOrders: ", totalOrders);
+        if (newOrders.length < limit) {
+          setHasMore(false);
+        }
+      } else {
+        console.error('Expected an array of orders, but received:', newOrders);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-      if (newOrders.length < limit) {
-        setHasMore(false);
+  const searchOrders = async (status: string, query: string) => {
+    try {
+      const searchedOrders = await searchOrdersByUser(status, query);
+      if (Array.isArray(searchedOrders)) {
+        setOrders(searchedOrders);
+      } else {
+        console.error('Expected an array of orders, but received:', searchedOrders);
       }
     } catch (error) {
       console.error(error);
@@ -43,9 +57,23 @@ const Orders = () => {
     setOrders([]);
     setOffset(0);
     setHasMore(true);
-    setTotalOrders(0);
+    // setTotalOrders(0);
     fetchOrders(filteredStatus, 5, 0);
   }, [filteredStatus]);
+
+  const handleSearchKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      if (searchQuery.trim() === '') {
+        setOrders([]);
+        setOffset(0);
+        setHasMore(true);
+        fetchOrders(filteredStatus, 5, 0);
+      } else {
+        searchOrders(filteredStatus, searchQuery);
+      }
+    }
+  };
 
   const handleLoadMore = () => {
     if (hasMore) {
@@ -57,7 +85,7 @@ const Orders = () => {
     setFilteredStatus(status);
   };
 
-  const filteredOrders = filteredStatus === 'ALL' ? orders : orders.filter(order => order.status === filteredStatus);
+  // const filteredOrders = filteredStatus === 'ALL' ? orders : orders.filter(order => order.status === filteredStatus);
 
   const handleCancelOrder = (orderId: number) => {
     console.log(`Cancel order #${orderId}`);
@@ -115,7 +143,7 @@ const Orders = () => {
     setIsModalOpen(false);
   };
 
-  const filteredOrdersBySearch = filteredOrders.filter(order =>
+  const filteredOrdersBySearch = orders.filter(order =>
     order.orderDetails.some(detail =>
       detail.book.title.toLowerCase().includes(searchQuery.toLowerCase())
     )
@@ -145,7 +173,8 @@ const Orders = () => {
           placeholder="Nhập tên sách cần tìm"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-10 py-2 border border-gray-400 rounded w-full"
+          onKeyDown={handleSearchKeyPress}
+          className="pl-10 py-2 border border-gray-400 w-full"
         />
       </div>
 
