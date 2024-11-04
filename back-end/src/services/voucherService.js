@@ -32,9 +32,13 @@ const createDiscount = async ({ code, name, discount_val, discount_perc, min_ord
 };
 
 //Hàm lấy tất cả các discount hiện có 
-const getAllDiscounts = async () => {
+const getAllDiscounts = async (limit, offset) => {
     try {
-      const discounts = await Discount.findAll();
+      const discounts = await Discount.findAll({
+        limit: limit,
+        offset: offset
+      });
+      
       if (discounts.length === 0) {
         throw new Error('No discounts found');
       }
@@ -133,9 +137,13 @@ const createFreeship = async ({ code, name, discount_val, discount_perc, min_ord
 };
 
 // Hàm lấy tất cả các freeship hiện có
-const getAllFreeships = async () => {
+const getAllFreeships = async (limit, offset) => {
   try {
-      const freeships = await Freeship.findAll();
+      const freeships = await Freeship.findAll({
+        limit: limit,
+        offset: offset
+      });
+
       if (freeships.length === 0) {
           throw new Error('No freeships found');
       }
