@@ -4,6 +4,7 @@ import { FaHistory, FaRegTrashAlt } from "react-icons/fa";
 import { formatStar } from "../../utils/bookUtils";
 import { addToCart } from "../../apis/cart";
 import { showToast } from "../../utils/toastUtils";
+import { useNavigate } from "react-router-dom";
 
 interface Book {
   id: number;
@@ -27,6 +28,8 @@ const ViewHistory: React.FC = () => {
   const [viewedBooks, setViewedBooks] = useState<Book[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchViewedBooks = async () => {
@@ -100,7 +103,9 @@ const ViewHistory: React.FC = () => {
         <>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 gap-2">
           {displayedBooks.map((book) => (
-            <div key={book.id} className="p-4 shadow-lg rounded-lg bg-white flex flex-col">
+            <div key={book.id} 
+              className="p-4 shadow-lg rounded-lg bg-white flex flex-col"
+              onClick={() => navigate(`/products/${book.id}`)}>
               <img
                 src={book.cover_img_url}
                 alt={book.title}
@@ -126,12 +131,12 @@ const ViewHistory: React.FC = () => {
                     className="w-36 border-2 border-gray-200 bg-gray-200 
                     text-black font-semibold px-4 py-2 rounded mr-2 cursor-not-allowed">Hết hàng</button>
                 ) : (
-                  <button onClick={() => handleAddToCart(book)}
+                  <button onClick={(e) => { e.stopPropagation(); handleAddToCart(book) }}
                     className="w-36 border-2 border-violet-600 bg-violet-600 hover:bg-violet-700 
                     text-white font-semibold px-4 py-2 rounded mr-2">Thêm vào giỏ</button>
                 )}
                 
-                <button onClick={() => handleRemoveFromHistory(book.id)} 
+                <button onClick={(e) => { e.stopPropagation(); handleRemoveFromHistory(book.id) }} 
                   className="w-24 border-2 border-rose-600 hover:bg-rose-600 
                     text-black hover:text-white font-semibold px-6 py-2 rounded transition duration-4000">Xóa</button>
               </div>

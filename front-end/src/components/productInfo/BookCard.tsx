@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import LoginRequired from '../modals/LoginRequired';
 import { Link } from 'react-router-dom';
+import { saveToHistory } from '../../utils/bookUtils';
 
 type BookCardProps = {
   id: number;
@@ -38,7 +39,7 @@ const BookCard: React.FC<BookCardProps> = ({ id, title, desc, price, salePrice, 
 
   return (
     <>
-      <div className="border p-4 rounded shadow-lg w-full self-start cursor-pointer bg-white">
+      <div onClick={() => saveToHistory(id)} className="border p-4 rounded shadow-lg w-full self-start cursor-pointer bg-white">
         <Link to={`/products/${id}`}>
         
         <img src={image} alt={title} className="w-full h-56 object-contain mb-2 rounded hover:opacity-90" />
