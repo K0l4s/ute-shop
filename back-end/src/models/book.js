@@ -13,7 +13,8 @@ module.exports = (sequelize) => {
         foreignKey: 'author_id'
       });
       Book.belongsTo(models.Category, {
-        foreignKey: 'category_id'
+        foreignKey: 'category_id',
+        as: 'category'
       });
       Book.hasMany(models.Collection_Book, {
         foreignKey: 'book_id'

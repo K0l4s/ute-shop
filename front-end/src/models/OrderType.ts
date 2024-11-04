@@ -1,9 +1,12 @@
-// OrderTypes.ts
+export interface Category {
+  name: string;
+}
+
 export interface Book {
     id: number;
     title: string;
     price: string;
-    category: string;
+    category: Category;
     cover_img_url: string;
   }
   

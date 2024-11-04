@@ -19,6 +19,11 @@ export const formatStar = (rating: number) => {
   return stars;
 };
 
+export const formatPriceToVND = (price: any) => {
+  price = parseInt(price);
+  return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }).replace('₫', '').trim();
+};
+
 export const saveToHistory = (bookId: number) => {
   const viewedBooks = JSON.parse(localStorage.getItem('viewedBooks') || '[]');
   const updatedViewedBooks = [bookId, ...viewedBooks.filter((id: number) => id !== bookId)];
