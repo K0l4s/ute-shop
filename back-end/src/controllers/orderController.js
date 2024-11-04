@@ -27,10 +27,13 @@ const getOrder = async (req, res) => {
 };
 const getAllOrdersByUser = async (req, res) => {
   const userId = req.user.id;
+  const status = req.query.status || 'ALL';
+  const limit = parseInt(req.query.limit) || 5;
+  const offset = parseInt(req.query.offset) || 0;
 
   try {
     // Gọi service để lấy danh sách đơn hàng của user
-    const orders = await orderService.getOrdersByUserId(userId);
+    const orders = await orderService.getOrdersByUserId(userId, status, limit, offset);
     res.status(200).json(orders);
   } catch (error) {
     res.status(400).json({ message: error.message });

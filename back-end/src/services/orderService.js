@@ -2,6 +2,7 @@ const db = require('../models');
 const Order = db.Order;
 const Detail_Order = db.Detail_Order;
 const Book = db.Book;
+const Category = db.Category;
 const Payment = db.Payment;
 const Notification = db.Notification;
 const User = db.User;
@@ -124,21 +125,33 @@ const getOrderById = async (orderId) => {
     throw new Error(error.message);
   }
 }
-const getOrdersByUserId = async (id) => {
+const getOrdersByUserId = async (id, status, limit, offset) => {
   try {
+    const whereClause = { user_id: id };
+    if (status !== 'ALL') {
+      whereClause.status = status;
+    }
+
     const orders = await Order.findAll({
-      where: { user_id: id },
+      where: whereClause,
       include: [
         {
           model: Detail_Order,
           as: 'orderDetails',
           include: {
             model: Book,
-            as: 'book'
+            as: 'book',
+            include: {
+              model: Category,
+              as: 'category',
+              attributes: ['name']
+            }
           },
         }
       ],
-      order: [['order_date', 'DESC']]
+      order: [['order_date', 'DESC']],
+      limit: limit,
+      offset: offset
     });
     if (!orders) {
       throw new Error('No orders found');
