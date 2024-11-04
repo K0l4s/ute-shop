@@ -96,7 +96,7 @@ const deleteDiscount = async (discountId) => {
     if (!discount) {
       throw new Error(`Discount with ID ${discountId} not found`);
     }
-    await discount.destroy();
+    await discount.update({is_active : false});
     return { message: `Discount with ID ${discountId} deleted successfully` };
   } catch (error) {
     throw new Error(`Failed to delete discount: ${error.message}`);
@@ -188,7 +188,7 @@ const deleteFreeship = async (freeshipId) => {
       if (!freeship) {
           throw new Error(`Freeship with ID ${freeshipId} not found`);
       }
-      await freeship.destroy();
+      await freeship.update({is_active : false});
       return { message: `Freeship with ID ${freeshipId} deleted successfully` };
   } catch (error) {
       throw new Error(`Failed to delete freeship: ${error.message}`);
