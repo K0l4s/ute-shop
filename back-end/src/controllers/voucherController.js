@@ -1,3 +1,4 @@
+const { parse } = require("dotenv");
 const { createDiscount, getAllDiscounts, getDiscountByCode, updateDiscount, deleteDiscount,
         createFreeship, getAllFreeships, getFreeshipByCode, updateFreeship, deleteFreeship} = require("../services/voucherService");
 
@@ -18,7 +19,8 @@ try {
 // Lấy tất cả các discount hiện có
 const getAllDiscountsController = async (req, res) => {
 try {
-    const discounts = await getAllDiscounts();
+    const { limit, offset} = req.query;
+    const discounts = await getAllDiscounts(parseInt(limit), parseInt(offset));
     res.status(200).json({
     message: "Success",
     data: discounts
@@ -88,7 +90,8 @@ const createFreeshipController = async (req, res) => {
 // Lấy tất cả các freeship hiện có
 const getAllFreeshipsController = async (req, res) => {
     try {
-        const freeships = await getAllFreeships();
+        const { limit, offset} = req.query;
+        const freeships = await getAllFreeships(parseInt(limit), parseInt(offset));
         res.status(200).json({
             message: "Success",
             data: freeships

@@ -18,7 +18,7 @@ router.get('/discounts/:code', authenticateJWT, getDiscountByCodeController);
 router.put('/discounts/update/:id', authenticateJWT, updateDiscountController);
 
 // Xóa discount theo ID
-router.delete('/discounts/delete/:id', authenticateJWT, deleteDiscountController);
+router.post('/discounts/delete/:id', authenticateJWT, deleteDiscountController);
 
 // Tạo mới một freeship
 router.post('/freeships/create', authenticateJWT, createFreeshipController);
@@ -33,6 +33,6 @@ router.get('/freeships/:code', authenticateJWT, getFreeshipByCodeController);
 router.put('/freeships/update/:id', authenticateJWT, updateFreeshipController);
 
 // Xóa freeship theo ID
-router.delete('/freeships/delete/:id', authenticateJWT, deleteFreeshipController);
+router.post('/freeships/delete/:id', authenticateJWT, deleteFreeshipController);
 
 module.exports = router;

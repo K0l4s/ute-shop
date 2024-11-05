@@ -164,8 +164,9 @@ const Cart: React.FC = () => {
           </div>
           
           {books.length === 0 ? (
-            <div className="w-full flex justify-center items-center mt-2">
-              <img src="./suchEmpty.jpeg" alt="Empty Cart" className="w-full h-auto rounded" />
+            <div className="w-full flex flex-col justify-center items-center mt-2">
+              <img src="./emptyCart.png" alt="Empty Cart" className="w-3/12 h-auto rounded" />
+              <div className="text-violet-700 font-semibold">Giỏ hàng đang trống</div>
             </div>
           ) : (
             <>
