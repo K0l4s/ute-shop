@@ -7,12 +7,13 @@ import { FiPackage } from 'react-icons/fi';
 import { IoInformationCircleOutline, IoSearchSharp } from 'react-icons/io5';
 import { formatStatus } from '../../utils/orderUtils';
 import { formatPriceToVND } from '../../utils/bookUtils';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { formatDateTime } from '../../utils/dateUtils';
 
 const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredStatus, setFilteredStatus] = useState<'ALL' | 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'RETURNED'>('ALL');
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [offset, setOffset] = useState(0);
@@ -20,6 +21,7 @@ const Orders = () => {
   // const [totalOrders, setTotalOrders] = useState(0); 
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const fetchOrders = async (status: string, limit: number, offset: number) => {
     try {
@@ -60,6 +62,17 @@ const Orders = () => {
     // setTotalOrders(0);
     fetchOrders(filteredStatus, 5, 0);
   }, [filteredStatus]);
+
+  // for history navigation
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const orderId = params.get('orderId');
+    if (orderId) {
+      setSelectedOrder(Number(orderId));
+      setIsModalOpen(true);
+    }
+  }, [location.search]);
+
 
   const handleSearchKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
@@ -133,14 +146,16 @@ const Orders = () => {
     const sevenDays = 7 * 24 * 60 * 60 * 1000;
     return now - orderTime <= sevenDays;
   };
-  const openModal = (order: Order) => {
-    setSelectedOrder(order);
+  const openModal = (orderId: number) => {
+    setSelectedOrder(orderId);
     setIsModalOpen(true);
+    navigate(`?orderId=${orderId}`);
   };
 
   const closeModal = () => {
     setSelectedOrder(null);
     setIsModalOpen(false);
+    navigate(location.pathname);
   };
 
   const filteredOrdersBySearch = orders.filter(order =>
@@ -161,7 +176,7 @@ const Orders = () => {
         <button onClick={() => filterOrders('CONFIRMED')} className={`px-4 py-2 font-semibold ${filteredStatus === 'CONFIRMED' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Đã xác nhận</button>
         <button onClick={() => filterOrders('PROCESSING')} className={`px-4 py-2 font-semibold ${filteredStatus === 'PROCESSING' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Đang xử lý</button>
         <button onClick={() => filterOrders('DELIVERED')} className={`px-4 py-2 font-semibold ${filteredStatus === 'DELIVERED' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Đang giao hàng</button>
-        <button onClick={() => filterOrders('SHIPPED')} className={`px-4 py-2 font-semibold ${filteredStatus === 'SHIPPED' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Giao hàng thành công</button>
+        <button onClick={() => filterOrders('SHIPPED')} className={`px-4 py-2 font-semibold ${filteredStatus === 'SHIPPED' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Đã nhận hàng</button>
         <button onClick={() => filterOrders('CANCELLED')} className={`px-4 py-2 font-semibold ${filteredStatus === 'CANCELLED' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Đã hủy</button>
         <button onClick={() => filterOrders('RETURNED')} className={`px-4 py-2 font-semibold ${filteredStatus === 'RETURNED' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Đã trả hàng</button>
       </div>
@@ -214,24 +229,24 @@ const Orders = () => {
                   <span className="text-lg font-semibold">Thành tiền: 
                     <span className='text-red-500 ml-4'>{formatPriceToVND(order.total_price)} đ</span>
                   </span>
-                  <span className="text-sm text-gray-700">Ngày đặt: {new Date(order.order_date).toLocaleString()}</span>
+                  <span className="text-sm text-gray-700">Ngày đặt: {formatDateTime(order.order_date)}</span>
                 </div>
                 <div className="flex p-2 space-x-3">
-                  <button onClick={() => openModal(order)} className="font-semibold text-blue-500 border border-blue-500 px-4 py-2 rounded-md hover:bg-blue-500 hover:text-white transition duration-300">Chi tiết</button>
+                  <button onClick={() => openModal(order.id)} className="font-semibold text-blue-500 border border-blue-500 px-4 py-2 rounded-md hover:bg-blue-500 hover:text-white transition duration-300">Chi tiết</button>
                   {order.status === 'PENDING'
                     &&
                     isWithinCancelPeriod(order.order_date) &&
                     (
-                      <button onClick={() => handleCancelOrder(order.id)} className="bg-red-500 font-semibold text-white px-4 py-2 rounded-md transition duration-300">Hủy đơn</button>
+                      <button onClick={() => handleCancelOrder(order.id)} className="bg-red-500 font-semibold text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">Hủy đơn</button>
                   )}
-                  {/* {(order.status === 'CONFIRMED' || order.status === 'PROCESSING' || order.status === 'CANCELLED' || order.status === 'RETURNED') && ( */}
+                  {(order.status === 'SHIPPED' || order.status === 'CANCELLED' || order.status === 'RETURNED') && (
                     <button onClick={() => handleReorder(order.id)} className="bg-red-500 font-semibold text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">Mua lại</button>
-                  {/* )} */}
+                  )}
                   {order.status === 'DELIVERED' && (
-                    <button onClick={() => handleConfirmDelivery(order.id)} className="bg-green-500 font-semibold text-white px-4 py-2 rounded-md transition duration-300">Nhận hàng</button>
+                    <button onClick={() => handleConfirmDelivery(order.id)} className="bg-green-500 font-semibold text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-300">Nhận hàng</button>
                   )}
                   {order.status === 'SHIPPED' && isWithinReturnPeriod(order.updatedAt) &&(
-                    <button onClick={() => handleReturn(order.id)} className="bg-red-500 font-semibold text-white px-4 py-2 rounded-md transition duration-300">Yêu cầu trả hàng</button>
+                    <button onClick={() => handleReturn(order.id)} className="border border-red-600 font-semibold text-red-600 px-4 py-2 rounded-md hover:bg-red-500 hover:text-white transition duration-300">Yêu cầu trả hàng</button>
                   )}
                 </div>
               </div>
@@ -249,7 +264,7 @@ const Orders = () => {
       
       {/* Modal for Order Details */}
       {isModalOpen && selectedOrder && (
-        <OrderDetail order={selectedOrder} onClose={closeModal} isOpen={isModalOpen}/>
+        <OrderDetail orderId={selectedOrder} onClose={closeModal} isOpen={isModalOpen}/>
       )}
     </div>
   );

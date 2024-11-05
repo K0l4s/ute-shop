@@ -137,3 +137,13 @@ export const searchOrdersByUser = async (status: string, searchQuery: string) =>
   });
   return response.data;
 };
+
+export const getDetailOrderByUser = async (orderId: number) => {
+  try {
+    const response = await axios.get(BASE_URL + `/order/detail/${orderId}`, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching order details:', error);
+    throw error;
+  }
+};

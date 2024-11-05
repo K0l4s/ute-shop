@@ -9,7 +9,7 @@ export const formatStatus = (status: String) => {
     case 'DELIVERED':
       return 'Đang giao hàng';
     case 'SHIPPED':
-      return 'Đã giao hàng';
+      return 'Đã nhận hàng';
     case 'CANCELLED':
       return 'Đã hủy';
     case 'RETURNED':

@@ -1,6 +1,7 @@
 const db = require('../models');
 const Order = db.Order;
 const Detail_Order = db.Detail_Order;
+const OrderTracking = db.OrderTracking;
 const Book = db.Book;
 const Category = db.Category;
 const Payment = db.Payment;
@@ -495,6 +496,47 @@ const searchOrdersByUserId = async (userId, status, searchQuery) => {
   }
 };
 
+const getDetailOrderByUser = async (userId, orderId) => {
+  try {
+    const order = await Order.findOne({
+      where: {
+        id: orderId,
+        user_id: userId
+      },
+      include: {
+        model: OrderTracking,
+        as: 'orderTracking',
+        attributes: ['confirmedAt', 'processedAt', 'deliveredAt', 'shippedAt', 'canceledAt', 'returnedAt']
+      }
+    });
+
+    if (!order) {
+      throw new Error(`Order with ID ${orderId} not found for user with ID ${userId}`);
+    }
+
+    const orderDetails = await Detail_Order.findAll({
+      where: { order_id: orderId },
+      include: {
+        model: Book,
+        as: 'book',
+        include: {
+          model: Category,
+          as: 'category',
+          attributes: ['name']
+        }
+      }
+    });
+
+    if (!orderDetails || orderDetails.length === 0) {
+      throw new Error('No order details found');
+    }
+
+    return { order, orderDetails };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   createOrder,
   getOrderById,
@@ -502,5 +544,6 @@ module.exports = {
   getAllOrders,
   updateOrder,
   updateMultipleOrderStatus,
-  searchOrdersByUserId
+  searchOrdersByUserId,
+  getDetailOrderByUser
 };

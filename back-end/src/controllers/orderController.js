@@ -106,6 +106,17 @@ const searchOrdersByUserController = async (req, res) => {
   }
 }
 
+const getDetailOrderByUserController = async (req, res) => {
+  const userId = req.user.id;
+  const orderId = req.params.id;
+  try {
+    const order = await orderService.getDetailOrderByUser(userId, orderId);
+    res.status(200).json({message: "sucess", data: order});
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
 module.exports = {
   placeOrder,
   getOrder,
@@ -113,5 +124,6 @@ module.exports = {
   getAllOrdersController,
   updateOrderController,
   updateMultipleOrderStatusController,
-  searchOrdersByUserController
+  searchOrdersByUserController,
+  getDetailOrderByUserController
 };
