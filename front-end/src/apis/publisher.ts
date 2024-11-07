@@ -10,3 +10,19 @@ export const getPublisher = async () => {
     throw error;
   }
 }
+interface Publisher {
+  name: string;
+  address: string;
+}
+export const createPublisher = async (
+  publisher: Publisher
+) => {
+  try {
+    const response = await axios.post("http://localhost:8080/api/v1/publisher", publisher);
+    return response.data;
+  }
+  catch (error) {
+    console.error("Failed to create publisher:", error);
+    throw error;
+  }
+}
