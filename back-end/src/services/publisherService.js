@@ -34,8 +34,24 @@ const createPublisher = async ({name,address}) => {
     throw new Error(error);
   }
 }
+const updatePublisher = async ({id,name,address}) => {
+  try {
+    const publisher = {
+      name,
+      address
+    }
+    return Publisher.update(publisher, {
+      where: {
+        id
+      }
+    });
+  } catch (error) {
+    throw new Error(error);
+  }
+}
 
 module.exports = {
   getPublishers,
-  createPublisher
+  createPublisher,
+  updatePublisher
 }

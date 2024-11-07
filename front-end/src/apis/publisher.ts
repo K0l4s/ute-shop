@@ -26,3 +26,18 @@ export const createPublisher = async (
     throw error;
   }
 }
+
+export const updatePublisher = async (
+  id: number,
+  name: string,
+  address: string
+) => {
+  try {
+    const response = await axios.put(`http://localhost:8080/api/v1/publisher`, {id, name, address });
+    return response.data;
+  }
+  catch (error) {
+    console.error("Failed to update publisher:", error);
+    throw error;
+  }
+}

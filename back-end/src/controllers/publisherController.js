@@ -1,4 +1,4 @@
-const { getPublishers, createPublisher } = require("../services/publisherService");
+const { getPublishers, createPublisher, updatePublisher } = require("../services/publisherService");
 
 const getPublishersController = async (req, res) => {
   try {
@@ -27,7 +27,22 @@ const createPublisherController = async (req, res) => {
   }
 }
 
+const updatePublisherController = async (req, res) => {
+  try {
+    const { id, name, address } = req.body;
+    const publisher = await updatePublisher({ id, name, address });
+    return res.status(200).json({
+      message: "success",
+      data: publisher,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+}
+
 module.exports = {
   getPublishersController,
-  createPublisherController
+  createPublisherController,
+  updatePublisherController
 }
