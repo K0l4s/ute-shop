@@ -18,7 +18,7 @@ const AdminPublisher = () => {
   const [publishers, setPublishers] = useState<Publisher[]>([]);
   const [filteredPublishers, setFilteredPublishers] = useState<Publisher[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5); 
+  const [itemsPerPage] = useState(5);
   const [isOpenCreatePublisher, setIsOpenCreatePublisher] = useState(false);
   const [editId, setEditId] = useState<number | null>(null); // Track editing row
   const [filters, setFilters] = useState({
@@ -77,11 +77,11 @@ const AdminPublisher = () => {
     setEditPublisherData({ ...publisher });
   };
 
-  const saveEdit = async(publisherId: number) => {
+  const saveEdit = async (publisherId: number) => {
     const updatedPublishers = publishers.map((publisher) =>
       publisher.id === publisherId ? { ...publisher, ...editPublisherData } : publisher
     );
-    await updatePublisher(publisherId, editPublisherData.name?.toString()||"", editPublisherData.address?.toString()||"");
+    await updatePublisher(publisherId, editPublisherData.name?.toString() || "", editPublisherData.address?.toString() || "");
     setPublishers(updatedPublishers);
     setFilteredPublishers(updatedPublishers);
     setEditId(null); // Exit edit mode
@@ -100,13 +100,13 @@ const AdminPublisher = () => {
 
   return (
     <div className="p-6 min-h-screen">
-      <h1 className="text-2xl font-bold mb-6 text-white">Quản lý nhà xuất bản</h1>
-      <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5" onClick={openModal}>
+      <h1 className="text-2xl font-bold mb-6 ">Quản lý nhà xuất bản</h1>
+      <button className="flex text-white items-center px-4 py-2 bg-gray-800 rounded-md mb-5" onClick={openModal}>
         <FaPlus className="mr-2" /> Thêm Nhà xuất bản
       </button>
 
       {/* Bộ lọc */}
-      <h1 className="text-white font-bold mb-2">Bộ lọc</h1>
+      <h1 className=" font-bold mb-2">Bộ lọc</h1>
       <div className="flex gap-4 mb-4">
         <input
           type="text"
@@ -126,38 +126,59 @@ const AdminPublisher = () => {
         />
       </div>
 
-      <div className="mb-4">
-        <label className="text-white mr-2">Số sách: {filters.minBooks} - {filters.maxBooks}</label>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={filters.minBooks}
-          onChange={(e) => {
-            const newMin = parseInt(e.target.value);
-            setFilters((prev) => ({
-              ...prev,
-              minBooks: newMin,
-              maxBooks: newMin < prev.maxBooks ? prev.maxBooks : newMin
-            }));
-          }}
-          className="mx-2"
-        />
-        <input
-          type="range"
-          min={filters.minBooks}
-          max="100"
-          value={filters.maxBooks}
-          onChange={(e) => {
-            const newMax = parseInt(e.target.value);
-            setFilters((prev) => ({
-              ...prev,
-              maxBooks: newMax,
-            }));
-          }}
-          className="mx-2"
-        />
+      <div className="mb-4 flex items-center gap-4">
+        <label className=" mr-2">Số sách:</label>
+        <div className="flex items-center">
+          {/* Minimum Books Range */}
+          <div className="relative flex items-center">
+            <span className="absolute -top-8 bg-blue-500 text-white rounded-full px-3 py-1 text-sm font-semibold shadow-md">
+              {filters.minBooks}
+            </span>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={filters.minBooks}
+              onChange={(e) => {
+                const newMin = parseInt(e.target.value);
+                setFilters((prev) => ({
+                  ...prev,
+                  minBooks: newMin,
+                  maxBooks: newMin < prev.maxBooks ? prev.maxBooks : newMin
+                }));
+              }}
+              className="range-slider mx-2"
+            />
+            <span className="font-bold px-3 py-1 rounded border">{`${filters.minBooks}`}</span>
+          </div>
+
+          <span className="text-white mx-2">-</span>
+
+          {/* Maximum Books Range */}
+          <div className="relative flex items-center">
+            <span className="absolute -top-8 bg-blue-500 text-white rounded-full px-3 py-1 text-sm font-semibold shadow-md">
+              {filters.maxBooks}
+            </span>
+            <input
+              type="range"
+              min={filters.minBooks}
+              max="100"
+              value={filters.maxBooks}
+              onChange={(e) => {
+                const newMax = parseInt(e.target.value);
+                setFilters((prev) => ({
+                  ...prev,
+                  maxBooks: newMax,
+                }));
+              }}
+              className="range-slider mx-2"
+            />
+            <span className=" font-bold px-3 py-1 rounded border">{`${filters.maxBooks}`}</span>
+          </div>
+        </div>
       </div>
+
+
       <button onClick={applyFilters} className="px-4 py-2 bg-blue-500 text-white rounded-md">
         Áp dụng lọc
       </button>
@@ -238,9 +259,8 @@ const AdminPublisher = () => {
             <button
               key={number + 1}
               onClick={() => paginate(number + 1)}
-              className={`px-4 py-2 rounded-md ${
-                currentPage === number + 1 ? "bg-blue-500 text-white" : "bg-gray-300"
-              }`}
+              className={`px-4 py-2 rounded-md ${currentPage === number + 1 ? "bg-blue-500 text-white" : "bg-gray-300"
+                }`}
             >
               {number + 1}
             </button>

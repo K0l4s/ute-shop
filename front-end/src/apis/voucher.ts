@@ -1,23 +1,36 @@
 import axios from "axios";
 import { BASE_URL } from "./base";
 
-export const getDiscountVouchers = async () => {
+export const getDiscountVouchers = async (limit: number, offset: number) => {
   try {
-    const response = await axios.get(BASE_URL + "/voucher/discounts/all", { withCredentials: true });
+    const response = await axios.get(
+      `${BASE_URL}/voucher/discounts/all`,
+      {
+        params: { limit, offset },
+        withCredentials: true,
+      }
+    );
     return response.data;
   } catch (error) {
     console.log(error);
   }
 };
 
-export const getFreeshipVouchers = async () => {
+export const getFreeshipVouchers = async (limit: number, offset: number) => {
   try {
-    const response = await axios.get(BASE_URL + "/voucher/freeships/all", { withCredentials: true });
+    const response = await axios.get(
+      `${BASE_URL}/voucher/freeships/all`,
+      {
+        params: { limit, offset },
+        withCredentials: true,
+      }
+    );
     return response.data;
   } catch (error) {
     console.log(error);
   }
 };
+
 
 export const updateDiscountVoucher = async (id: string, data: any) => {
   try {
