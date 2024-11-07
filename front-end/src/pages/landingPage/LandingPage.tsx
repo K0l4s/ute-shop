@@ -8,7 +8,9 @@ import { useNavigate } from "react-router-dom";
 import { getTop10BooksAPI } from "../../apis/book";
 import lifechangingbooks from "../../assets/images/life-changing-books.jpg";
 import { FaChartLine } from "react-icons/fa";
+
 import { formatStar, saveToHistory } from "../../utils/bookUtils";
+
 
 interface Book {
   id: number;
@@ -117,10 +119,12 @@ const LandingPage = () => {
                   <div
                     className="p-4 shadow-lg rounded-lg 
                       cursor-pointer h-full justify-between bg-white"
+
                     onClick={() => {
                       handleBookClick(book)
                       navigate("/products/" + book.id)
                     }}
+
                   >
                     <div>
                       <img

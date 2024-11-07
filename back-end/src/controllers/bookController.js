@@ -32,14 +32,14 @@ const upload = multer({
 
 const createBookController = async (req, res) => {
   // getdata form FromData
-  const { ISBN, title, desc, price, salePrice, year, age, stock } = req.body;
+  const { ISBN, title, desc, price, salePrice, year, age, stock, author_id } = req.body;
      console.log(req.body);
   try {
     let cover_img_url = null;
     if (req.file) {
       cover_img_url = await uploadBookImage(req, res); // Nhận URL từ Cloudinary
     }
-    const book = await createNewBook({ISBN, title, desc, price, salePrice, year, age, stock,cover_img_url});
+    const book = await createNewBook({ISBN, title, desc, price, salePrice, year, age, stock,cover_img_url, author_id});
     return res.status(201).json({
       message: "success",
       data: book

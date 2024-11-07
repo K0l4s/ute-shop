@@ -4,7 +4,7 @@ module.exports = (sequelize) => {
   class Book extends Model {
     static associate(models) {
       Book.belongsTo(models.Publisher, {
-        foreignKey: 'publisher_id'
+        foreignKey: 'publisher_id',
       });
       Book.hasMany(models.Review, {
         foreignKey: 'book_id'

@@ -27,6 +27,7 @@ import AdminUser from '../pages/admin/user/AdminUser'
 import AdminVoucher from '../pages/admin/voucher/AdminVoucher'
 import AdminEvent from '../pages/admin/eventPage/AdminEvent'
 import AdminCategory from '../pages/admin/category/AdminCategory'
+import AdminFreeship from '../pages/admin/voucher/AdminFreeship'
 // import OrderDetailModal from '../components/modals/OrderDetailModal'
 
 
@@ -78,6 +79,7 @@ const Router = () => {
           <Route path="/admin/authors" element={<AdminAuthorPage />} />
           {/* Vouchers */}
           <Route path="/admin/vouchers" element={<AdminVoucher />} />
+          <Route path="/admin/freeships" element={<AdminFreeship />} />
           <Route path="/admin/event" element={<AdminEvent />} />
           {/* <Route path="/admin/config" element={<Cart />} /> */}
 

@@ -135,7 +135,6 @@ const createFreeship = async ({ code, name, discount_val, discount_perc, min_ord
       throw new Error(`Failed to create freeship: ${error.message}`);
   }
 };
-
 // Hàm lấy tất cả các freeship hiện có
 const getAllFreeships = async (limit, offset) => {
   try {

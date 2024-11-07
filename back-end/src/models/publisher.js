@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
   class Publisher extends Model {
     static associate(models) {
       Publisher.hasMany(models.Book, {
-        foreignKey: 'publisher_id'
+        foreignKey: 'publisher_id', as: 'books'
       });
     }
   }

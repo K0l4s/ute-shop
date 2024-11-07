@@ -238,14 +238,15 @@ const getBookDetailById = async (id) => {
     throw error;
   }
 };
-const createNewBook = async ({ISBN,
+const createNewBook = async ({ ISBN,
   title,
   desc,
   price,
   salePrice,
   year,
   age,
-  stock,cover_img_url}) => {
+  stock, cover_img_url,
+  author_id }) => {
   try {
     // Check if required fields are provided
     // if (!ISBN || !title || !price || !salePrice || !year || !age || !stock) {
@@ -262,7 +263,8 @@ const createNewBook = async ({ISBN,
       year,
       age,
       stock,
-      cover_img_url
+      cover_img_url,
+      author_id
     }
     const newBook = await Book.create(book);
     return newBook;
@@ -289,6 +291,25 @@ const createNewBook = async ({ISBN,
 //     throw error;
 //   }
 // }
+const updateBookService = async (id, book) => {
+  try {
+    // Check if ID is provided
+    if (!id) {
+      throw new Error("Id is required");
+    }
+
+    // Update book by ID
+    const updatedBook = await Book.update(book, {
+      where: {
+        id: id
+      }
+    });
+
+    return updatedBook;
+  } catch (error) {
+    throw error;
+  }
+}
 
 const getBooksByListId = async (ids) => {
   try {

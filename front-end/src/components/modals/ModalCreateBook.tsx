@@ -1,9 +1,23 @@
-// src/components/ModalCreateBook.tsx
-import React, { useState } from 'react';
-// import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { createBook } from '../../apis/book';
+import { getAllAuthors } from '../../apis/author';
+// import { getAllCategories } from '../../apis/category'; // Giả sử hàm lấy danh sách thể loại
+
+export interface Author {
+    id: number;
+    name: string;
+}
+export interface Category {
+    id: number;
+    name: string;
+}
 
 const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+    const [categoryList, setCategoryList] = useState<Category[]>([]);
+    const [authorList, setAuthorList] = useState<Author[]>([]);
+    const [selectedAuthor, setSelectedAuthor] = useState<number | null>(null);
+    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+
     const [ISBN, setISBN] = useState('');
     const [title, setTitle] = useState('');
     const [desc, setDesc] = useState('');
@@ -14,6 +28,29 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     const [stock, setStock] = useState<number | ''>('');
     const [coverImg, setCoverImg] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
+
+    useEffect(() => {
+        const fetchCategory = async () => {
+            try {
+                // const response = await getAllCategories();
+                // setCategoryList(response);
+            } catch (error) {
+                console.error('Failed to fetch category:', error);
+            }
+        };
+
+        const fetchAuthor = async () => {
+            try {
+                const response = await getAllAuthors();
+                setAuthorList(response);
+            } catch (error) {
+                console.error('Failed to fetch author:', error);
+            }
+        };
+
+        fetchCategory();
+        fetchAuthor();
+    }, []);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
@@ -26,28 +63,20 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         setUploading(true);
 
         try {
-
-            try {
-                await createBook(
-                    ISBN,
-                    title,
-                    desc,
-                    Number(price),
-                    Number(salePrice),
-                    new Date(year),
-                    Number(age),
-                    Number(stock),
-                    coverImg ? coverImg : null
-                ).then((response) => {
-                    console.log(response);
-                    return response.data;
-                }
-                );
-
-            } catch (err) {
-                console.error('Something went wrong: ', err);
-            }
-
+            const newBook = await createBook(
+                ISBN,
+                title,
+                desc,
+                Number(price),
+                Number(salePrice),
+                new Date(year),
+                Number(age),
+                Number(stock),
+                // selectedCategory,
+                coverImg ? coverImg : null,
+                selectedAuthor || 0,
+            );
+            console.log('Book created:', newBook);
             alert('Book created successfully!');
             onClose();
         } catch (error) {
@@ -57,12 +86,14 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             setUploading(false);
         }
     };
+
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 text-black">
             <div className="bg-white p-6 rounded shadow-md overflow-y-auto mt-12">
                 <h2 className="text-lg font-semibold mb-4">Create New Book</h2>
                 <form onSubmit={handleSubmit}>
-                    <div className='grid grid-cols-3 text-black gap-5'>
+                    <div className="grid grid-cols-3 text-black gap-5">
+                        {/* Các trường input */}
                         <div className="mb-4">
                             <label className="block text-sm font-medium">ISBN</label>
                             <input
@@ -122,7 +153,7 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                             />
                         </div>
                         <div className="mb-4">
-                            <label className="block text-sm font-medium">Quy định độ tuổi</label>
+                            <label className="block text-sm font-medium">Độ tuổi</label>
                             <input
                                 type="number"
                                 value={age}
@@ -131,9 +162,8 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                 required
                             />
                         </div>
-
                         <div className="mb-4">
-                            <label className="block text-sm font-medium">Nhập kho (quyển)</label>
+                            <label className="block text-sm font-medium">Kho sách</label>
                             <input
                                 type="number"
                                 value={stock}
@@ -151,6 +181,38 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                 accept="image/*"
                                 required
                             />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium">Tác giả</label>
+                            <select
+                                value={selectedAuthor || ''}
+                                onChange={(e) => setSelectedAuthor(Number(e.target.value))}
+                                className="border rounded w-full p-2"
+                                required
+                            >
+                                <option value="">Chọn tác giả</option>
+                                {authorList.map((author) => (
+                                    <option key={author.id} value={author.id}>
+                                        {author.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium">Thể loại</label>
+                            <select
+                                value={selectedCategory || ''}
+                                onChange={(e) => setSelectedCategory(Number(e.target.value))}
+                                className="border rounded w-full p-2"
+                                // required
+                            >
+                                <option value="">Chọn thể loại</option>
+                                {categoryList.map((category) => (
+                                    <option key={category.id} value={category.id}>
+                                        {category.name}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     </div>
                     <button
