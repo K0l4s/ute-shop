@@ -35,3 +35,21 @@ export const createAuthor = async (author: any) => {
         throw err;
       }
 }
+
+export const updateAuthor = async (author: any) => {
+    try {
+        const response = await axios.put(
+          BASE_URL + `/author/${author.id}`,
+          author,
+          { headers: 
+            { 'Content-Type': 'application/json' }, 
+            withCredentials: true 
+          }
+        );
+        
+        return response.data;
+      } catch (err) {
+        console.error('Có lỗi xảy ra: ', err);
+        throw err;
+      }
+}

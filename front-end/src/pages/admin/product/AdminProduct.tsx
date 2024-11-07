@@ -194,7 +194,7 @@ const AdminProduct = () => {
     };
     return (
         <div className="p-8">
-            <h1 className="text-2xl font-semibold mb-4 text-white">Quản lý sách</h1>
+            <h1 className="text-2xl font-semibold mb-4">Quản lý sách</h1>
 
             {/* Filter Inputs */}
             {/* <h2 className="text-lg font-semibold mb-2">Lọc sách the</h2> */}
@@ -204,7 +204,7 @@ const AdminProduct = () => {
                     name="title"
                     placeholder="Lọc sách theo tiêu đề"
                     className="border px-4 py-2 rounded-full w-10/12 
-                    bg-white border-none
+                    bg-gray-300 border-none
                     focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent focus:ring-opacity-50"
 
                     onChange={handleFilterChange}
@@ -222,7 +222,7 @@ const AdminProduct = () => {
                 </select>
 
             </div>
-            <h2 className="text-lg font-semibold mb-2 text-white">Thao tác</h2>
+            <h2 className="text-lg font-semibold mb-2 ">Thao tác</h2>
             <div className="flex flex-cols gap-3">
                 <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-5" onClick={openModal}>
                     <FaPlus className="mr-2" />Thêm sách</button>

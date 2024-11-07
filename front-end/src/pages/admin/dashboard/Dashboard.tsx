@@ -117,13 +117,13 @@ const Dashboard = () => {
 
   return (
     <div className="p-5 space-y-6">
-      <h2 className="text-2xl font-semibold text-center text-white">TỔNG QUAN UTESHOP TRONG NĂM {currentYear}</h2>
+      <h2 className="text-2xl font-bold text-center ">TỔNG QUAN UTESHOP TRONG NĂM {currentYear}</h2>
       <div className="text-center">
-        <label htmlFor="year" className="text-white font-bold mr-2">Chọn năm:</label>
+        <label htmlFor="year" className="font-bold mr-2">Chọn năm:</label>
         <select
           value={currentYear}
           onChange={(e) => setCurrentYear(Number(e.target.value))}
-          className="bg-white w-1/5 text-center p-2 rounded-lg focus:outline-none font-bold"
+          className="bg-blue-200 w-1/5 text-center p-2 rounded-lg focus:outline-none font-bold"
         >
           {Array.from({ length: 12 }).map((_, index) => (
             <option

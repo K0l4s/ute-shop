@@ -291,7 +291,7 @@ const AdminOrder = () => {
   return (
     <>
       <div className="p-6 min-h-screen from-blue-500 to-purple-600">
-        <h1 className="text-3xl font-bold text-center mb-6 text-white">Quản lý đơn hàng</h1>
+        <h1 className="text-3xl font-bold text-center mb-6 ">Quản lý đơn hàng</h1>
         <div className="flex items-center mb-4 p-2 gap-3">
           <input
             type="text"
@@ -342,11 +342,11 @@ const AdminOrder = () => {
             <BsSearch className="mr-2" /> Tìm kiếm
           </button>
         </div>
-        <h2 className="text-xl font-semibold text-white mb-2">Thao tác</h2>
-        <label htmlFor="txtABillIds" className="text-white font-bold m-5" >Danh sách MÃ HÓA ĐƠN</label>
+        <h2 className="text-xl font-semibold  mb-2">Thao tác</h2>
+        <label htmlFor="txtABillIds" className="font-bold m-5" >Danh sách MÃ HÓA ĐƠN</label>
         <div className="flex items-center gap-2">
 
-          <textarea name="txtABillIds" id="txtABillIds" className="resize-none w-full h-36 p-3 rounded-xl bg-white/10 text-white focus:outline-none"
+          <textarea name="txtABillIds" id="txtABillIds" className="resize-none w-full h-36 p-3 rounded-xl bg-blue-300 focus:outline-none"
             placeholder="Mã hóa đơn cần xử lý (Thêm tay hoặc nhấn chọn hóa đơn có trong bảng)"
             onChange={txtABillIdsCondition}></textarea>
 
@@ -380,7 +380,7 @@ const AdminOrder = () => {
 
         <div className="overflow-x-auto">
           <div className="flex gap-2 items-center">
-            <h2 className="text-xl font-semibold text-white mb-2">Tổng số đơn hàng: {currentOrders.length + "/" + filteredOrders.length}</h2>
+            <h2 className="text-xl font-semibold mb-2">Tổng số đơn hàng: {currentOrders.length + "/" + filteredOrders.length}</h2>
             <button
               onClick={addAllIdsToTxtABillIds}
               className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-2"

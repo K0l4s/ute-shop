@@ -26,6 +26,10 @@ const AdminLeftBar: React.FC = () => {
         { title: 'Khách hàng', link: '/admin/customers', icon: FaUser },
         { title: 'Admin', link: '/admin/admins', icon: FaUser },
     ];
+    const voucherSubmenus: Submenu[] = [
+        { title: 'Discount', link: '/admin/vouchers', icon: FaUser },
+        { title: 'Freeship', link: '/admin/freeships', icon: FaUser },
+    ];
     const user = useSelector((state: RootState) => state.auth.user);
     return (
         <div className="bg-gradient-to-b from-violet-900 to-blue-900 min-h-screen fixed lg:w-64 w-16 md:w-48 transition-all duration-300">
@@ -51,10 +55,11 @@ const AdminLeftBar: React.FC = () => {
                         <span className="hidden lg:block">Quản lý đơn</span>
                     </Link>
 
-                    <Link to={"/admin/vouchers"} className="flex items-center hover:text-gray-500 cursor-pointer duration-300 ease-in-out p-2">
+                    {/* <Link to={"/admin/vouchers"} className="flex items-center hover:text-gray-500 cursor-pointer duration-300 ease-in-out p-2">
                         <FaTags className="mr-2" />
                         <span className="hidden lg:block">Mã giảm giá</span>
-                    </Link>
+                    </Link> */}
+                    <MenuGroup title="Mã giảm giá" icon={FaTags} submenus={voucherSubmenus} />
                     <Link to={"/admin/event"} className="flex items-center hover:text-gray-500 cursor-pointer duration-300 ease-in-out p-2">
                         <BiCalendarEvent className="mr-2" />
                         <span className="hidden lg:block">Sự kiện</span>

@@ -65,10 +65,10 @@ const AdminNavbar = () => {
                                     {/* User icon with dropdown menu */}
                                     <li className="relative group">
                                         <Link className='flex items-center' to="/account/profile">
-                                            <p className='mr-2 font-bold text-white'>Xin chào, {firstname}</p>
+                                            <p className='mr-2 font-bold '>Xin chào, {firstname}</p>
                                             <div className="py-2">
 
-                                                <FaRegUserCircle size={34} className="text-white cursor-pointer" />
+                                                <FaRegUserCircle size={34} className=" cursor-pointer" />
                                             </div>
 
                                         </Link>
