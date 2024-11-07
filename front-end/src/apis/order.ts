@@ -1,11 +1,13 @@
 import axios from "axios";
 import { BASE_URL } from "./base";
 
-export const getOrderByUser = async () => {
+export const getOrderByUser = async (status:string, limit: number, offset: number) => {
   try {
     const response = await axios.get(
-      BASE_URL + '/order/all',
-      { withCredentials: true }
+      BASE_URL + '/order/all', {
+        params: {status, limit, offset },
+        withCredentials: true
+      }
     );
     return response.data;
   } catch (err) {
@@ -127,3 +129,21 @@ export const updateMultipleCartStatus = async (orderIds: number[]) => {
     throw error;
   }
 }
+
+export const searchOrdersByUser = async (status: string, searchQuery: string) => {
+  const response = await axios.get(BASE_URL + '/order/search', {
+    params: { status, searchQuery }, 
+    withCredentials: true
+  });
+  return response.data;
+};
+
+export const getDetailOrderByUser = async (orderId: number) => {
+  try {
+    const response = await axios.get(BASE_URL + `/order/detail/${orderId}`, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching order details:', error);
+    throw error;
+  }
+};

@@ -32,9 +32,13 @@ const createDiscount = async ({ code, name, discount_val, discount_perc, min_ord
 };
 
 //Hàm lấy tất cả các discount hiện có 
-const getAllDiscounts = async () => {
+const getAllDiscounts = async (limit, offset) => {
     try {
-      const discounts = await Discount.findAll();
+      const discounts = await Discount.findAll({
+        limit: limit,
+        offset: offset
+      });
+      
       if (discounts.length === 0) {
         throw new Error('No discounts found');
       }
@@ -96,7 +100,7 @@ const deleteDiscount = async (discountId) => {
     if (!discount) {
       throw new Error(`Discount with ID ${discountId} not found`);
     }
-    await discount.destroy();
+    await discount.update({is_active : false});
     return { message: `Discount with ID ${discountId} deleted successfully` };
   } catch (error) {
     throw new Error(`Failed to delete discount: ${error.message}`);
@@ -132,9 +136,13 @@ const createFreeship = async ({ code, name, discount_val, discount_perc, min_ord
   }
 };
 // Hàm lấy tất cả các freeship hiện có
-const getAllFreeships = async () => {
+const getAllFreeships = async (limit, offset) => {
   try {
-      const freeships = await Freeship.findAll();
+      const freeships = await Freeship.findAll({
+        limit: limit,
+        offset: offset
+      });
+
       if (freeships.length === 0) {
           throw new Error('No freeships found');
       }
@@ -187,7 +195,7 @@ const deleteFreeship = async (freeshipId) => {
       if (!freeship) {
           throw new Error(`Freeship with ID ${freeshipId} not found`);
       }
-      await freeship.destroy();
+      await freeship.update({is_active : false});
       return { message: `Freeship with ID ${freeshipId} deleted successfully` };
   } catch (error) {
       throw new Error(`Failed to delete freeship: ${error.message}`);

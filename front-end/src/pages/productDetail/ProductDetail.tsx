@@ -21,7 +21,10 @@ import { showToast } from '../../utils/toastUtils';
 import { addToCart } from '../../apis/cart';
 import Modal from 'react-modal';
 import ImageViewSwiperModal from '../../components/modals/ImageViewSwiperModal';
-import { formatStar } from '../../utils/formatStar';
+
+import { formatStar } from '../../utils/bookUtils';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
+
 
 interface Reviews {
   id: string,
@@ -65,6 +68,8 @@ const ProductDetail: React.FC = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
 
+  const [isFavorite, setIsFavorite] = useState(false);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -87,7 +92,16 @@ const ProductDetail: React.FC = () => {
     fetchBook();
     // add cover to Images
   }, [id]);
-  
+
+  useEffect(() => {
+    if (book) {
+      const favoriteBooks = JSON.parse(localStorage.getItem('favoriteBooks') || '[]');
+      if (favoriteBooks.includes(book.id)) {
+        setIsFavorite(true);
+      }
+    }
+  }, [book]);
+
   if (error) {
     return <div>Error: {error}</div>;
   }
@@ -161,6 +175,21 @@ const ProductDetail: React.FC = () => {
       showToast("Có lỗi xảy ra, vui lòng kiểm tra giỏ hàng", "error");
     }
   };
+
+  const handleFavoriteClick = () => {
+    setIsFavorite(!isFavorite);
+    const favoriteBooks = JSON.parse(localStorage.getItem('favoriteBooks') || '[]');
+    if (isFavorite) {
+      // Remove from favorites
+      const updatedFavorites = favoriteBooks.filter((favId: number) => favId !== book.id);
+      localStorage.setItem('favoriteBooks', JSON.stringify(updatedFavorites));
+    } else {
+      // Add to favorites
+      const updatedFavorites = [book.id, ...favoriteBooks.filter((id: number) => id !== book.id)];
+      localStorage.setItem('favoriteBooks', JSON.stringify(updatedFavorites));
+    }
+  };
+
   return (
     <div className="font-sans">
 
@@ -186,8 +215,22 @@ const ProductDetail: React.FC = () => {
           {/* Right side (Product Information) */}
           <div className='rounded-xl bg-white p-6 px-8'>
             <div className="space-y-4">
-              <h1 className="text-3xl font-bold">{book.title}</h1>
-              
+              <div className="relative">
+                <h1 className="text-3xl font-bold">{book.title}</h1>
+                <div className="relative group">
+                  <div
+                    className={`absolute -top-20 -right-14 p-2 border-2 border-black hover:border-rose-500 
+                      hover:text-rose-500 rounded-full cursor-pointer transition duration-200 ${isFavorite ? 'text-rose-500 border-rose-500' : ''}`}
+                    onClick={handleFavoriteClick}
+                  >
+                    {isFavorite ? <FaHeart size={32} /> : <FaRegHeart size={32} />}
+                  </div>
+                  <span className="tooltip opacity-0 group-hover:opacity-100 absolute -top-8 -right-44
+                    transform -translate-x-1/2 bg-gray-700 text-white text-sm rounded py-1 px-2 transition-opacity duration-300 whitespace-nowrap">
+                    {isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                  </span>
+                </div>
+              </div>
               <div className="grid lg:grid-cols-2">
                 <p className='font-semibold'>Nhà xuất bản: {book.Publisher?.name}</p>
                 <p className='font-semibold'>Xuất bản: {book.year}</p>

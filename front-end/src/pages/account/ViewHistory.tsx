@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { getBooksByListId } from "../../apis/book";
-import { FaRegTrashAlt } from "react-icons/fa";
+import { FaHistory, FaRegTrashAlt } from "react-icons/fa";
 import { formatStar } from "../../utils/bookUtils";
 import { addToCart } from "../../apis/cart";
 import { showToast } from "../../utils/toastUtils";
 import { useNavigate } from "react-router-dom";
-import { MdFavorite } from "react-icons/md";
 
 interface Book {
   id: number;
@@ -25,16 +24,16 @@ interface Book {
   totalSell: number;
 }
 
-const FavoriteBooks: React.FC = () => {
-  const [favoriteBooks, setFavoriteBooks] = useState<Book[]>([]);
+const ViewHistory: React.FC = () => {
+  const [viewedBooks, setViewedBooks] = useState<Book[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchFavoriteBooks = async () => {
-      const storedBookIds = JSON.parse(localStorage.getItem('favoriteBooks') || '[]');
+    const fetchViewedBooks = async () => {
+      const storedBookIds = JSON.parse(localStorage.getItem('viewedBooks') || '[]');
       if (storedBookIds.length > 0) {
         try {
           const response = await getBooksByListId(storedBookIds);
@@ -42,25 +41,25 @@ const FavoriteBooks: React.FC = () => {
           
           // Sort books according to the order of IDs in local storage
           const sortedBooks = storedBookIds.map((id: number) => books.find((book: Book) => book.id === id)).filter(Boolean);
-          setFavoriteBooks(sortedBooks);
+          setViewedBooks(sortedBooks);
         } catch (error) {
           console.error('Failed to fetch viewed books:', error);
         }
       }
     };
 
-    fetchFavoriteBooks();
+    fetchViewedBooks();
   }, []);
 
-  const handleRemoveAllFavorite = () => {
-    localStorage.removeItem('favoriteBooks');
-    setFavoriteBooks([]);
+  const handleRemoveAllHistory = () => {
+    localStorage.removeItem('viewedBooks');
+    setViewedBooks([]);
   }
   
-  const handleRemoveFromFavorite = (bookId: number) => {
-    const updatedBookIds = JSON.parse(localStorage.getItem('favoriteBooks') || '[]').filter((id: number) => id !== bookId);
-    localStorage.setItem('favoriteBooks', JSON.stringify(updatedBookIds));
-    setFavoriteBooks(favoriteBooks.filter(book => book.id !== bookId));
+  const handleRemoveFromHistory = (bookId: number) => {
+    const updatedBookIds = JSON.parse(localStorage.getItem('viewedBooks') || '[]').filter((id: number) => id !== bookId);
+    localStorage.setItem('viewedBooks', JSON.stringify(updatedBookIds));
+    setViewedBooks(viewedBooks.filter(book => book.id !== bookId));
   }
 
   const handleAddToCart = async (book: Book) => {
@@ -82,17 +81,17 @@ const FavoriteBooks: React.FC = () => {
     return parseInt(price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
   };
   
-  const totalPages = Math.ceil(favoriteBooks.length / itemsPerPage);
-  const displayedBooks = favoriteBooks.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+  const totalPages = Math.ceil(viewedBooks.length / itemsPerPage);
+  const displayedBooks = viewedBooks.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   return (
     <div>
       <div className="font-semibold  p-4 bg-white mb-4 rounded-lg shadow-lg flex justify-between">
         <h2 className='text-xl text-violet-700'>
-          <MdFavorite style={{display: "inline-block", marginBottom: "3px", marginRight: "5px"}}/>
-          Danh sách yêu thích
+          <FaHistory style={{display: "inline-block", marginBottom: "3px", marginRight: "5px"}} />
+          Đã xem gần đây
         </h2>
-        <button onClick={handleRemoveAllFavorite} className='text-base text-violet-600 hover:text-violet-700 relative group'>
+        <button onClick={handleRemoveAllHistory} className='text-base text-violet-600 hover:text-violet-700 relative group'>
           <span className="tooltip opacity-0 group-hover:opacity-100 absolute -bottom-8 left-1/2 
             transform -translate-x-1/2 bg-gray-700 text-white text-sm rounded py-1 px-2 transition-opacity duration-300 whitespace-nowrap">
             Xóa tất cả
@@ -100,7 +99,7 @@ const FavoriteBooks: React.FC = () => {
           <FaRegTrashAlt size={24}/>
         </button>
       </div>
-      {favoriteBooks.length > 0 ? (
+      {viewedBooks.length > 0 ? (
         <>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5 gap-2">
           {displayedBooks.map((book) => (
@@ -137,7 +136,7 @@ const FavoriteBooks: React.FC = () => {
                     text-white font-semibold px-4 py-2 rounded mr-2">Thêm vào giỏ</button>
                 )}
                 
-                <button onClick={(e) => { e.stopPropagation(); handleRemoveFromFavorite(book.id) }} 
+                <button onClick={(e) => { e.stopPropagation(); handleRemoveFromHistory(book.id) }} 
                   className="w-24 border-2 border-rose-600 hover:bg-rose-600 
                     text-black hover:text-white font-semibold px-6 py-2 rounded transition duration-4000">Xóa</button>
               </div>
@@ -174,7 +173,7 @@ const FavoriteBooks: React.FC = () => {
       ) : (
         <>
         <div className="w-full flex flex-col justify-center items-center mt-2 gap-4">
-          <h4 className='font-bold text-xl'>Danh sách yêu thích đang trống</h4>
+          <h4 className='font-bold text-xl'>Không tìm thấy lịch sử</h4>
           <img src="/emptyHistory.jpeg" alt="Empty History" className="w-1/3 h-auto rounded" />
         </div>
         </>
@@ -183,4 +182,4 @@ const FavoriteBooks: React.FC = () => {
   );
 }
 
-export default FavoriteBooks;
+export default ViewHistory;

@@ -118,3 +118,15 @@ export const createBook = async (
     console.error('Something went wrong: ', err);
   }
 };
+
+export const getBooksByListId = async (ids: number[]) => {
+  try {
+    const response = await axios.post(BASE_URL + "/book/getByList", 
+      { ids },
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Something went wrong: ', error);
+  }
+};

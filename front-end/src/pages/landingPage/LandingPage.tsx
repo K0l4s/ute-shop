@@ -8,7 +8,9 @@ import { useNavigate } from "react-router-dom";
 import { getTop10BooksAPI } from "../../apis/book";
 import lifechangingbooks from "../../assets/images/life-changing-books.jpg";
 import { FaChartLine } from "react-icons/fa";
-import { formatStar } from "../../utils/formatStar";
+
+import { formatStar, saveToHistory } from "../../utils/bookUtils";
+
 
 interface Book {
   id: number;
@@ -48,6 +50,12 @@ const LandingPage = () => {
   const formatPrice = (price: string) => {
     return parseInt(price).toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
   };
+
+  const handleBookClick = (book: Book) => {
+    saveToHistory(book.id);
+    navigate("/products/" + book.id);
+  };
+
   return (
     <div className="bg-gray-100">
       {/* Hero Section */}
@@ -111,7 +119,12 @@ const LandingPage = () => {
                   <div
                     className="p-4 shadow-lg rounded-lg 
                       cursor-pointer h-full justify-between bg-white"
-                    onClick={() => navigate("/products/" + book.id)}
+
+                    onClick={() => {
+                      handleBookClick(book)
+                      navigate("/products/" + book.id)
+                    }}
+
                   >
                     <div>
                       <img

@@ -23,6 +23,11 @@ module.exports = (sequelize) => {
         foreignKey: 'freeship_id',
         as: 'freeship'
       });
+
+      Order.hasOne(models.OrderTracking, {
+        foreignKey: 'order_id',
+        as: 'orderTracking'
+      });
     }
   }
   Order.init({

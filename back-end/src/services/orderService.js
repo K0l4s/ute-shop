@@ -1,7 +1,9 @@
 const db = require('../models');
 const Order = db.Order;
 const Detail_Order = db.Detail_Order;
+const OrderTracking = db.OrderTracking;
 const Book = db.Book;
+const Category = db.Category;
 const Payment = db.Payment;
 const Notification = db.Notification;
 const User = db.User;
@@ -124,21 +126,33 @@ const getOrderById = async (orderId) => {
     throw new Error(error.message);
   }
 }
-const getOrdersByUserId = async (id) => {
+const getOrdersByUserId = async (id, status, limit, offset) => {
   try {
+    const whereClause = { user_id: id };
+    if (status !== 'ALL') {
+      whereClause.status = status;
+    }
+
     const orders = await Order.findAll({
-      where: { user_id: id },
+      where: whereClause,
       include: [
         {
           model: Detail_Order,
           as: 'orderDetails',
           include: {
             model: Book,
-            as: 'book'
+            as: 'book',
+            include: {
+              model: Category,
+              as: 'category',
+              attributes: ['name']
+            }
           },
         }
       ],
-      order: [['order_date', 'DESC']]
+      order: [['order_date', 'DESC']],
+      limit: limit,
+      offset: offset
     });
     if (!orders) {
       throw new Error('No orders found');
@@ -440,11 +454,96 @@ const updateMultipleOrderStatus = async (ordersId,userId) => {
     }
     return messages;
 }
+
+const searchOrdersByUserId = async (userId, status, searchQuery) => {
+  try {
+    const whereClause = { user_id: userId };
+    if (status !== 'ALL') {
+      whereClause.status = status;
+    }
+
+    const orders = await Order.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: Detail_Order,
+          as: 'orderDetails',
+          include: {
+            model: Book,
+            as: 'book',
+            where: {
+              title: {
+                [db.Sequelize.Op.like]: `%${searchQuery}%`
+              }
+            },
+            include: {
+              model: Category,
+              as: 'category',
+              attributes: ['name']
+            }
+          },
+        }
+      ],
+      order: [['order_date', 'DESC']]
+    });
+
+    if (!orders) {
+      throw new Error('No orders found');
+    }
+    return orders;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
+const getDetailOrderByUser = async (userId, orderId) => {
+  try {
+    const order = await Order.findOne({
+      where: {
+        id: orderId,
+        user_id: userId
+      },
+      include: {
+        model: OrderTracking,
+        as: 'orderTracking',
+        attributes: ['confirmedAt', 'processedAt', 'deliveredAt', 'shippedAt', 'canceledAt', 'returnedAt']
+      }
+    });
+
+    if (!order) {
+      throw new Error(`Order with ID ${orderId} not found for user with ID ${userId}`);
+    }
+
+    const orderDetails = await Detail_Order.findAll({
+      where: { order_id: orderId },
+      include: {
+        model: Book,
+        as: 'book',
+        include: {
+          model: Category,
+          as: 'category',
+          attributes: ['name']
+        }
+      }
+    });
+
+    if (!orderDetails || orderDetails.length === 0) {
+      throw new Error('No order details found');
+    }
+
+    return { order, orderDetails };
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   createOrder,
   getOrderById,
   getOrdersByUserId,
   getAllOrders,
   updateOrder,
-  updateMultipleOrderStatus
+  updateMultipleOrderStatus,
+  searchOrdersByUserId,
+  getDetailOrderByUser
 };
