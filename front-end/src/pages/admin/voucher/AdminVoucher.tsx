@@ -27,7 +27,7 @@ const AdminVoucher = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getDiscountVouchers();
+        const response = await getDiscountVouchers(1000, 0);
         setDiscounts(response.data);
         setFilteredDiscounts(response.data);
       } catch (error) {

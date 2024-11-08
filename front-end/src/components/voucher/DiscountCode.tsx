@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
 import { IoIosArrowForward, IoMdClose } from 'react-icons/io';
 import VoucherModal from '../modals/VoucherModal';
-import { getDiscountVouchers, getFreeshipVouchers } from '../../apis/voucher';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import { useDispatch } from 'react-redux';
-import { deselectVoucher, setAvailableVouchers } from '../../redux/reducers/voucherSlice';
+import { deselectVoucher } from '../../redux/reducers/voucherSlice';
 import { BiSolidDiscount } from 'react-icons/bi';
 import { TbMapDiscount } from 'react-icons/tb';
 
 const DiscountCode: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [discountVouchers, setDiscountVouchers] = useState([]);
-  const [freeshipVouchers, setFreeshipVouchers] = useState([]);
   const selectedDiscountVoucherId = useSelector((state: RootState) => state.voucher.selectedDiscountVoucherId);
   const selectedFreeshipVoucherId = useSelector((state: RootState) => state.voucher.selectedFreeshipVoucherId);
   const availableVouchers = useSelector((state: RootState) => state.voucher.availableVouchers);
@@ -20,18 +17,6 @@ const DiscountCode: React.FC = () => {
 
   const handleOpenModal = async () => {
     setIsModalOpen(true)
-
-    try {
-      const discountData = await getDiscountVouchers();
-      const freeshipData = await getFreeshipVouchers();
-      const discountVouchersWithType = discountData.data.map((voucher: any) => ({ ...voucher, type: 'discount' }));
-      const freeshipVouchersWithType = freeshipData.data.map((voucher: any) => ({ ...voucher, type: 'freeship' }));
-      setDiscountVouchers(discountVouchersWithType);
-      setFreeshipVouchers(freeshipVouchersWithType);
-      dispatch(setAvailableVouchers([...discountVouchersWithType, ...freeshipVouchersWithType]));
-    } catch (error) {
-      console.error("Error fetching vouchers:", error);
-    }
   };
 
   const handleCloseModal = () => setIsModalOpen(false);
@@ -95,9 +80,7 @@ const DiscountCode: React.FC = () => {
       {/* Modal for selecting vouchers */}
       <VoucherModal 
         isOpen={isModalOpen} 
-        onRequestClose={handleCloseModal}  
-        discountVouchers={discountVouchers}
-        freeshipVouchers={freeshipVouchers} />
+        onRequestClose={handleCloseModal} />
     </div>
   );
 };
