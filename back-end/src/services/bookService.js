@@ -246,7 +246,8 @@ const createNewBook = async ({ ISBN,
   year,
   age,
   stock, cover_img_url,
-  author_id }) => {
+  author_id,
+  publisher_id }) => {
   try {
     // Check if required fields are provided
     // if (!ISBN || !title || !price || !salePrice || !year || !age || !stock) {
@@ -264,7 +265,8 @@ const createNewBook = async ({ ISBN,
       age,
       stock,
       cover_img_url,
-      author_id
+      author_id,
+      publisher_id
     }
     const newBook = await Book.create(book);
     return newBook;

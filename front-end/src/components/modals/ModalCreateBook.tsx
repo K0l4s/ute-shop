@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createBook } from '../../apis/book';
 import { getAllAuthors } from '../../apis/author';
+import { getPublisher } from '../../apis/publisher';
 // import { getAllCategories } from '../../apis/category'; // Giả sử hàm lấy danh sách thể loại
 
 export interface Author {
@@ -11,12 +12,17 @@ export interface Category {
     id: number;
     name: string;
 }
-
+export interface Pub {
+    id: number;
+    name: string;
+}
 const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     const [categoryList, setCategoryList] = useState<Category[]>([]);
     const [authorList, setAuthorList] = useState<Author[]>([]);
+    const [publisherList, setPublisherList] = useState<Pub[]>([]);
     const [selectedAuthor, setSelectedAuthor] = useState<number | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+    const [selectedPublisher, setSelectedPublisher] = useState<number | null>(null);
 
     const [ISBN, setISBN] = useState('');
     const [title, setTitle] = useState('');
@@ -28,6 +34,7 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     const [stock, setStock] = useState<number | ''>('');
     const [coverImg, setCoverImg] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
+    // const [publisher, setPublisher] = useState('');
 
     useEffect(() => {
         const fetchCategory = async () => {
@@ -47,9 +54,19 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 console.error('Failed to fetch author:', error);
             }
         };
+        const fetchPublisher = async () => {
+            try {
+                const response = await getPublisher();
+                console.log(response);
+                setPublisherList(response.data);
+            } catch (error) {
+                console.error('Failed to fetch publisher:', error);
+            }
+        };
 
         fetchCategory();
         fetchAuthor();
+        fetchPublisher();
     }, []);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,6 +92,7 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 // selectedCategory,
                 coverImg ? coverImg : null,
                 selectedAuthor || 0,
+                selectedPublisher || 0
             );
             console.log('Book created:', newBook);
             alert('Book created successfully!');
@@ -204,12 +222,28 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                 value={selectedCategory || ''}
                                 onChange={(e) => setSelectedCategory(Number(e.target.value))}
                                 className="border rounded w-full p-2"
-                                // required
+                            // required
                             >
                                 <option value="">Chọn thể loại</option>
                                 {categoryList.map((category) => (
                                     <option key={category.id} value={category.id}>
                                         {category.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium">Nhà xuất bản</label>
+                            <select
+                                value={selectedPublisher || ''}
+                                onChange={(e) => setSelectedPublisher(Number(e.target.value))}
+                                className="border rounded w-full p-2"
+                            // required
+                            >
+                                <option value="">Chọn nhà xuất bản</option>
+                                {publisherList.length>0 && publisherList.map((pub) => (
+                                    <option key={pub.id} value={pub.id}>
+                                        {pub.name}
                                     </option>
                                 ))}
                             </select>
