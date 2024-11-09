@@ -23,12 +23,22 @@ const Checkout: React.FC = () => {
   const [productsToCheckout, setProductsToCheckout] = useState<Product[]>([]);
   const [shippingFee, setShippingFee] = useState<number>(20000);
   const [estimatedDeliveryDate, setEstimatedDeliveryDate] = useState<string>("");
-  const [freeship] = useState<number>(0);
-  const [discount] = useState<number>(0);
+  const [freeship, setFreeship] = useState<number>(0);
+  const [discount, setDiscount] = useState<number>(0);
   const [shipping_method, setShippingMethod] = useState<string>("STANDARD");
   const [paymentMethod, setPaymentMethod] = useState<string>("");
+  const [amount, setAmount] = useState<number>(0);
   const [totalAmount, setTotalAmount] = useState<number>(0);
+  // const [discountVoucher, setDiscountVoucher] = useState<any>(null);
+  // const [freeshipVoucher, setFreeshipVoucher] = useState<any>(null);
+
   const [lastEncodedData, setLastEncodedData] = useState<string | null>(null);
+  
+  const discountVouchers = useSelector((state: RootState) => state.voucher.discountVouchers);
+  const freeshipVouchers = useSelector((state: RootState) => state.voucher.freeshipVouchers);
+  const selectedDiscountVoucherId = useSelector((state: RootState) => state.voucher.selectedDiscountVoucherId);
+  const selectedFreeshipVoucherId = useSelector((state: RootState) => state.voucher.selectedFreeshipVoucherId);
+
   // Lấy thông tin người dùng từ Redux store
   const user = useSelector((state: RootState) => state.auth.user);
 
@@ -37,8 +47,11 @@ const Checkout: React.FC = () => {
   const shipping_address = user?.address + ', ' + user?.ward + ', ' + user?.district + ', ' + user?.province;
   
   // Lấy các sản phẩm đã chọn từ cartSlice
-  const cartItems = useSelector((state: RootState) => state.cart.items);
+  // const cartItems = useSelector((state: RootState) => state.cart.items);
 
+  const selectedDiscountVoucher = discountVouchers.find(voucher => voucher.id === selectedDiscountVoucherId);
+  const selectedFreeshipVoucher = freeshipVouchers.find(voucher => voucher.id === selectedFreeshipVoucherId);
+  
   useEffect(() => {
     const fetchDecodedData = async () => {
       const queryParams = new URLSearchParams(location.search);
@@ -50,7 +63,7 @@ const Checkout: React.FC = () => {
           setProductsToCheckout(decodedData.selectedItems || []);
           setShippingMethod(decodedData.shipping_method || "STANDARD");
           setPaymentMethod(decodedData.payment_method || "COD");
-          setTotalAmount(decodedData.totalAmount || 0);
+          setAmount(decodedData.totalAmount || 0);
           setLastEncodedData(dataFromUrl);
         } catch (error) {
           console.error("Failed to decode cart data:", error);
@@ -66,7 +79,7 @@ const Checkout: React.FC = () => {
       selectedItems: productsToCheckout,
       shipping_method: newShippingMethod,
       payment_method: newPaymentMethod,
-      totalAmount
+      amount
     };
 
     try {
@@ -152,10 +165,22 @@ const Checkout: React.FC = () => {
 
   // Tính toán lại tổng tiền khi các sản phẩm thay đổi
   useEffect(() => {
-    const newTotal = cartItems.reduce((acc, item) => 
-      acc + (item.salePrice || item.price) * item.quantity, 0);
-    setTotalAmount(newTotal);
-  }, [cartItems]);
+    const totalPrice = productsToCheckout.reduce((total, product) => {
+      return total + (product.salePrice || product.price) * product.quantity;
+    }, 0);
+
+    const discountAmount = selectedDiscountVoucher ? (selectedDiscountVoucher.discount_val || (selectedDiscountVoucher.discount_perc / 100) * totalPrice) : 0;
+    setDiscount(discountAmount);
+
+    // Tính toán lại phí vận chuyển sau khi áp dụng freeshipVoucher
+    const shippingFeeAmount = selectedFreeshipVoucher ? (selectedFreeshipVoucher.discount_val || (selectedFreeshipVoucher.discount_perc / 100) * shippingFee) : 0;
+    setFreeship(shippingFeeAmount);
+
+    // Cập nhật thành tiền cuối cùng
+    const finalTotalAmount = totalPrice + shippingFee - discountAmount - shippingFeeAmount;
+    setTotalAmount(finalTotalAmount);
+
+  }, [productsToCheckout, selectedDiscountVoucher, selectedFreeshipVoucher, shippingFee]);
   
   const handlePlaceOrder = async () => {
     const orderItems = productsToCheckout.map(item => ({
@@ -165,12 +190,14 @@ const Checkout: React.FC = () => {
     }));
     
     const orderData = {
-      total_price: totalAmount + shippingFee - freeship - discount,
+      total_price: totalAmount,
       shipping_address,
       shipping_method: "STANDARD",
       shipping_fee: shippingFee,
       payment_method: paymentMethod,
-      orderItems
+      orderItems,
+      discount_id: selectedDiscountVoucherId,
+      freeship_id: selectedFreeshipVoucherId,
     };
 
     try {
@@ -301,7 +328,7 @@ const Checkout: React.FC = () => {
         <div className="space-y-2">
           <div className="flex justify-between">
             <span>Tổng tiền:</span>
-            <span>{totalAmount.toLocaleString()} đ</span>
+            <span>{amount.toLocaleString()} đ</span>
           </div>
           <div className="flex justify-between">
             <span>Phí vận chuyển:</span>
@@ -309,15 +336,15 @@ const Checkout: React.FC = () => {
           </div>
           <div className="flex justify-between">
             <span>Voucher freeship:</span>
-            <span>{freeship} đ</span>
+            <span>- {freeship} đ</span>
           </div>
           <div className="flex justify-between">
             <span>Voucher giảm giá:</span>
-            <span>{discount} đ</span>
+            <span>- {discount} đ</span>
           </div>
           <div className="flex justify-between font-bold">
             <span>Thành tiền:</span>
-            <span>{(totalAmount + shippingFee - freeship - discount).toLocaleString()} đ</span>
+            <span>{totalAmount.toLocaleString()} đ</span>
           </div>
         </div>
       </div>

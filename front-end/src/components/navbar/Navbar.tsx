@@ -25,7 +25,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [openNoti, setOpenNoti] = useState(false);
   const [openAcc, setOpenAcc] = useState(false);
-  const { setUnreadCount, unreadCount, fetchNotifications } = useWebSocket();
+  const { unreadCount, fetchNotifications, clearNotifications } = useWebSocket();
 
   const handleCategoryClick = (category: string) => {
     setActiveCategory(category);
@@ -45,7 +45,8 @@ const Navbar = () => {
       if (response.ok) {
         // Nếu logout thành công, cập nhật trạng thái trong Redux
         dispatch(logout());
-        localStorage.removeItem('userData');
+        localStorage.clear();
+        clearNotifications();
         alert('Đăng xuất thành công!');
         // Có thể điều hướng về trang đăng nhập hoặc trang chủ
         navigate('/login');
@@ -137,7 +138,7 @@ const Navbar = () => {
                             transition={{ duration: 0.2, ease: "easeOut" }}
                             className="absolute right rounded-lg shadow-lg group-hover:block"
                           >
-                            <Notification setUnreadCount={setUnreadCount} />
+                            <Notification />
                           </motion.div>
                         )}
                       </AnimatePresence>

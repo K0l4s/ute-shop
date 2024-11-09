@@ -37,11 +37,10 @@ const PaymentSuccess: React.FC = () => {
         const orderDetails = await getOrder(vnp_TxnRef);
         setOrder(orderDetails);
       } catch (error) {
-        console.error('Error fetching order details:', error);
         setError("Failed to load order details.");
       }
     };
-    
+
     const handleVNPayResponse = async () => {
       try {
         await getDataReturnVNPay(queryParams);
@@ -52,11 +51,25 @@ const PaymentSuccess: React.FC = () => {
 
     if (vnp_TxnRef) {
       fetchOrderDetails();
+    }
+
+    // Check if the notification has already been sent
+    const notificationSent = sessionStorage.getItem('notificationSent');
+
+    if (!notificationSent) {
       if (vnp_TransactionStatus) {
         handleVNPayResponse();
       }
+      sessionStorage.setItem('notificationSent', 'true');
     }
   }, [vnp_TxnRef]);
+
+  useEffect(() => {
+    // Reset notificationSent when component unmounts
+    return () => {
+      sessionStorage.removeItem('notificationSent');
+    };
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">

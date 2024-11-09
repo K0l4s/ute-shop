@@ -11,9 +11,10 @@ const Detail_Order = db.Detail_Order;
 const sequelize = db.sequelize;
 const Book = db.Book;
 const Notification = db.Notification;
+const OrderTracking = db.OrderTracking;
 const querystring = require('qs');
 const crypto = require('crypto');
-
+const { sendNotificationToClient } = require('../services/notificationService');
 // 
 router.post('/create_payment_url', authenticateJWT, async function (req, res, next) {
   const userId = req.user.id; // Lấy userId từ req.user sau khi authenticateJWT
@@ -75,6 +76,19 @@ router.get('/vnpay_ipn', async function (req, res, next) {
   let vnp_Params = req.query;
   let secureHash = vnp_Params['vnp_SecureHash'];
   let orderId = vnp_Params['vnp_TxnRef'];
+
+  let order;
+  try {
+    order = await Order.findOne({ where: { id: orderId } });
+    if (!order) {
+      return res.status(404).json({ message: 'Order not found' });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+  
+  let userId = order.user_id;
+
   let rspCode = vnp_Params['vnp_ResponseCode'];
 
   delete vnp_Params['vnp_SecureHash'];
@@ -110,6 +124,7 @@ router.get('/vnpay_ipn', async function (req, res, next) {
                 // Thanh toán thành công, cập nhật trạng thái đơn hàng và thanh toán
                 await Order.update({ status: 'PROCESSING' }, { where: { id: orderId }, transaction: t});
                 await Payment.update({ status: 'COMPLETED', payment_date: new Date() }, { where: { order_id: orderId }, transaction: t});
+                await OrderTracking.update({ confirmedAt: new Date() }, { where: { order_id: orderId }, transaction: t });
                 // Tạo thông báo mới trong database
                 const newNotification = await Notification.create({
                   user_id: userId,
@@ -118,11 +133,12 @@ router.get('/vnpay_ipn', async function (req, res, next) {
                   type: 'ORDER_UPDATE',
                   createdAt: new Date(),
                   is_read: false
-                });
+                }, { transaction: t });
                 
-                // Gửi thông báo qua WebSocket
-                sendNotificationToClient(req.wss, userId, newNotification.message);
                 await t.commit();
+                // Gửi thông báo qua WebSocket
+                sendNotificationToClient(req.wss, newNotification);
+
                 res.status(200).json({RspCode: '00', Message: 'Success'})
               }
               else {
@@ -138,6 +154,7 @@ router.get('/vnpay_ipn', async function (req, res, next) {
                 await Order.destroy({ where: { id: orderId }, transaction: t });
                 await Payment.destroy({ where: { order_id: orderId }, transaction: t });
                 await Notification.destroy({ where: { order_id: orderId }});
+                await OrderTracking.destroy({ where: { order_id: orderId }});
                 await t.commit();
                 res.status(200).json({ RspCode: '24', Message: 'Payment cancelled or failed, rolled back order and payment' });
                 // res.status(200).json({RspCode: '00', Message: 'Success'})

@@ -12,8 +12,10 @@ import { showToast } from "../../utils/toastUtils";
 const Cart: React.FC = () => {
   // Lấy item từ store
   const books = useSelector((state: RootState) => state.cart.items);
+  const discountVouchers = useSelector((state: RootState) => state.voucher.discountVouchers);
+  // const freeshipVouchers = useSelector((state: RootState) => state.voucher.freeshipVouchers);
   const selectedDiscountVoucherId = useSelector((state: RootState) => state.voucher.selectedDiscountVoucherId);
-  const availableVouchers = useSelector((state: RootState) => state.voucher.availableVouchers);
+  // const selectedFreeshipVoucherId = useSelector((state: RootState) => state.voucher.selectedFreeshipVoucherId);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [selectAll, setSelectAll] = useState(false);
@@ -107,8 +109,8 @@ const Cart: React.FC = () => {
 
 
   // Lấy thông tin voucher đã chọn
-  const selectedDiscountVoucher = availableVouchers.find(voucher => voucher.id === selectedDiscountVoucherId && voucher.type === 'discount');
-
+  const selectedDiscountVoucher = discountVouchers.find(voucher => voucher.id === selectedDiscountVoucherId);
+  // const selectedFreeshipVoucher = freeshipVouchers.find(voucher => voucher.id === selectedFreeshipVoucherId);
   // Tính toán lại tổng tiền sau khi áp dụng discount
   const discountAmount = selectedDiscountVoucher ? (selectedDiscountVoucher.discount_val || (selectedDiscountVoucher.discount_perc / 100) * totalPrice) : 0;
   const finalTotalPrice = totalPrice - discountAmount;
@@ -126,13 +128,15 @@ const Cart: React.FC = () => {
     const shipping_method = "STANDARD";
     const payment_method = "COD";
 
-    //  const totalAmount = totalPrice; 
-
-    const totalAmount = finalTotalPrice;
-
+    const totalAmount = totalPrice;
 
     try {
-      const response = await encodeCartData({ selectedItems, shipping_method, payment_method, totalAmount});
+      const response = await encodeCartData({ 
+        selectedItems, 
+        shipping_method, 
+        payment_method, 
+        totalAmount
+      });
       const encodedData = response.data.encryptedData;
       navigate(`/checkout?data=${encodeURIComponent(encodedData)}`);
     } catch (error) {

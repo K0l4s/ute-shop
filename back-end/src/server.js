@@ -51,7 +51,10 @@ app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/book', bookRoutes);
 app.use('/api/v1/review', reviewRoutes);
 app.use('/api/v1/publisher', publisherRoutes);
-app.use('/api/v1/order', orderRoutes);
+app.use('/api/v1/order', (req, res, next) => {
+  req.wss = wss;
+  next();
+}, orderRoutes);
 app.use('/api/v1/cart', cartRoutes);
 
 app.use('/api/v1/checkout', checkoutRoutes);

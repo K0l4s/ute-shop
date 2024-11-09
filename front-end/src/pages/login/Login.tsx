@@ -20,6 +20,7 @@ const Login: React.FC<LoginProps> = () => {
       // Lưu thông tin người dùng vào Redux
       dispatch(login());
       dispatch(setUser({
+        id: data.data.id,
         firstname: data.data.firstname,
         lastname: data.data.lastname,
         phone: data.data.phone,

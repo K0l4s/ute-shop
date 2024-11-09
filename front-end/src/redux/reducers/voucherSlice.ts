@@ -14,14 +14,16 @@ interface Voucher {
 }
 
 interface VoucherState {
-  availableVouchers: Voucher[];
+  discountVouchers: Voucher[];
+  freeshipVouchers: Voucher[];
   selectedDiscountVoucherId: number | null;
   selectedFreeshipVoucherId: number | null;
   viewedVoucherId: number | null;
 }
 
 const initialState: VoucherState = {
-  availableVouchers: [],
+  discountVouchers: [],
+  freeshipVouchers: [],
   selectedDiscountVoucherId: null,
   selectedFreeshipVoucherId: null,
   viewedVoucherId: null,
@@ -31,8 +33,11 @@ const voucherSlice = createSlice({
   name: 'voucher',
   initialState,
   reducers: {
-    setAvailableVouchers(state, action: PayloadAction<Voucher[]>) {
-      state.availableVouchers = action.payload;
+    setDiscountVouchers(state, action: PayloadAction<Voucher[]>) {
+      state.discountVouchers = action.payload;
+    },
+    setFreeshipVouchers(state, action: PayloadAction<Voucher[]>) {
+      state.freeshipVouchers = action.payload;
     },
     applyVoucher(state, action: PayloadAction<{ id: number; type: 'discount' | 'freeship' }>) {
       const { id, type } = action.payload;
@@ -59,5 +64,5 @@ const voucherSlice = createSlice({
   },
 });
 
-export const { setAvailableVouchers, applyVoucher, deselectVoucher, viewVoucherDetail, clearViewedVoucher } = voucherSlice.actions;
+export const { setDiscountVouchers, setFreeshipVouchers, applyVoucher, deselectVoucher, viewVoucherDetail, clearViewedVoucher } = voucherSlice.actions;
 export default voucherSlice.reducer;

@@ -5,7 +5,7 @@ import VoucherItem from '../voucher/VoucherItem';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { applyVoucher, deselectVoucher, setAvailableVouchers } from '../../redux/reducers/voucherSlice';
+import { applyVoucher, deselectVoucher, setDiscountVouchers, setFreeshipVouchers} from '../../redux/reducers/voucherSlice';
 import { animated } from '@react-spring/web';
 import { useModalOpenAnimation } from '../../animations/useModalOpenAnimation';
 import { getDiscountVouchers, getFreeshipVouchers } from '../../apis/voucher';
@@ -29,8 +29,8 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose }) =
     return total;
   }, 0));
 
-  const [discountVouchers, setDiscountVouchers] = useState<any[]>([]);
-  const [freeshipVouchers, setFreeshipVouchers] = useState<any[]>([]);
+  const [discountVouchers, setDiscountVouchersState] = useState<any[]>([]);
+  const [freeshipVouchers, setFreeshipVouchersState] = useState<any[]>([]);
   const [limit] = useState(10);
   const [discountOffset, setDiscountOffset] = useState(0);
   const [freeshipOffset, setFreeshipOffset] = useState(0);
@@ -39,8 +39,8 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose }) =
 
   useEffect(() => {
     if (isOpen) {
-      setDiscountVouchers([]);
-      setFreeshipVouchers([]);
+      setDiscountVouchersState([]);
+      setFreeshipVouchersState([]);
       setDiscountOffset(0);
       setFreeshipOffset(0);
       setHasMoreDiscount(true);
@@ -54,8 +54,8 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose }) =
     try {
       const discountData = await getDiscountVouchers(limit, newOffset);
       const discountVouchersWithType = discountData.data.map((voucher: any) => ({ ...voucher, type: 'discount' }));
-      setDiscountVouchers(prev => [...prev, ...discountVouchersWithType]);
-      dispatch(setAvailableVouchers([...discountVouchersWithType]));
+      setDiscountVouchersState(prev => [...prev, ...discountVouchersWithType]);
+      dispatch(setDiscountVouchers([...discountVouchersWithType]));
 
       if (discountData.data.length < limit) {
         setHasMoreDiscount(false);
@@ -72,8 +72,8 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose }) =
     try {
       const freeshipData = await getFreeshipVouchers(limit, newOffset);
       const freeshipVouchersWithType = freeshipData.data.map((voucher: any) => ({ ...voucher, type: 'freeship' }));
-      setFreeshipVouchers(prev => [...prev, ...freeshipVouchersWithType]);
-      dispatch(setAvailableVouchers([...freeshipVouchersWithType]));
+      setFreeshipVouchersState(prev => [...prev, ...freeshipVouchersWithType]);
+      dispatch(setFreeshipVouchers([...freeshipVouchersWithType]));
 
       if (freeshipData.data.length < limit) {
         setHasMoreFreeship(false);
