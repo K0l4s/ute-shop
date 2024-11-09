@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getDiscountVouchers, updateDiscountVoucher } from "../../../apis/voucher";
+import { createDiscountVoucher, getDiscountVouchers, updateDiscountVoucher } from "../../../apis/voucher";
 
 interface Discount {
   code: string;
@@ -22,6 +22,19 @@ const AdminVoucher = () => {
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingRow, setEditingRow] = useState<number | null>(null);
+  const [newVoucher, setNewVoucher] = useState<Discount>({
+    code: "",
+    createdAt: "",
+    desc: "",
+    discount_perc: 0,
+    discount_val: "",
+    id: 0,
+    is_active: false,
+    min_order_val: "",
+    name: "",
+    stock: 0,
+    updatedAt: "",
+  });
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -78,7 +91,7 @@ const AdminVoucher = () => {
       // Cập nhật trạng thái voucher
       const updatedDiscount = { ...discounts.find(d => d.id === discountId), is_active: newStatus };
       await updateDiscountVoucher(discountId.toString(), updatedDiscount);
-  
+
       // Cập nhật lại trạng thái ở UI
       setDiscounts((prevDiscounts) =>
         prevDiscounts.map((discount) =>
@@ -89,7 +102,7 @@ const AdminVoucher = () => {
       console.error("Failed to update voucher status", error);
     }
   };
-  
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>,
     discountId: number,
@@ -117,7 +130,36 @@ const AdminVoucher = () => {
     currentPage * itemsPerPage
   );
   const totalPages = Math.ceil(filteredDiscounts.length / itemsPerPage);
+  const handleNewVoucherChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, field: keyof Discount) => {
+    const { value } = e.target;
+    setNewVoucher((prevDiscount) => ({
+      ...prevDiscount,
+      [field]: field === "is_active" ? value === "active" : value
+    }));
+  };
 
+  const handleCreateNewVoucher = async () => {
+    try {
+      // Tạo voucher mới
+      const response = await createDiscountVoucher(newVoucher);
+      setDiscounts((prevDiscounts) => [...prevDiscounts, response.data]);
+      setNewVoucher({
+        code: "",
+        createdAt: "",
+        desc: "",
+        discount_perc: 0,
+        discount_val: "",
+        id: 0,
+        is_active: false,
+        min_order_val: "",
+        name: "",
+        stock: 0,
+        updatedAt: "",
+      });
+    } catch (error) {
+      console.error("Failed to create new voucher", error);
+    }
+  };
   return (
     <div className="p-6 min-h-screen">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Quản lý Voucher</h1>
@@ -151,6 +193,34 @@ const AdminVoucher = () => {
             </tr>
           </thead>
           <tbody>
+            <tr className="bg-gray-100">
+              <td className="p-4 border-t"><input type="text" value={newVoucher.code} onChange={(e) => handleNewVoucherChange(e, "code")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t"><input type="text" value={newVoucher.name} onChange={(e) => handleNewVoucherChange(e, "name")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t"><input type="text" value={newVoucher.desc} onChange={(e) => handleNewVoucherChange(e, "desc")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t"><input type="number" value={newVoucher.discount_perc || ""} onChange={(e) => handleNewVoucherChange(e, "discount_perc")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t"><input type="text" value={newVoucher.discount_val || ""} onChange={(e) => handleNewVoucherChange(e, "discount_val")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t"><input type="number" value={newVoucher.stock} onChange={(e) => handleNewVoucherChange(e, "stock")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t"><input type="text" value={newVoucher.min_order_val || ""} onChange={(e) => handleNewVoucherChange(e, "min_order_val")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t">
+                <select
+                  name="is_active"
+                  value={newVoucher.is_active ? "active" : "inactive"}
+                  onChange={(e) => handleNewVoucherChange(e, "is_active")}
+                  className="border p-1 rounded w-full"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </td>
+              <td className="p-4 border-t">
+                <button
+                  className="bg-blue-500 text-white p-2 rounded"
+                  onClick={handleCreateNewVoucher}
+                >
+                  Create
+                </button>
+              </td>
+            </tr>
             {paginatedData.map((discount) => (
               <tr key={discount.id} className={discount.is_active ? "bg-white" : "bg-red-100"}>
                 <td className="p-4 border-t">{discount.code}</td>

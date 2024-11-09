@@ -48,4 +48,22 @@ export const updateFreeshipVoucher = async (id: string, data: any) => {
   } catch (error) {
     console.log(error);
   }
+}; 
+
+export const createDiscountVoucher = async (data: any) => {
+  try {
+    const response = await axios.post(BASE_URL + "/voucher/discounts/create", data, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const createFreeshipVoucher = async (data: any) => {
+  try {
+    const response = await axios.post(BASE_URL + "/voucher/freeships/create", data, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
 };
