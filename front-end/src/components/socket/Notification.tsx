@@ -4,7 +4,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { format, toZonedTime } from 'date-fns-tz';
 import { useWebSocket } from '../../context/WebSocketContext';
 
-const Notification: React.FC<{ setUnreadCount: React.Dispatch<React.SetStateAction<number>> }> = () => {
+const Notification: React.FC = () => {
   const { notifications, fetchNotifications } = useWebSocket();
 
   const [error, setError] = useState<string | null>(null);
@@ -74,6 +74,9 @@ const Notification: React.FC<{ setUnreadCount: React.Dispatch<React.SetStateActi
   }, [offset]);
 
   const formatNotificationTime = (createdAt: string) => {
+    if (!createdAt) {
+      return '';
+    }
     const timeZone = 'Asia/Bangkok';
     const zonedDate = toZonedTime(createdAt, timeZone);
     const timeDifference = Date.now() - zonedDate.getTime();

@@ -26,6 +26,7 @@ function App() {
             // Load user data from localStorage
             const userData = JSON.parse(storedUserData);
             dispatch(setUser({
+              id: userData["id"],
               firstname: userData["firstname"],
               lastname: userData["lastname"],
               phone: userData["phone"],
@@ -42,6 +43,7 @@ function App() {
             const userData = await getProfileApi();
             localStorage.setItem("userData", JSON.stringify(userData));
             dispatch(setUser({
+              id: userData.data["id"],
               firstname: userData.data["firstname"],
               lastname: userData.data["lastname"],
               phone: userData.data["phone"],

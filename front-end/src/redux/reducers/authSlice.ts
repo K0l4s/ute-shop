@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 interface User {
+  id: number;
   firstname: string;
   lastname: string;
   phone: string;
@@ -45,7 +46,7 @@ const authSlice = createSlice({
       state.isLoading = action.payload;
     },
     setUser(state, action) {
-      console.log(action.payload);
+      // console.log(action.payload);
       state.user = { ...state.user, ...action.payload };
     },
   },

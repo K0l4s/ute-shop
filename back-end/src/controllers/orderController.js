@@ -2,13 +2,15 @@ const orderService = require('../services/orderService.js');
 const userService = require('../services/userService.js');
 const Role = require('../enums/role.js');
 const orderStatus = require('../enums/orderStatus.js');
+
 const placeOrder = async (req, res) => {
   const userId = req.user.id;
   const orderData = req.body;
+  const wss = req.wss;
 
   try {
     // Gọi service để tạo đơn hàng mới
-    const { newOrder, newPayment } = await orderService.createOrder(userId, orderData);
+    const { newOrder, newPayment } = await orderService.createOrder(userId, orderData, null, wss);
     res.status(201).json({ message: 'Order created successfully', order: newOrder, payment: newPayment });
   } catch (error) {
     res.status(400).json({ message: error.message });

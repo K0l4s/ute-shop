@@ -1,13 +1,20 @@
 const EncryptionService = require('../services/encryptionService.js');
 
 const encodeCartData = (req, res) => {
-  const { selectedItems, shipping_method, payment_method, totalAmount } = req.body;
+  const { selectedItems, shipping_method, payment_method, totalAmount, discountVoucher, freeshipVoucher } = req.body;
   if (!selectedItems || !Array.isArray(selectedItems)) {
     return res.status(400).json({ message: "Invalid items" });
   }
 
   try {
-    const encryptedData = EncryptionService.encrypt({selectedItems, shipping_method, payment_method, totalAmount});
+    const encryptedData = EncryptionService.encrypt({
+      selectedItems, 
+      shipping_method, 
+      payment_method, 
+      totalAmount,
+      discountVoucher,
+      freeshipVoucher
+    });
     res.cookie('ck_data', encryptedData, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'development',

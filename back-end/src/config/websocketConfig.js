@@ -7,8 +7,15 @@ const setupWebSocket = (server) => {
   const wss = new WebSocket.Server({ server });
 
   // Lắng nghe các kết nối WebSocket
-  wss.on('connection', async (ws) => {
+  wss.on('connection', async (ws, req) => {
     console.log('Client connected');
+    // Lấy userId từ query string
+    const userId = req.url.split('userId=')[1];
+    if (!userId) {
+      ws.close(4001, 'Unauthorized');
+      return;
+    }
+    ws.userId = userId;
 
     // Nhận tin nhắn từ client
     ws.on('message', (message) => {

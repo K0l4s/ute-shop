@@ -1,24 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Modal from 'react-modal';
 import { IoClose } from 'react-icons/io5';
 import VoucherItem from '../voucher/VoucherItem';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { applyVoucher, deselectVoucher } from '../../redux/reducers/voucherSlice';
+import { applyVoucher, deselectVoucher, setDiscountVouchers, setFreeshipVouchers} from '../../redux/reducers/voucherSlice';
 import { animated } from '@react-spring/web';
 import { useModalOpenAnimation } from '../../animations/useModalOpenAnimation';
+import { getDiscountVouchers, getFreeshipVouchers } from '../../apis/voucher';
 
 Modal.setAppElement('#root');
 
 interface VoucherModalProps {
   isOpen: boolean;
   onRequestClose: () => void;
-  discountVouchers: any[];
-  freeshipVouchers: any[];
 }
 
-const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose, discountVouchers, freeshipVouchers }) => {
+const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose }) => {
   const dispatch = useDispatch();
   // const vouchers = useSelector((state: RootState) => state.voucher.availableVouchers);
   const selectedDiscountVoucherId = useSelector((state: RootState) => state.voucher.selectedDiscountVoucherId);
@@ -29,6 +28,64 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose, dis
     }
     return total;
   }, 0));
+
+  const [discountVouchers, setDiscountVouchersState] = useState<any[]>([]);
+  const [freeshipVouchers, setFreeshipVouchersState] = useState<any[]>([]);
+  const [limit] = useState(10);
+  const [discountOffset, setDiscountOffset] = useState(0);
+  const [freeshipOffset, setFreeshipOffset] = useState(0);
+  const [hasMoreDiscount, setHasMoreDiscount] = useState(true);
+  const [hasMoreFreeship, setHasMoreFreeship] = useState(true);
+
+  useEffect(() => {
+    if (isOpen) {
+      setDiscountVouchersState([]);
+      setFreeshipVouchersState([]);
+      setDiscountOffset(0);
+      setFreeshipOffset(0);
+      setHasMoreDiscount(true);
+      setHasMoreFreeship(true);
+      loadMoreDiscountVouchers(0);
+      loadMoreFreeshipVouchers(0);
+    }
+  }, [isOpen]);
+
+  const loadMoreDiscountVouchers = async (newOffset: number) => {
+    try {
+      const discountData = await getDiscountVouchers(limit, newOffset);
+      const discountVouchersWithType = discountData.data.map((voucher: any) => ({ ...voucher, type: 'discount' }));
+      setDiscountVouchersState(prev => [...prev, ...discountVouchersWithType]);
+      dispatch(setDiscountVouchers([...discountVouchersWithType]));
+
+      if (discountData.data.length < limit) {
+        setHasMoreDiscount(false);
+      } else {
+        setDiscountOffset(newOffset + limit);
+      }
+    } catch (error) {
+      console.error("Error fetching discount vouchers:", error);
+      setHasMoreDiscount(false);
+    }
+  };
+
+  const loadMoreFreeshipVouchers = async (newOffset: number) => {
+    try {
+      const freeshipData = await getFreeshipVouchers(limit, newOffset);
+      const freeshipVouchersWithType = freeshipData.data.map((voucher: any) => ({ ...voucher, type: 'freeship' }));
+      setFreeshipVouchersState(prev => [...prev, ...freeshipVouchersWithType]);
+      dispatch(setFreeshipVouchers([...freeshipVouchersWithType]));
+
+      if (freeshipData.data.length < limit) {
+        setHasMoreFreeship(false);
+      } else {
+        setFreeshipOffset(newOffset + limit);
+      }
+    } catch (error) {
+      console.error("Error fetching freeship vouchers:", error);
+      setHasMoreFreeship(false);
+    }
+  };
+
 
   const handleApply = (id: number, type: 'discount' | 'freeship', min_order_val: number) => {
     if (totalPrice >= min_order_val) {
@@ -95,6 +152,11 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose, dis
               onViewDetail={() => {}}
             />
           ))}
+          {hasMoreDiscount && (
+            <button onClick={() => loadMoreDiscountVouchers(discountOffset)} className="btn btn-secondary">
+              Tải thêm
+            </button>
+          )}
         </div>
         
         {/* Section: Mã vận chuyển */}
@@ -116,6 +178,11 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose, dis
               onViewDetail={() => {}}
             />
           ))}
+          {hasMoreFreeship && (
+            <button onClick={() => loadMoreFreeshipVouchers(freeshipOffset)} className="btn btn-secondary">
+              Tải thêm
+            </button>
+          )}
         </div>
 
       </animated.div>

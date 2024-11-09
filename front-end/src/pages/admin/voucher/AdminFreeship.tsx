@@ -40,7 +40,8 @@ const AdminFreeship = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getFreeshipVouchers(100, 0);
+        const response = await getFreeshipVouchers(1000, 0);
+
         setFreeships(response.data);
         setFilteredFreeships(response.data);
       } catch (error) {
