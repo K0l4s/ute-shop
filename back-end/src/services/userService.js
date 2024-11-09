@@ -55,8 +55,35 @@ const updateUserLocationById = async (id, { province, district, ward, address })
   }
 };
 
+const getAllUser = async () => {
+  // Lấy tất cả người dùng với tổng đơn và số tiền họ đã mua
+  return await User.findAll({
+    attributes: {
+      include: [
+        [
+          db.sequelize.literal(`(
+            SELECT COUNT(*)
+            FROM Orders
+            WHERE Orders.user_id = User.id
+          )`),
+          "total_orders",
+        ],
+        [
+          db.sequelize.literal(`(
+            SELECT SUM(total_price)
+            FROM Orders
+            WHERE Orders.user_id = User.id
+          )`),
+          "total_spent",
+        ],
+      ],
+    },
+  });
+};
+
 module.exports = {
   getUserById,
   updateUserById,
-  updateUserLocationById
+  updateUserLocationById,
+  getAllUser,
 };

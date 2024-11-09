@@ -1,5 +1,6 @@
+const Role = require("../enums/role.js");
 const { uploadAvatarService } = require("../services/uploadService.js");
-const { getUserById, updateUserById, updateUserLocationById } = require("../services/userService.js");
+const { getUserById, updateUserById, updateUserLocationById, getAllUser } = require("../services/userService.js");
 
 // Lấy thông tin người dùng
 const getUserProfile = async (req, res) => {
@@ -31,7 +32,7 @@ const updateUserProfile = async (req, res) => {
 
   try {
     const { firstname, lastname, birthday, gender, phone } = req.body;
- 
+
     // Kiểm tra và upload avatar nếu có
     let avatar_url = null;
     if (req.file) {
@@ -78,8 +79,25 @@ const updateUserLocation = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 }
+const getAllUserController = async (req, res) => {
+  const userToken = req.user;
+  const user = await getUserById(userToken.id);
+  if (user.role !== Role.ADMIN) {
+    throw new Error('You do not have permission to perform this action');
+  }
+  try {
+    const users = await getAllUser();
+    res.status(200).json({
+      message: "Success",
+      data: users
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+}
 module.exports = {
   getUserProfile,
   updateUserProfile,
-  updateUserLocation
+  updateUserLocation,
+  getAllUserController
 };
