@@ -12,6 +12,9 @@ const sequelize = db.sequelize;
 const Book = db.Book;
 const Notification = db.Notification;
 const OrderTracking = db.OrderTracking;
+const Discount = db.Discount;
+const FreeShip = db.Freeship;
+const Cart = db.Cart;
 const querystring = require('qs');
 const crypto = require('crypto');
 const { sendNotificationToClient } = require('../services/notificationService');
@@ -125,6 +128,19 @@ router.get('/vnpay_ipn', async function (req, res, next) {
                 await Order.update({ status: 'PROCESSING' }, { where: { id: orderId }, transaction: t});
                 await Payment.update({ status: 'COMPLETED', payment_date: new Date() }, { where: { order_id: orderId }, transaction: t});
                 await OrderTracking.update({ confirmedAt: new Date() }, { where: { order_id: orderId }, transaction: t });
+                
+                const orderItems = await Detail_Order.findAll({ where: { order_id: orderId }, transaction: t });
+                // Xóa các mục tương ứng trong giỏ hàng
+                for (const item of orderItems) {
+                  await Cart.destroy({
+                    where: {
+                      user_id: userId,
+                      book_id: item.book_id
+                    },
+                    transaction: t
+                  });
+                }
+
                 // Tạo thông báo mới trong database
                 const newNotification = await Notification.create({
                   user_id: userId,
@@ -150,11 +166,14 @@ router.get('/vnpay_ipn', async function (req, res, next) {
                  // Tăng lại stock
                 for (const item of orderItems) {
                   await Book.increment('stock', { by: item.quantity, where: { id: item.book_id }, transaction: t });
+                  await Book.decrement('sold', { by: item.quantity, where: { id: item.book_id }, transaction: t });
                 }
+                await Discount.increment('stock', { by: 1, where: { id: order.discount_id }, transaction: t });
+                await FreeShip.increment('stock', { by: 1, where: { id: order.freeship_id }, transaction: t });
+                await OrderTracking.destroy({ where: { order_id: orderId }});
                 await Order.destroy({ where: { id: orderId }, transaction: t });
                 await Payment.destroy({ where: { order_id: orderId }, transaction: t });
                 await Notification.destroy({ where: { order_id: orderId }});
-                await OrderTracking.destroy({ where: { order_id: orderId }});
                 await t.commit();
                 res.status(200).json({ RspCode: '24', Message: 'Payment cancelled or failed, rolled back order and payment' });
                 // res.status(200).json({RspCode: '00', Message: 'Success'})

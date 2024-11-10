@@ -134,3 +134,15 @@ export const encodeCartData = (data: any) => {
 export const decodeCartData = (encodedData: any) => {
   return axios.get(BASE_URL + `/checkout/decode-cart?data=${encodedData}`, {withCredentials: true});
 };
+
+export const reserveStockAndVouchers = (data: any) => {
+  return axios.post(BASE_URL + '/checkout/reserve', data, { withCredentials: true });
+};
+
+export const releaseStockAndVouchers = (data: any) => {
+  return axios.post(BASE_URL + '/checkout/release', data, { withCredentials: true });
+};
+
+export const checkStock = (data: any) => {
+  return axios.post(BASE_URL + '/checkout/checkStock', data, { withCredentials: true });
+};

@@ -8,14 +8,15 @@ import { removeItem, updateQuantity, toggleCheck, toggleSelectAll, setItems } fr
 import { useNavigate } from "react-router-dom";
 import { encodeCartData, getUserCart, removeFromCart, toggleCheckAllStatus, toggleCheckStatus, updateCartItem } from "../../apis/cart";
 import { showToast } from "../../utils/toastUtils";
+import { deselectVoucher } from "../../redux/reducers/voucherSlice";
 
 const Cart: React.FC = () => {
   // Lấy item từ store
   const books = useSelector((state: RootState) => state.cart.items);
   const discountVouchers = useSelector((state: RootState) => state.voucher.discountVouchers);
-  // const freeshipVouchers = useSelector((state: RootState) => state.voucher.freeshipVouchers);
+  const freeshipVouchers = useSelector((state: RootState) => state.voucher.freeshipVouchers);
   const selectedDiscountVoucherId = useSelector((state: RootState) => state.voucher.selectedDiscountVoucherId);
-  // const selectedFreeshipVoucherId = useSelector((state: RootState) => state.voucher.selectedFreeshipVoucherId);
+  const selectedFreeshipVoucherId = useSelector((state: RootState) => state.voucher.selectedFreeshipVoucherId);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [selectAll, setSelectAll] = useState(false);
@@ -50,6 +51,28 @@ const Cart: React.FC = () => {
     fetchCart();
   }, [dispatch]);
   
+  useEffect(() => {
+    const selectedDiscountVoucher = discountVouchers.find(voucher => voucher.id === selectedDiscountVoucherId);
+    const selectedFreeshipVoucher = freeshipVouchers.find(voucher => voucher.id === selectedFreeshipVoucherId);
+
+    const totalPrice = books.reduce((total, book) => {
+      if (book.checked) {
+        return total + (book.salePrice || book.price) * book.quantity;
+      }
+      return total;
+    }, 0);
+
+    if (selectedDiscountVoucher && totalPrice < selectedDiscountVoucher.min_order_val) {
+      dispatch(deselectVoucher('discount'));
+      showToast("Đơn hàng không đủ điều kiện áp dụng mã giảm giá", "error");
+    }
+
+    if (selectedFreeshipVoucher && totalPrice < selectedFreeshipVoucher.min_order_val) {
+      dispatch(deselectVoucher('freeship'));
+      showToast("Đơn hàng không đủ điều kiện áp dụng mã giảm giá", "error");
+    }
+  }, [books, discountVouchers, freeshipVouchers, selectedDiscountVoucherId, selectedFreeshipVoucherId, dispatch]);
+
   // Hàm để cập nhật số lượng sách
   const handleQuantityChange = async (id: number, delta: number) => {
     const book = books.find((book) => book.id === id);
@@ -138,6 +161,7 @@ const Cart: React.FC = () => {
         totalAmount
       });
       const encodedData = response.data.encryptedData;
+      // await reserveStockAndVouchers({ selectedItems });
       navigate(`/checkout?data=${encodeURIComponent(encodedData)}`);
     } catch (error) {
       console.error("Failed to encode cart data:", error);

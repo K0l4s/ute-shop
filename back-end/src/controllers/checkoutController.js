@@ -1,3 +1,8 @@
+const db = require('../models');
+const Book = db.Book;
+const Discount = db.Discount;
+const FreeShip = db.Freeship;
+
 const EncryptionService = require('../services/encryptionService.js');
 
 const encodeCartData = (req, res) => {
@@ -16,7 +21,7 @@ const encodeCartData = (req, res) => {
       freeshipVoucher
     });
     res.cookie('ck_data', encryptedData, {
-      httpOnly: true,
+      httpOnly: false,
       secure: process.env.NODE_ENV === 'development',
       maxAge: 8 * 60 * 60 * 1000,
       sameSite: 'None' // allow cookies to enable cross-site usage (virtual domain)
@@ -47,7 +52,84 @@ const decodeCartData = (req, res) => {
   }
 };
 
+const reserveStock = async (req, res) => {
+  const { selectedItems } = req.body;
+
+  try {
+    // Kiểm tra và đặt trước số lượng sách
+    for (const item of selectedItems) {
+      const book = await Book.findByPk(item.id);
+      if (!book || book.stock < item.quantity) {
+        throw new Error(`Book ${item.name} is out of stock`);
+      }
+      book.stock -= item.quantity;
+      await book.save();
+    }
+
+    res.status(200).json({ message: 'Stock reserved successfully' });
+  } catch (error) {
+    console.error('Reservation error:', error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const releaseStock = async (req, res) => {
+  const { selectedItems } = req.body;
+
+  try {
+    // Hoàn trả lại số lượng sách
+    for (const item of selectedItems) {
+      const book = await Book.findByPk(item.id);
+      book.stock += item.quantity;
+      await book.save();
+    }
+
+    res.status(200).json({ message: 'Stock and vouchers released successfully' });
+  } catch (error) {
+    console.error('Release error:', error);
+    res.status(400).json({ message: error.message });
+  }
+};
+
+const checkStockAndVoucherAvailability = async (req, res) => {
+  const { selectedItems, discountVoucher, freeshipVoucher } = req.body;
+
+  try {
+    // Kiểm tra số lượng sách
+    for (const item of selectedItems) {
+      const book = await Book.findByPk(item.id);
+      if (!book || book.stock < item.quantity) {
+        return res.status(400).json({ message: `Sách ${item.name} đã hết hàng` });
+      }
+    }
+
+    // Kiểm tra số lượng voucher giảm giá
+    if (discountVoucher) {
+      const discount = await Discount.findByPk(discountVoucher.id);
+      if (!discount || discount.stock < 1) {
+        return res.status(400).json({ message: `Mã giảm giá ${discountVoucher.code} đã hết. Vui lòng đổi mã!` });
+      }
+    }
+
+    // Kiểm tra số lượng voucher freeship
+    if (freeshipVoucher) {
+      const freeship = await FreeShip.findByPk(freeshipVoucher.id);
+      if (!freeship || freeship.stock < 1) {
+        return res.status(400).json({ message: `Mã giảm vận chuyển ${freeshipVoucher.code} đã hết. Vui lòng đổi mã!` });
+      }
+    }
+
+    res.status(200).json({ message: 'Stock and vouchers are available' });
+  } catch (error) {
+    console.error('Stock and voucher availability check error:', error);
+    res.status(500).json({ message: 'Failed to check stock and voucher availability' });
+  }
+};
+
 module.exports = {
   encodeCartData,
-  decodeCartData
+  decodeCartData,
+  reserveStock,
+  releaseStock,
+  checkStockAndVoucherAvailability
 }

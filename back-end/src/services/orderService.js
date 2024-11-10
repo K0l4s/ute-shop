@@ -6,6 +6,9 @@ const Book = db.Book;
 const Category = db.Category;
 const Payment = db.Payment;
 const User = db.User;
+const Discount = db.Discount;
+const FreeShip = db.Freeship;
+const Cart = db.Cart;
 const orderStatus = require('../enums/orderStatus');
 const { createAndSendOrderNotification } = require('./notificationService');
 
@@ -42,8 +45,12 @@ const createOrder = async (userId, orderData, transaction, wss) => {
         throw new Error(`Book with ID ${item.book_id} is out of stock or does not exist`);
       }
 
-      // Cập nhật stock
-      // await book.update({ stock: book.stock - item.quantity });
+      // Cập nhật stock và sold
+      if (book) {
+        book.stock -= item.quantity;
+        book.sold += item.quantity;
+        await book.save({ transaction });
+      }
 
       // Thêm chi tiết đơn hàng vào bảng Detail_Order
       await Detail_Order.create({
@@ -52,6 +59,17 @@ const createOrder = async (userId, orderData, transaction, wss) => {
         quantity: item.quantity,
         price: item.unit_price
       }, { transaction });
+
+      if (payment_method === 'COD') {
+        // Xóa item khỏi cart
+        await Cart.destroy({
+          where: {
+            user_id: userId,
+            book_id: item.book_id
+          },
+          transaction
+        });
+      }
     }
 
     let payment_date = null;
@@ -69,6 +87,24 @@ const createOrder = async (userId, orderData, transaction, wss) => {
       status: 'PENDING'
     }, { transaction });
 
+    // Trừ stock cho voucher giảm giá
+    if (discount_id) {
+      const discountVoucher = await Discount.findByPk(discount_id, { transaction });
+      if (discountVoucher) {
+        discountVoucher.stock -= 1;
+        await discountVoucher.save({ transaction });
+      }
+    }
+
+    // Trừ stock cho voucher freeship
+    if (freeship_id) {
+      const freeshipVoucher = await FreeShip.findByPk(freeship_id, { transaction });
+      if (freeshipVoucher) {
+        freeshipVoucher.stock -= 1;
+        await freeshipVoucher.save({ transaction });
+      }
+    }
+    
     // Tạo một thông báo mới trong database
 
     if (payment_method === "COD") {

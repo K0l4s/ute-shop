@@ -9,12 +9,13 @@ interface VoucherItemProps {
   type: 'discount' | 'freeship';
   isSelected: boolean;
   isApplicable: boolean;
+  stock: number;
   onApply: () => void;
   onDeselect: () => void;
   onViewDetail: () => void;
 }
 
-const VoucherItem: React.FC<VoucherItemProps> = ({ name, desc, type, isSelected, isApplicable, onViewDetail, onApply, onDeselect }) => {
+const VoucherItem: React.FC<VoucherItemProps> = ({ name, desc, type, isSelected, isApplicable, stock, onViewDetail, onApply, onDeselect }) => {
   return (
     <div className={`p-4 voucher-tag rounded ${type === 'discount' ? 'bg-yellow-100' : 'bg-green-200'} `}>
       <div className="flex items-center">
@@ -25,6 +26,7 @@ const VoucherItem: React.FC<VoucherItemProps> = ({ name, desc, type, isSelected,
           <div>
             <h3 className="font-bold line-clamp-2">{name}</h3>
             <p className="text-sm text-gray-600 line-clamp-1">{desc}</p>
+            <p className="text-sm font-semibold text-gray-600">Còn lại: {stock}</p>
           </div>
           <div className="flex flex-col justify-between items-center gap-y-3">
             <button className="font-semibold text-violet-700 hover:text-violet-600" onClick={onViewDetail}>

@@ -146,7 +146,8 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose }) =
               desc={voucher.desc}
               type="discount"
               isSelected={selectedDiscountVoucherId === voucher.id}
-              isApplicable={totalPrice >= voucher.min_order_val}
+              isApplicable={totalPrice >= voucher.min_order_val && voucher.stock > 0}
+              stock={voucher.stock}
               onApply={() => handleApply(voucher.id, 'discount', voucher.min_order_val)}
               onDeselect={() => handleDeselect('discount')}
               onViewDetail={() => {}}
@@ -172,7 +173,8 @@ const VoucherModal: React.FC<VoucherModalProps> = ({ isOpen, onRequestClose }) =
               desc={voucher.desc}
               type="freeship"
               isSelected={selectedFreeshipVoucherId === voucher.id}
-              isApplicable={totalPrice >= voucher.min_order_val}
+              isApplicable={totalPrice >= voucher.min_order_val && voucher.stock > 0}
+              stock={voucher.stock}
               onApply={() => handleApply(voucher.id, 'freeship', voucher.min_order_val)}
               onDeselect={() => handleDeselect('freeship')}
               onViewDetail={() => {}}

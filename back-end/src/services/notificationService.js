@@ -36,7 +36,6 @@ const sendNotificationToClient = (wss, message) => {
     console.log('Client userId:', client.userId);
     console.log('Message userId:', message.user_id);
     if (client.readyState === WebSocket.OPEN && client.userId == message.user_id) {
-      console.log('Waiting');
       client.send(JSON.stringify({ message }));
     }
   });
