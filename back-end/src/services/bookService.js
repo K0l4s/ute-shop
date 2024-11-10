@@ -68,15 +68,24 @@ const getBooks = async (filters, page = 1, limit = 16) => {
 
     // Lọc theo khoảng giá nếu có
     if (minPrice || maxPrice) {
-      whereClause.price = {
+      whereClause[Op.or] = [
+        {
+          salePrice: {
         ...(minPrice ? { [Op.gte]: minPrice } : {}),
         ...(maxPrice ? { [Op.lte]: maxPrice } : {}),
-      };
+          }
+        },
+        {
+          price: {
+        ...(minPrice ? { [Op.gte]: minPrice } : {}),
+        ...(maxPrice ? { [Op.lte]: maxPrice } : {}),
+          }
+        }
+      ];
     }
 
     // Lọc theo khoảng độ tuổi nếu có
     if (minAge || maxAge) {
-
       whereClause.age = {
         ...(minAge ? { [Op.gte]: minAge } : {}),
         ...(maxAge ? { [Op.lte]: maxAge } : {}),
@@ -89,11 +98,13 @@ const getBooks = async (filters, page = 1, limit = 16) => {
       order.push(['price', sortByPrice === 'asc' ? 'ASC' : 'DESC']);
     }
 
+    // Decode the publisher
+    const decodedPublisher = publisher ? decodeURIComponent(publisher) : null;
     // Sử dụng include với where để áp dụng điều kiện lọc publisher
     const includePublisher = {
       model: Publisher,
       attributes: ['name'],
-      ...(publisher ? { where: { name: { [Op.eq]: publisher } } } : {}),
+      ...(decodedPublisher ? { where: { name: { [Op.eq]: decodedPublisher } } } : {}),
     };
 
     // Lấy tổng số lượng sách thỏa mãn điều kiện
@@ -108,6 +119,11 @@ const getBooks = async (filters, page = 1, limit = 16) => {
       where: whereClause,
       include: [
         {
+          model: Publisher,
+          attributes: ['name'],
+          ...(decodedPublisher ? { where: { name: { [Op.eq]: decodedPublisher } } } : {}),
+        },
+        {
           model: Genre,
           as: 'genres', // Alias for Genre association
           attributes: ['name'],
@@ -117,10 +133,10 @@ const getBooks = async (filters, page = 1, limit = 16) => {
           model: Author,
           as: 'Author' // Ensure this matches the association alias
         },
-        {
-          model: Publisher,
-          as: 'Publisher' // Ensure this matches the association alias
-        },
+        // {
+        //   model: Publisher,
+        //   as: 'Publisher' // Ensure this matches the association alias
+        // },
         {
           model: Review,
           as: 'Reviews', // Ensure this matches the association alias
@@ -141,20 +157,36 @@ const getBooks = async (filters, page = 1, limit = 16) => {
       attributes: {
         include: [
           [
-            db.sequelize.literal(`(
-                      SELECT COUNT(*)
-                      FROM Books AS BookSold
-                      WHERE BookSold.author_id = Book.author_id
-                  )`),
+            sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM Books AS BookSold
+              WHERE BookSold.author_id = Book.author_id
+            )`),
             'sold_count'
           ],
           [
-            db.sequelize.literal(`(
-                      SELECT SUM(detail_orders.quantity)
-                      FROM detail_orders
-                      WHERE detail_orders.book_id = Book.id
-                  )`),
+            sequelize.literal(`(
+              SELECT SUM(detail_orders.quantity)
+              FROM detail_orders
+              WHERE detail_orders.book_id = Book.id
+            )`),
             'total_sold'
+          ],
+          [
+            sequelize.literal(`(
+              SELECT AVG(Reviews.star)
+              FROM Reviews
+              WHERE Reviews.book_id = Book.id
+            )`),
+            'avgRating'
+          ],
+          [
+            sequelize.literal(`(
+              SELECT COUNT(Reviews.id)
+              FROM Reviews
+              WHERE Reviews.book_id = Book.id
+            )`),
+            'reviewCount'
           ]
         ]
       },
@@ -162,6 +194,7 @@ const getBooks = async (filters, page = 1, limit = 16) => {
       offset: offset,
       limit: limit,
     });
+
     return {
       books: books,
       currentPage: page,
@@ -231,10 +264,10 @@ const getBookDetailById = async (id) => {
         book_id: id
       }
     });
-    console.log(totalSold);
+    // console.log(totalSold);
     // add totalSold to book
     book.sold = totalSold;
-    console.log(book);
+    // console.log(book);
     // Check if the book was found
     if (!book) {
       return null;

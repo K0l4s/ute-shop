@@ -7,7 +7,6 @@ type SearchFilterProps = {
 };
 
 const SearchFilter: React.FC<SearchFilterProps> = ({ onFilterChange, publishers, selectedFilters }) => {
-  console.log(publishers);
   return (
     <div className="p-4 border rounded shadow-sm w-full bg-white">
       

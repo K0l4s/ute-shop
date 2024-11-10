@@ -24,6 +24,7 @@ import ImageViewSwiperModal from '../../components/modals/ImageViewSwiperModal';
 
 import { formatStar } from '../../utils/bookUtils';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import LoginRequired from '../../components/modals/LoginRequired';
 
 
 interface Reviews {
@@ -57,6 +58,8 @@ interface Book {
 Modal.setAppElement('#root');
 
 const ProductDetail: React.FC = () => {
+  const [showLoginRequired, setShowLoginRequired] = useState(false);
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const [reviewList, setReviewList] = useState<Reviews[]>([]); // Review list
   // user address from redux
   const userAddress = useSelector((state: RootState) => state.auth.user?.address + ', ' + state.auth.user?.ward + ', ' + state.auth.user?.district + ', ' + state.auth.user?.province);
@@ -153,6 +156,11 @@ const ProductDetail: React.FC = () => {
   const images = [book.cover_img_url, ...book.Images.map(image => image.url)];
 
   const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      setShowLoginRequired(true);
+      return;
+    }
+
     const cartItem = {
       id: book.id,
       title: book.title,
@@ -341,6 +349,8 @@ const ProductDetail: React.FC = () => {
         images={images}
         initialSlide={selectedImageIndex}
       />
+
+      {showLoginRequired && <LoginRequired isOpen={showLoginRequired} onClose={() => setShowLoginRequired(false)} />}
     </div>
   );
 };

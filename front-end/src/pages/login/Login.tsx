@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { login, setUser } from '../../redux/reducers/authSlice';
 import { useDispatch } from 'react-redux';
 import { loginApi } from '../../apis/auth';
@@ -10,6 +10,7 @@ const Login: React.FC<LoginProps> = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +36,9 @@ const Login: React.FC<LoginProps> = () => {
         role: data.data.role,
       }));
       localStorage.setItem('userData', JSON.stringify(data.data));
-      navigate('/');
+      // Redirect to the previous page or home if no previous page
+      const from = location.state?.from?.pathname || '/';
+      navigate(from);
     } catch (err) {
       alert('Đăng nhập thất bại!');
       // if (data?.error === "Error logging in: User not active") {

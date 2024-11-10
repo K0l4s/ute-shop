@@ -3,8 +3,8 @@ import BookCard from '../../components/productInfo/BookCard';
 import SearchFilter from '../../components/filter/SeachFilter';
 import SortFilter from '../../components/filter/SortFilter';
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
-import { useDispatch } from 'react-redux';
-import { addItem } from '../../redux/reducers/cartSlice';
+// import { useDispatch } from 'react-redux';
+// import { addItem } from '../../redux/reducers/cartSlice';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { searchBooks } from '../../apis/book';
 import { getPublisher } from '../../apis/publisher';
@@ -20,13 +20,16 @@ type Publisher = {
 type Book = {
   id: number;
   title: string;
-  price: number;
-  salePrice?: number;
-  stars: number;
-  cover_img_url: string;
-  publisher: string;
-  age: string;
+  desc: string;
+  price: string;
+  salePrice: string;
+  year: string;
   stock: number;
+  cover_img_url: string;
+  avgRating: number;
+  reviewCount: number;
+  total_sold: number;
+  age: string;
 };
 
 const SearchResults: React.FC = () => {
@@ -45,9 +48,16 @@ const SearchResults: React.FC = () => {
     [key: string]: string | undefined;
     price?: string;
     publisher?: string;
+    minPrice?: string;
+    maxPrice?: string;
   };
 
-  const [filters, setFilters] = useState<Filters>({});
+  const [filters, setFilters] = useState<Filters>({
+    price: searchParams.get('price') || undefined,
+    publisher: searchParams.get('publisher') || undefined,
+    minPrice: searchParams.get('minPrice') || undefined,
+    maxPrice: searchParams.get('maxPrice') || undefined,
+  });
   const [currentPage, setCurrentPage] = useState(page);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -93,7 +103,7 @@ const SearchResults: React.FC = () => {
       }
     };
 
-    if (query) fetchBooks();
+    fetchBooks();
   }, [query, currentPage, filters]); // Gọi API mỗi khi query hoặc currentPage thay đổi
 
   useEffect(() => {
@@ -109,25 +119,25 @@ const SearchResults: React.FC = () => {
     fetchPublishers();
   }, []);
 
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const handleAddToCart = async (book: Book) => {
     try {
       await addToCart(book.id, 1);
-      const cartItem = {
-          id: book.id,
-          title: book.title,
-          price: book.price,
-          salePrice: book.salePrice,
-          image: book.cover_img_url,
-          stars: book.stars,
-          age: book.age,
-          publisher: book.publisher,
-          quantity: 1, //Mặc định thêm 1 sản phẩm vào giỏ
-          stock: book.stock,
-          checked: true, // Mặc định là đã chọn sản phẩm
-      };
-      dispatch(addItem(cartItem));
+      // const cartItem = {
+      //     id: book.id,
+      //     title: book.title,
+      //     price: book.price,
+      //     salePrice: book.salePrice,
+      //     image: book.cover_img_url,
+      //     stars: book.avgRating,
+      //     age: book.age,
+      //     publisher: book.publisher,
+      //     quantity: 1, //Mặc định thêm 1 sản phẩm vào giỏ
+      //     stock: book.stock,
+      //     checked: true, // Mặc định là đã chọn sản phẩm
+      // };
+      // dispatch(addItem(cartItem));
       showToast('Đã thêm thành công', 'success');
     } catch(error){
       showToast('Đã xảy ra lỗi', 'error');
@@ -159,7 +169,32 @@ const SearchResults: React.FC = () => {
       navigate(`/search?query=${query}&page=${pageNumber}`);
     }
   };
-  
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (filters.price) {
+      params.set('price', filters.price);
+    } else {
+      params.delete('price');
+    }
+    if (filters.publisher) {
+      params.set('publisher', filters.publisher);
+    } else {
+      params.delete('publisher');
+    }
+    if (filters.minPrice) {
+      params.set('minPrice', filters.minPrice);
+    } else {
+      params.delete('minPrice');
+    }
+    if (filters.maxPrice) {
+      params.set('maxPrice', filters.maxPrice);
+    } else {
+      params.delete('maxPrice');
+    }
+    navigate({ search: params.toString() });
+  }, [filters, navigate, location.search]);
+
   return (
     <div className="container mx-auto p-4 flex gap-4">
       <div className="w-1/5">
@@ -175,17 +210,23 @@ const SearchResults: React.FC = () => {
             <SortFilter onSortChange={handleSortChange} />
           </div>
         </div>
-        <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+          {books.length === 0 && (
+            <div className="col-span-4 flex justify-center items-center bg-white font-semibold p-4 h-[70vh] rounded border">
+              Không tìm thấy sách phù hợp
+            </div>
+          )}
           {books.map((book) => (
             <BookCard
               key={book.id}
               id={book.id}
               title={book.title}
-              desc={''}
               price={book.price}
               salePrice={book.salePrice}
-              stars={book.stars}
-              image={book.cover_img_url}
+              cover_img_url={book.cover_img_url}
+              avgRating={book.avgRating}
+              reviewCount={book.reviewCount}
+              totalSold={book.total_sold}
               onAddToCart={() => handleAddToCart(book)}
               onBuyNow={() => handleBuyNow(book.id)}
             />
@@ -194,6 +235,7 @@ const SearchResults: React.FC = () => {
         </div>
         
         {/* Pagination Controls */}
+        {books.length > 0 && (
         <div className="mt-4 flex justify-center items-center gap-2">
           <button
             className={`px-4 py-3 border ${currentPage === 1 ? 'cursor-not-allowed text-gray-400' : ''}`}
@@ -219,7 +261,7 @@ const SearchResults: React.FC = () => {
             <IoIosArrowForward />
           </button>
         </div>
-
+        )}
       </div>
     </div>
   );

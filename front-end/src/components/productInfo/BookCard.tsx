@@ -3,21 +3,22 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import LoginRequired from '../modals/LoginRequired';
 import { Link } from 'react-router-dom';
-import { saveToHistory } from '../../utils/bookUtils';
+import { formatPriceToVND, formatStar, saveToHistory } from '../../utils/bookUtils';
 
 type BookCardProps = {
   id: number;
   title: string;
-  desc: string;
-  price: number;
-  salePrice?: number;
-  stars: number;
-  image: string;
+  price: string;
+  salePrice: string;
+  cover_img_url: string;
+  avgRating: number;
+  reviewCount: number;
+  totalSold: number;
   onAddToCart: () => void;
   onBuyNow: () => void;
 };
 
-const BookCard: React.FC<BookCardProps> = ({ id, title, desc, price, salePrice, stars, image, onAddToCart, onBuyNow }) => {
+const BookCard: React.FC<BookCardProps> = ({ id, title, price, salePrice, cover_img_url, avgRating, reviewCount, totalSold, onAddToCart, onBuyNow }) => {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const [showLoginRequired, setShowLoginRequired] = useState(false);
 
@@ -42,28 +43,28 @@ const BookCard: React.FC<BookCardProps> = ({ id, title, desc, price, salePrice, 
       <div onClick={() => saveToHistory(id)} className="border p-4 rounded shadow-lg w-full self-start cursor-pointer bg-white">
         <Link to={`/products/${id}`}>
         
-        <img src={image} alt={title} className="w-full h-56 object-contain mb-2 rounded hover:opacity-90" />
+        <img src={cover_img_url} alt={title} className="w-full h-56 object-contain mb-2 rounded hover:opacity-90" />
         <h3 className="text-base font-semibold line-clamp-2 h-[50px]">{title}</h3>
-        <p className="text-gray-600">{desc}</p>
-        <div className="flex items-center gap-2 my-2">
-          <span className="text-lg font-semibold">{salePrice ? <span className="text-violet-700 line-through">{price} đ</span> 
-            : <span className='text-red-600 font-semibold text-lg'>{price} đ</span>} 
+        <div className="flex items-center gap-2">
+          <span className="text-lg font-semibold">{salePrice ? <span className="text-violet-700 line-through">{formatPriceToVND(price)} đ</span> 
+            : <span className='text-red-600 font-semibold text-lg'>{formatPriceToVND(price)} đ</span>} 
           </span>
-          {salePrice && <span className="text-red-600 font-semibold text-xl">{salePrice} đ</span>}
+          {salePrice && <span className="text-red-600 font-semibold text-xl">{formatPriceToVND(salePrice)} đ</span>}
         </div>
-        <div className="flex items-center gap-1 mb-2">
-          {Array(stars).fill('★').map((star, index) => (
-            <span key={index} className="text-yellow-500">{star}</span>
-          ))}
+        <div className="flex items-center">
+          <label className='text-2xl flex'>{formatStar(avgRating)}</label>
+          <p className="text-xl">({reviewCount})</p>
         </div>
+        <h3 className="text-base font-semibold my-2">Đã bán {totalSold > 1 ? totalSold : 0}</h3>
+
         </Link>
         <div className="flex justify-evenly">
-          <button onClick={handleAddToCart} className="bg-violet-600 hover:bg-violet-700 text-white px-6 py-2 rounded mr-2">Thêm giỏ</button>
-          <button onClick={handleBuyNow} className="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2 rounded">Mua ngay</button>
+          <button onClick={handleAddToCart} className="bg-violet-600 hover:bg-violet-700 text-white px-6 py-2 font-semibold rounded mr-2 transition duration-300">Thêm giỏ</button>
+          <button onClick={handleBuyNow} className="border border-rose-600 hover:bg-rose-700 hover:text-white text-rose-700 px-6 py-2 font-semibold rounded transition duration-300">Mua ngay</button>
         </div>
 
       </div>
-      {showLoginRequired && <LoginRequired onClose={() => setShowLoginRequired(false)} />}
+      {showLoginRequired && <LoginRequired isOpen={showLoginRequired}  onClose={() => setShowLoginRequired(false)} />}
       
     </>
   );

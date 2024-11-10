@@ -22,6 +22,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [isVisible, setIsVisible] = useState<boolean>(false);
+  // const [searchInput, setSearchInput] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [openNoti, setOpenNoti] = useState(false);
   const [openAcc, setOpenAcc] = useState(false);
@@ -58,10 +59,21 @@ const Navbar = () => {
     }
   };
 
+  // Extract search query from the URL
+  const searchParams = new URLSearchParams(location.search);
+  const query = searchParams.get('query') || '';
+
+  useEffect(() => {
+    setSearchQuery(query); // Initialize search input with query parameter
+  }, [query]);
+  
   const handleSearch = () => {
-    if (searchQuery.trim()) {
+    // if (searchQuery.trim()) {
       navigate(`/search?query=${searchQuery.trim()}&page=1`);
-    }
+    // }
+    // else {
+    //   navigate(`/search?query`);
+    // }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -89,7 +101,7 @@ const Navbar = () => {
             <div className="flex items-center w-100">
               <input
                 type="text"
-                placeholder="Search"
+                placeholder="Nhập sách cần tìm"
                 className="bg-white p-1 h-8 rounded-l-lg w-80"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
