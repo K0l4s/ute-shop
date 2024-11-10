@@ -17,7 +17,7 @@ export interface Pub {
     name: string;
 }
 const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-    const [categoryList, setCategoryList] = useState<Category[]>([]);
+    const [categoryList] = useState<Category[]>([]);
     const [authorList, setAuthorList] = useState<Author[]>([]);
     const [publisherList, setPublisherList] = useState<Pub[]>([]);
     const [selectedAuthor, setSelectedAuthor] = useState<number | null>(null);
@@ -106,164 +106,162 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     };
 
     return (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50 text-black">
-            <div className="bg-white p-6 rounded shadow-md overflow-y-auto mt-12">
-                <h2 className="text-lg font-semibold mb-4">Create New Book</h2>
-                <form onSubmit={handleSubmit}>
-                    <div className="grid grid-cols-3 text-black gap-5">
-                        {/* Các trường input */}
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium">ISBN</label>
-                            <input
-                                type="text"
-                                value={ISBN}
-                                onChange={(e) => setISBN(e.target.value)}
-                                className="border rounded w-full p-2"
-                                required
-                            />
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+            <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div>
+            <div className="bg-white rounded-2xl shadow-xl w-[80%] max-w-4xl max-h-[90vh] overflow-y-auto relative z-10">
+                <div className="p-8">
+                    <h2 className="text-2xl font-bold text-gray-800 mb-6">Create New Book</h2>
+                    <form onSubmit={handleSubmit}>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">ISBN</label>
+                                <input
+                                    type="text"
+                                    value={ISBN}
+                                    onChange={(e) => setISBN(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Title</label>
+                                <input
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Description</label>
+                                <textarea
+                                    value={desc}
+                                    onChange={(e) => setDesc(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200 resize-none"
+                                    rows={3}
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Price</label>
+                                <input
+                                    type="number"
+                                    value={price}
+                                    onChange={(e) => setPrice(Number(e.target.value))}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Sale Price</label>
+                                <input
+                                    type="number"
+                                    value={salePrice}
+                                    onChange={(e) => setSalePrice(Number(e.target.value))}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Publication Year</label>
+                                <input
+                                    type="date"
+                                    value={year}
+                                    onChange={(e) => setYear(e.target.value)}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Age Range</label>
+                                <input
+                                    type="number"
+                                    value={age}
+                                    onChange={(e) => setAge(Number(e.target.value))}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Stock</label>
+                                <input
+                                    type="number"
+                                    value={stock}
+                                    onChange={(e) => setStock(Number(e.target.value))}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Cover Image</label>
+                                <input
+                                    type="file"
+                                    onChange={handleImageChange}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                    accept="image/*"
+                                    required
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Author</label>
+                                <select
+                                    value={selectedAuthor || ''}
+                                    onChange={(e) => setSelectedAuthor(Number(e.target.value))}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                    required
+                                >
+                                    <option value="">Select Author</option>
+                                    {authorList.map((author) => (
+                                        <option key={author.id} value={author.id}>{author.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Category</label>
+                                <select
+                                    value={selectedCategory || ''}
+                                    onChange={(e) => setSelectedCategory(Number(e.target.value))}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                >
+                                    <option value="">Select Category</option>
+                                    {categoryList.map((category) => (
+                                        <option key={category.id} value={category.id}>{category.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-semibold text-gray-700">Publisher</label>
+                                <select
+                                    value={selectedPublisher || ''}
+                                    onChange={(e) => setSelectedPublisher(Number(e.target.value))}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-200"
+                                >
+                                    <option value="">Select Publisher</option>
+                                    {publisherList.length > 0 && publisherList.map((pub) => (
+                                        <option key={pub.id} value={pub.id}>{pub.name}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium">Tiêu đề</label>
-                            <input
-                                type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                className="border rounded w-full p-2"
-                                required
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium">Mô tả sách</label>
-                            <textarea
-                                value={desc}
-                                onChange={(e) => setDesc(e.target.value)}
-                                className="border rounded w-full p-2"
-                                required
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium">Giá</label>
-                            <input
-                                type="number"
-                                value={price}
-                                onChange={(e) => setPrice(Number(e.target.value))}
-                                className="border rounded w-full p-2"
-                                required
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium">Giảm giá</label>
-                            <input
-                                type="number"
-                                value={salePrice}
-                                onChange={(e) => setSalePrice(Number(e.target.value))}
-                                className="border rounded w-full p-2"
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium">Năm xuất bản</label>
-                            <input
-                                type="date"
-                                value={year}
-                                onChange={(e) => setYear(e.target.value)}
-                                className="border rounded w-full p-2"
-                                required
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium">Độ tuổi</label>
-                            <input
-                                type="number"
-                                value={age}
-                                onChange={(e) => setAge(Number(e.target.value))}
-                                className="border rounded w-full p-2"
-                                required
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium">Kho sách</label>
-                            <input
-                                type="number"
-                                value={stock}
-                                onChange={(e) => setStock(Number(e.target.value))}
-                                className="border rounded w-full p-2"
-                                required
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium">Ảnh bìa</label>
-                            <input
-                                type="file"
-                                onChange={handleImageChange}
-                                className="border rounded w-full p-2"
-                                accept="image/*"
-                                required
-                            />
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium">Tác giả</label>
-                            <select
-                                value={selectedAuthor || ''}
-                                onChange={(e) => setSelectedAuthor(Number(e.target.value))}
-                                className="border rounded w-full p-2"
-                                required
+
+                        <div className="mt-8 flex justify-end space-x-4">
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="px-6 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition duration-200"
                             >
-                                <option value="">Chọn tác giả</option>
-                                {authorList.map((author) => (
-                                    <option key={author.id} value={author.id}>
-                                        {author.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium">Thể loại</label>
-                            <select
-                                value={selectedCategory || ''}
-                                onChange={(e) => setSelectedCategory(Number(e.target.value))}
-                                className="border rounded w-full p-2"
-                            // required
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={uploading}
+                                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                <option value="">Chọn thể loại</option>
-                                {categoryList.map((category) => (
-                                    <option key={category.id} value={category.id}>
-                                        {category.name}
-                                    </option>
-                                ))}
-                            </select>
+                                {uploading ? 'Creating...' : 'Create Book'}
+                            </button>
                         </div>
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium">Nhà xuất bản</label>
-                            <select
-                                value={selectedPublisher || ''}
-                                onChange={(e) => setSelectedPublisher(Number(e.target.value))}
-                                className="border rounded w-full p-2"
-                            // required
-                            >
-                                <option value="">Chọn nhà xuất bản</option>
-                                {publisherList.length>0 && publisherList.map((pub) => (
-                                    <option key={pub.id} value={pub.id}>
-                                        {pub.name}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-                    <button
-                        type="submit"
-                        className="bg-blue-500 text-white rounded p-2 w-full"
-                        disabled={uploading}
-                    >
-                        {uploading ? 'Đang tạo sách...' : 'Tạo sách'}
-                    </button>
-                    <button
-                        type="button"
-                        className="mt-2 text-gray-600"
-                        onClick={onClose}
-                    >
-                        Cancel
-                    </button>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     );
