@@ -9,11 +9,21 @@ import {
   Title,
   Tooltip,
   Legend,
-  ChartData
+  ChartData,
+  Filler
 } from 'chart.js';
 
-// Register the necessary components for Chart.js
-ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend);
+// Register all required components including Filler for area fills
+ChartJS.register(
+  CategoryScale, 
+  LinearScale, 
+  LineElement, 
+  PointElement, 
+  Title, 
+  Tooltip, 
+  Legend,
+  Filler
+);
 
 interface LineChartProps {
   data: ChartData<"line", number[], string>;
@@ -22,68 +32,130 @@ interface LineChartProps {
 }
 
 const LineChart: React.FC<LineChartProps> = ({ data, width, height }) => {
-  // Function to create a more visible gradient color for the line
+  // Enhanced gradient function with smoother color transitions
   const createGradient = (ctx: CanvasRenderingContext2D, chartArea: any) => {
     const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-    gradient.addColorStop(0, "#E43D00"); // Darker blue at the bottom
-    gradient.addColorStop(1, "#FFE900"); // Lighter purple at the top
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.1)'); // Very transparent blue at bottom
+    gradient.addColorStop(0.5, 'rgba(59, 130, 246, 0.3)'); // Semi-transparent blue in middle
+    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.5)'); // More opaque blue at top
     return gradient;
   };
 
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    interaction: {
+      intersect: false,
+      mode: 'index' as const,
+    },
     plugins: {
       legend: {
-        position: 'bottom' as const,
+        position: 'top' as const,
         labels: {
-          color: '#FFFFFF', // Set legend text color to white
+          color: '#FFFFFF',
+          font: {
+            size: 14,
+            weight: 'bold' as const
+          }
         },
       },
       title: {
         display: true,
-        text: 'Monthly Revenue',
-        color: '#FFFFFF', // Set title text color to white
+        text: 'DOANH THU THEO THÁNG',
+        color: '#FFFFFF',
+        font: {
+          size: 20,
+          weight: 'bold' as const
+        },
+        padding: 20
       },
+      tooltip: {
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: '#FFFFFF',
+        bodyColor: '#FFFFFF',
+        bodyFont: {
+          size: 14
+        },
+        padding: 12,
+        displayColors: false,
+        callbacks: {
+          label: function(context: any) {
+            let value = context.parsed.y;
+            return new Intl.NumberFormat('vi-VN', { 
+              style: 'currency', 
+              currency: 'VND' 
+            }).format(value);
+          }
+        }
+      }
     },
     scales: {
       x: {
-        ticks: {
-          color: '#FFFFFF', // Set X-axis text color to white
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)',
+          drawBorder: false,
         },
+        ticks: {
+          color: '#FFFFFF',
+          font: {
+            size: 12
+          }
+        }
       },
       y: {
         beginAtZero: true,
-        ticks: {
-          color: '#FFFFFF', // Set Y-axis text color to white
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)',
+          drawBorder: false,
         },
-      },
+        ticks: {
+          color: '#FFFFFF',
+          font: {
+            size: 12
+          },
+          callback: function(value: any) {
+            return new Intl.NumberFormat('vi-VN', { 
+              style: 'currency', 
+              currency: 'VND',
+              notation: 'compact'
+            }).format(value);
+          }
+        }
+      }
     },
     elements: {
       line: {
-        borderColor: (context: any) => {
-          const { ctx, chartArea } = context.chart;
-          if (!chartArea) return '#1E3A8A'; // Fallback color
-          const gradient = createGradient(ctx, chartArea);
-          context.dataset.backgroundColor = gradient;
-           // Fill the area under the line
-          return gradient;
-        },
-        
-        borderWidth: 2,
+        tension: 0.4, // Adds smooth curves to the line
+        borderWidth: 3,
+        borderColor: '#3B82F6', // Solid blue line
         fill: true,
+        backgroundColor: (context: any) => {
+          const { ctx, chartArea } = context.chart;
+          return chartArea ? createGradient(ctx, chartArea) : 'rgba(59, 130, 246, 0.1)';
+        }
       },
       point: {
-        radius: 2,
-        borderColor: 'white',
-        borderWidth: 1,
-      },
+        radius: 0, // Hide points by default
+        hoverRadius: 6, // Show points on hover
+        backgroundColor: '#FFFFFF',
+        borderColor: '#3B82F6',
+        borderWidth: 2,
+        hoverBorderWidth: 3,
+        hitRadius: 30, // Increase hover detection area
+      }
     },
+    animation: {
+      duration: 2000,
+      easing: 'easeInOutQuart' as const // Fixed by adding type assertion
+    }
   };
 
   return (
-    <div className="p-4 bg-gradient-to-r from-purple-400 to-blue-600 shadow-xl rounded-lg h-80 opacity-90">
-      <Line data={data} options={chartOptions} width={width} height={height} />
+    <div className="relative p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl">
+      <div className="absolute inset-0 bg-blue-500/10 rounded-2xl backdrop-blur-sm"></div>
+      <div className="relative h-[400px]">
+        <Line data={data} options={chartOptions} width={width} height={height} />
+      </div>
     </div>
   );
 }

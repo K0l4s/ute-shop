@@ -7,10 +7,11 @@ import {
     Tooltip,
     Legend,
     ChartData,
+    Title
 } from 'chart.js';
 
 // Register necessary components for Chart.js
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, Title);
 
 interface PieChartProps {
     data: ChartData<"pie", number[], string>;
@@ -19,36 +20,64 @@ interface PieChartProps {
 }
 
 const PieChart: React.FC<PieChartProps> = ({ data, width, height }) => {
-    return (
-        <div className="p-4 bg-gradient-to-r from-purple-400 to-blue-600 shadow-xl rounded-lg opacity-90">
-            <h2 className="text-white text-center text-xl font-semibold">Top sách bán chạy</h2>
-            <Pie className='max-w-screen h-full m-auto'
-                data={data}
-                options={{
-                    plugins: {
-                        legend: {
-                            display: false,
-                            position: 'top',
-                            labels: {
-                                color: '#fff',
-                                font: {
-                                    size: 16,
-                                },
-                            },
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: (tooltipItem) => `${tooltipItem.label}: ${tooltipItem.raw}%`,
-                            },
-                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                            titleColor: '#fff',
-                            bodyColor: '#fff',
-                        },
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'right' as const,
+                labels: {
+                    color: '#FFFFFF',
+                    font: {
+                        size: 14,
+                        weight: 'bold' as const
                     },
-                }}
-                width={width}
-                height={height}
-            />
+                    padding: 20,
+                    usePointStyle: true,
+                    pointStyle: 'circle'
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: (tooltipItem: any) => {
+                        const value = Number(tooltipItem.raw);
+                        return `${tooltipItem.label}: ${value.toFixed(1)}%`;
+                    }
+                },
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: '#FFFFFF',
+                bodyColor: '#FFFFFF',
+                padding: 12,
+                cornerRadius: 8,
+                displayColors: true
+            }
+        },
+        animation: {
+            animateRotate: true,
+            animateScale: true,
+            duration: 2000,
+            easing: 'easeInOutQuart' as const
+        },
+        elements: {
+            arc: {
+                borderWidth: 2,
+                borderColor: '#FFFFFF'
+            }
+        }
+    };
+
+    return (
+        <div className="relative p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl shadow-2xl">
+            <div className="absolute inset-0 bg-blue-500/10 rounded-2xl backdrop-blur-sm"></div>
+            <h2 className="relative text-white text-center text-2xl font-bold mb-6">Top sách bán chạy</h2>
+            <div className="relative h-[400px]">
+                <Pie 
+                    data={data}
+                    options={chartOptions}
+                    width={width}
+                    height={height}
+                />
+            </div>
         </div>
     );
 };

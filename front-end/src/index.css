@@ -2,36 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
-/* width */
+/* Scrollbar Styles */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
+  height: 10px;
 }
 
-/* Track */
 ::-webkit-scrollbar-track {
   background: #f1f1f1;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #888;
   border-radius: 5px;
 }
 
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #888, #666);
+  border-radius: 5px;
+  border: 2px solid #f1f1f1;
 }
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #666, #444); 
+}
+
+::-webkit-scrollbar-corner {
+  background: #f1f1f1;
+}
+
+/* Range Slider Styles */
 @layer utilities {
   .range-slider {
-    @apply appearance-none w-24 h-2 bg-blue-300 rounded-lg outline-none transition-opacity duration-200;
+    @apply appearance-none w-28 h-2.5 bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg outline-none transition-all duration-300 hover:from-blue-500 hover:to-blue-700;
   }
 
   .range-slider::-webkit-slider-thumb {
-    @apply appearance-none w-4 h-4 bg-blue-600 rounded-full cursor-pointer;
+    @apply appearance-none w-5 h-5 bg-white border-2 border-blue-600 rounded-full cursor-pointer shadow-md hover:scale-110 transition-transform duration-200;
   }
 
   .range-slider::-moz-range-thumb {
-    @apply w-4 h-4 bg-blue-600 rounded-full cursor-pointer;
+    @apply w-5 h-5 bg-white border-2 border-blue-600 rounded-full cursor-pointer shadow-md hover:scale-110 transition-transform duration-200;
+  }
+
+  .range-slider:focus {
+    @apply ring-2 ring-blue-300 ring-opacity-50;
   }
 }

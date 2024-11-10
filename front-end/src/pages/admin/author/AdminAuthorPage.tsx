@@ -4,6 +4,7 @@ import { createAuthor, getAllAuthors, updateAuthor } from '../../../apis/author'
 import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 
 import { showToast } from '../../../utils/toastUtils';
+import { BsSearch } from 'react-icons/bs';
 
 interface basicAuthor {
     id: number,
@@ -123,61 +124,78 @@ const AdminAuthorPage: React.FC = () => {
     const totalPages = Math.ceil(filteredAuthors.length / authorsPerPage);
 
     return (
-        <div className="p-8">
-            <h1 className="text-2xl font-semibold mb-6">Quản lý tác giả</h1>
-            {/* Tìm kiếm tác giả */}
-            <div className="mb-4">
-                <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={handleSearchChange}
-                    placeholder="Tìm tác giả theo tên"
-                    className="px-4 py-2 border rounded-md w-full"
-                />
+        <div className="p-8 min-h-screen">
+            <h1 className="text-3xl font-bold mb-8 text-white text-center">Quản lý tác giả</h1>
+            
+            {/* Search bar */}
+            <div className="mb-6 max-w-2xl mx-auto">
+                <div className="relative">
+                    <input
+                        type="text"
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        placeholder="Tìm kiếm tác giả..."
+                        className="w-full px-6 py-3 rounded-full border-2 border-blue-300/30 bg-white/10 text-white placeholder-blue-200 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50 transition-all duration-300"
+                    />
+                    <BsSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-blue-200 animate-pulse" size={20} />
+                </div>
             </div>
 
-            <div className="bg-white shadow-md rounded-lg overflow-hidden">
-                <table className="min-w-full text-sm text-left">
-                    <thead className="bg-blue-500 text-white uppercase text-xs font-semibold">
+            <div className="bg-white/10 backdrop-blur-lg shadow-xl rounded-xl overflow-hidden border border-white/20 hover:border-blue-400/30 transition-colors duration-300">
+                <table className="min-w-full text-sm text-white">
+                    <thead className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
                         <tr>
-                            <th className="px-6 py-3 cursor-pointer" onClick={() => handleSort('id')}>
-                                ID
-                                {sortField === 'id' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                            <th className="px-6 py-4 cursor-pointer hover:bg-blue-700/50 transition-colors group" onClick={() => handleSort('id')}>
+                                <div className="flex items-center justify-between">
+                                    ID
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {sortField === 'id' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                                    </div>
+                                </div>
                             </th>
-                            <th className="px-6 py-3 cursor-pointer" onClick={() => handleSort('name')}>
-                                Tên tác giả
-                                {sortField === 'name' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                            <th className="px-6 py-4 cursor-pointer hover:bg-blue-700/50 transition-colors group" onClick={() => handleSort('name')}>
+                                <div className="flex items-center justify-between">
+                                    Tên tác giả
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {sortField === 'name' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                                    </div>
+                                </div>
                             </th>
-                            <th className="px-6 py-3 cursor-pointer" onClick={() => handleSort('book_count')}>
-                                Số sách
-                                {sortField === 'book_count' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                            <th className="px-6 py-4 cursor-pointer hover:bg-blue-700/50 transition-colors group" onClick={() => handleSort('book_count')}>
+                                <div className="flex items-center justify-between">
+                                    Số sách
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                        {sortField === 'book_count' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
+                                    </div>
+                                </div>
                             </th>
-                            <th className="px-6 py-3">Thao tác</th>
+                            <th className="px-6 py-4">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr className="bg-blue-100">
+                        <tr className="bg-blue-500/20 border-b border-blue-400/20 hover:bg-blue-500/30 transition-colors">
                             <td className="px-6 py-4">Thêm mới</td>
                             <td className="px-6 py-4">
                                 <input
                                     type="text"
                                     value={newAuthorModal.name}
                                     onChange={(e) => setNewAuthorModal({ ...newAuthorModal, name: e.target.value })}
-                                    className="border rounded px-2"
+                                    className="w-full px-3 py-2 bg-white/10 border border-blue-300/30 rounded-lg text-white placeholder-blue-200 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50"
+                                    placeholder="Nhập tên tác giả mới..."
                                 />
                             </td>
                             <td className="px-6 py-4">0</td>
                             <td className="px-6 py-4">
                                 <button
                                     onClick={handleNewAuthor}
-                                    className="text-blue-500 hover:text-blue-700"
+                                    className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300"
                                 >
-                                    <FaPlus />
+                                    <FaPlus size={16} className="animate-pulse" />
                                 </button>
                             </td>
                         </tr>
                         {currentAuthors.map((author) => (
-                            <tr key={author.id} className="border-b hover:bg-blue-200">
+                            <tr key={author.id} className="border-b border-blue-400/20 hover:bg-blue-500/20 transition-all duration-300">
                                 <td className="px-6 py-4">{author.id}</td>
                                 <td className="px-6 py-4">
                                     {author.isEditing ? (
@@ -185,45 +203,47 @@ const AdminAuthorPage: React.FC = () => {
                                             type="text"
                                             value={editedName}
                                             onChange={(e) => setEditedName(e.target.value)}
-                                            className="border rounded px-2"
+                                            className="w-full px-3 py-2 bg-white/10 border border-blue-300/30 rounded-lg text-white focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/50"
                                         />
                                     ) : (
                                         author.name
                                     )}
                                 </td>
                                 <td className="px-6 py-4">{author.book_count}</td>
-                                <td className="px-6 py-4 flex space-x-2">
-                                    {author.isEditing ? (
-                                        <>
-                                            <button
-                                                onClick={() => handleSave(author.id)}
-                                                className="text-green-500 hover:text-green-700"
-                                            >
-                                                <FaCheck />
-                                            </button>
-                                            <button
-                                                onClick={() => handleEditToggle(author)}
-                                                className="text-gray-500 hover:text-gray-700"
-                                            >
-                                                <FaTimes />
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <button
-                                                onClick={() => handleEditToggle(author)}
-                                                className="text-yellow-500 hover:text-yellow-700"
-                                            >
-                                                <FaEdit />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(author.id)}
-                                                className="text-red-500 hover:text-red-700"
-                                            >
-                                                <FaTrash />
-                                            </button>
-                                        </>
-                                    )}
+                                <td className="px-6 py-4">
+                                    <div className="flex space-x-3">
+                                        {author.isEditing ? (
+                                            <>
+                                                <button
+                                                    onClick={() => handleSave(author.id)}
+                                                    className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                                                >
+                                                    <FaCheck size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleEditToggle(author)}
+                                                    className="p-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                                                >
+                                                    <FaTimes size={16} />
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    onClick={() => handleEditToggle(author)}
+                                                    className="p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                                                >
+                                                    <FaEdit size={16} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(author.id)}
+                                                    className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                                                >
+                                                    <FaTrash size={16} />
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
                                 </td>
                             </tr>
                         ))}
@@ -231,23 +251,33 @@ const AdminAuthorPage: React.FC = () => {
                 </table>
             </div>
 
-            <div className="flex justify-between items-center mt-4">
+            <div className="flex justify-center items-center gap-6 mt-8">
                 <button
                     onClick={() => setCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`px-4 py-2 ${currentPage === 1 ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-700'} text-white rounded-md`}
+                    className={`px-6 py-3 rounded-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105 ${
+                        currentPage === 1 
+                        ? 'bg-gray-600 cursor-not-allowed opacity-50' 
+                        : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg'
+                    }`}
                 >
-                    <BiLeftArrow />
+                    <BiLeftArrow className="animate-pulse" />
+                    <span>Trước</span>
                 </button>
-                <span className="text-white">
-                    Trang {currentPage}/{totalPages}
+                <span className="text-white font-medium bg-blue-600/30 px-4 py-2 rounded-lg">
+                    Trang {currentPage} / {totalPages}
                 </span>
                 <button
                     onClick={() => setCurrentPage(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className={`px-4 py-2 ${currentPage === totalPages ? 'bg-gray-400' : 'bg-blue-500 hover:bg-blue-700'} text-white rounded-md`}
+                    className={`px-6 py-3 rounded-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105 ${
+                        currentPage === totalPages
+                        ? 'bg-gray-600 cursor-not-allowed opacity-50'
+                        : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg'
+                    }`}
                 >
-                    <BiRightArrow />
+                    <span>Tiếp</span>
+                    <BiRightArrow className="animate-pulse" />
                 </button>
             </div>
         </div>

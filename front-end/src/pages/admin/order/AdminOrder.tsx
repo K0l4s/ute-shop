@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { getAllOrder, updateCartStatus, updateMultipleCartStatus } from "../../../apis/order";
 import { PiFileCsvBold } from "react-icons/pi";
-// import OrderConfigModal from "../../../components/modals/OrderConfigModal";
 import { BsSearch } from "react-icons/bs";
 import { BiDetail, BiLoaderCircle, BiSelectMultiple } from "react-icons/bi";
 import { FaDropbox, FaProjectDiagram, FaTruck } from "react-icons/fa";
@@ -15,13 +14,13 @@ import { useNavigate } from "react-router-dom";
 import Tooltip from "../../../components/tooltip/Tooltip";
 
 const ORDER_STATUSES = {
-  PENDING: "Pending",
-  CONFIRMED: "Confirmed",
-  PROCESSING: "Processing",
-  SHIPPED: "Shipped",
-  DELIVERED: "Delivered",
-  CANCELLED: "Cancelled",
-  RETURNED: "Returned",
+  PENDING: "PENDING",
+  CONFIRMED: "CONFIRMED", 
+  PROCESSING: "PROCESSING",
+  SHIPPED: "SHIPPED",
+  DELIVERED: "DELIVERED",
+  CANCELLED: "CANCELLED",
+  RETURNED: "RETURNED",
 };
 
 interface OrderDetail {
@@ -72,25 +71,21 @@ interface Order {
 const AdminOrder = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
-  // const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Orders per page
+  const itemsPerPage = 10;
   const [filteredOrders, setFilteredOrders] = useState<Order[]>(orders);
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [userIdFilter, setUserIdFilter] = useState<string>("");
   const [orderIdFilter, setOrderIdFilter] = useState<string>("");
-  // New sorting state variables
   const [sortField, setSortField] = useState<keyof Order>("id");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
-
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await getAllOrder();
         setOrders(response);
-        setFilteredOrders(response); // Set initial filtered orders
-        console.log("Fetched orders:", response); // Kiểm tra dữ liệu ở đây
+        setFilteredOrders(response);
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
@@ -98,9 +93,7 @@ const AdminOrder = () => {
     fetchOrders();
   }, []);
 
-  const formatAddress = (address: string) => {
-    return address.length > 20 ? address.slice(0, 20) + "..." : address;
-  };
+  const formatAddress = (address: string) => address.length > 20 ? address.slice(0, 20) + "..." : address;
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
@@ -118,21 +111,17 @@ const AdminOrder = () => {
   const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
   const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
 
-  // Filter orders based on user ID and status
   const handleFilterChange = () => {
-    // console.log("Current status filter:", statusFilter); // Kiểm tra giá trị filter
     const filtered = orders.filter(order => {
       const matchesUserId = userIdFilter ? order.user_id.toString() === userIdFilter : true;
       const matchesStatus = statusFilter ? order.status === statusFilter : true;
       const matchesOrderId = orderIdFilter ? order.id.toString() === orderIdFilter : true;
       return matchesUserId && matchesStatus && matchesOrderId;
     });
-    console.log("Filtered orders:", statusFilter); // Kiểm tra kết quả filter
     setFilteredOrders(filtered);
-    setCurrentPage(1); // Reset to first page when filtering
+    setCurrentPage(1);
   };
 
-  // Sort orders based on selected field and direction
   const handleSort = (field: keyof Order) => {
     const direction = sortField === field && sortDirection === "asc" ? "desc" : "asc";
     setSortField(field);
@@ -143,33 +132,20 @@ const AdminOrder = () => {
       const bValue = b[field];
 
       if (typeof aValue === "string" && typeof bValue === "string") {
-        return direction === "asc"
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
+        return direction === "asc" ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
       }
-
       return direction === "asc" ? (aValue as any) - (bValue as any) : (bValue as any) - (aValue as any);
     });
 
     setFilteredOrders(sortedOrders);
   };
 
-  // Export orders to CSV
   const exportTableToCsv = () => {
-    const csvRows: string[] = [];
-    csvRows.push([
-      "Order ID",
-      "User ID",
-      "Total Price",
-      "Order Date",
-      "Address",
-      "Ship Method",
-      "Ship Fee",
-      "Status",
-      "Updated At",
-    ].join(","));
+    const csvRows = [
+      ["Order ID", "User ID", "Total Price", "Order Date", "Address", "Ship Method", "Ship Fee", "Status", "Updated At"].join(",")
+    ];
 
-    for (const order of filteredOrders) {
+    filteredOrders.forEach(order => {
       csvRows.push([
         order.id,
         order.user_id,
@@ -181,372 +157,305 @@ const AdminOrder = () => {
         order.status,
         formatDate(order.updatedAt),
       ].join(","));
-    }
+    });
 
     const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.setAttribute("href", url);
-    a.setAttribute("download", "orders.csv");
+    a.href = url;
+    a.download = "orders.csv";
     a.click();
     window.URL.revokeObjectURL(url);
   };
+
   useEffect(() => {
     handleFilterChange();
   }, [statusFilter, userIdFilter, orderIdFilter]);
+
   const addValuetotxtABillIds = (value: string) => {
     const txtABillIds = document.getElementById("txtABillIds") as HTMLTextAreaElement;
     txtABillIds.value += value + ", ";
   };
+
   const exportMultipleBillToPdf = () => {
     const txtABillIds = document.getElementById("txtABillIds") as HTMLTextAreaElement;
-    const billIds = txtABillIds.value.split(",").map((id) => parseInt(id.trim()));
-    console.log("Bill IDs:", billIds);
-    // alert("Exporting multiple bills to PDF: " + billIds);
+    const billIds = txtABillIds.value.split(",").map(id => parseInt(id.trim()));
     showToast("Exporting multiple bills to PDF: " + billIds, "success");
-    // Call API to export multiple bills to PDF
   };
+
   const deleteAlltxtABillIds = () => {
     const txtABillIds = document.getElementById("txtABillIds") as HTMLTextAreaElement;
     txtABillIds.value = "";
-  }
+  };
+
   const addAllIdsToTxtABillIds = () => {
     const txtABillIds = document.getElementById("txtABillIds") as HTMLTextAreaElement;
-    // const allBillIds = currentOrders.map((order) => order.id).join(", ");
-    // Thêm tất cả vào, nếu có rồi thì bỏ qua
-    const allBillIds = currentOrders.map((order) => order.id).filter((id) => !txtABillIds.value.includes(id.toString())).join(", ");
+    const allBillIds = currentOrders
+      .map(order => order.id)
+      .filter(id => !txtABillIds.value.includes(id.toString()))
+      .join(", ");
     txtABillIds.value += allBillIds;
-  }
+  };
+
   const txtABillIdsCondition = () => {
-    const regex = /^[0-9,\s]*$/;
     const txtABillIds = document.getElementById("txtABillIds") as HTMLTextAreaElement;
-    console.log("txtABillIds:", txtABillIds);
-    if (!regex.test(txtABillIds.value)) {
-      txtABillIds.value = txtABillIds.value.replace(/[^0-9,\s]/g, "");
-    }
-  }
+    txtABillIds.value = txtABillIds.value.replace(/[^0-9,\s]/g, "");
+  };
+
   const confirmOrd = async (orderId: number) => {
-    updateCartStatus(orderId.toString(), 'CONFIRMED').then(() => {
+    try {
+      await updateCartStatus(orderId.toString(), 'CONFIRMED');
       showToast("Đã xác nhận đơn hàng", "success");
-      // điều chỉnh trạng thái đơn hàng
-      const updatedOrders = filteredOrders.map((order) =>
-        order.id === orderId ? { ...order, status: "CONFIRMED" } : order
+      setFilteredOrders(prev => 
+        prev.map(order => order.id === orderId ? {...order, status: "CONFIRMED"} : order)
       );
-      setFilteredOrders(updatedOrders);
-    }).catch((err) => {
+    } catch (err: any) {
       console.log(err);
       showToast('Có lỗi xảy ra khi xác nhận đơn hàng: ' + err.message, 'error');
-    });
+    }
+  };
 
-  }
   const progress = async (orderId: number) => {
-    updateCartStatus(orderId.toString(), 'PROCESSING').then(() => {
+    try {
+      await updateCartStatus(orderId.toString(), 'PROCESSING');
       showToast("Đã xử lý đơn hàng", "success");
-      // điều chỉnh trạng thái đơn hàng
-      const updatedOrders = filteredOrders.map((order) =>
-        order.id === orderId ? { ...order, status: "PROCESSING" } : order
+      setFilteredOrders(prev =>
+        prev.map(order => order.id === orderId ? {...order, status: "PROCESSING"} : order)
       );
-      setFilteredOrders(updatedOrders);
-    }).catch((err) => {
+    } catch (err: any) {
       console.log(err);
       showToast('Có lỗi xảy ra khi xử lý đơn hàng: ' + err.message, 'error');
-    });
+    }
+  };
 
-  }
   const ship = async (orderId: number) => {
-    updateCartStatus(orderId.toString(), 'DELIVERED').then(() => {
+    try {
+      await updateCartStatus(orderId.toString(), 'DELIVERED');
       showToast("Đã gửi hàng", "success");
-      // điều chỉnh trạng thái đơn hàng
-      const updatedOrders = filteredOrders.map((order) =>
-        order.id === orderId ? { ...order, status: "DELIVERED" } : order
+      setFilteredOrders(prev =>
+        prev.map(order => order.id === orderId ? {...order, status: "DELIVERED"} : order)
       );
-      setFilteredOrders(updatedOrders);
-    }).catch((err) => {
+    } catch (err: any) {
       console.log(err);
       showToast('Có lỗi xảy ra khi gửi hàng: ' + err.message, 'error');
-    });
-  }
-  const handleUpdateMultipleStatus = async () => {
-    // lấy thông tin từ txtABillIds
-    const txtABillIds = document.getElementById("txtABillIds") as HTMLTextAreaElement;
-    const billIds = txtABillIds.value.split(",").map((id) => parseInt(id.trim()));
-    console.log("Bill IDs:", billIds);
-    // alert("Exporting multiple bills to PDF: " + billIds);
-    showToast("Đang xử lý hàng loạt đơn hàng: " + billIds, "success");
-    // Call API to export multiple bills to PDF
-    updateMultipleCartStatus(billIds).then(() => {
-      showToast("Đã xử lý hàng loạt đơn hàng", "success");
-      // điều chỉnh trạng thái đơn hàng
-      const updatedOrders = filteredOrders.map((order) =>
-        billIds.includes(order.id) ? { ...order, status: "DELIVERED" } : order
-      );
-      setFilteredOrders(updatedOrders);
     }
-    ).catch((err) => {
+  };
+
+  const handleUpdateMultipleStatus = async () => {
+    const txtABillIds = document.getElementById("txtABillIds") as HTMLTextAreaElement;
+    const billIds = txtABillIds.value.split(",").map(id => parseInt(id.trim()));
+    
+    try {
+      await updateMultipleCartStatus(billIds);
+      showToast("Đã xử lý hàng loạt đơn hàng", "success");
+      setFilteredOrders(prev =>
+        prev.map(order => billIds.includes(order.id) ? {...order, status: "DELIVERED"} : order)
+      );
+    } catch (err: any) {
       console.log(err);
       showToast('Có lỗi xảy ra khi xử lý hàng loạt đơn hàng: ' + err.message, 'error');
-    });
-  }
+    }
+  };
 
   return (
-    <>
-      <div className="p-6 min-h-screen from-blue-500 to-purple-600">
-        <h1 className="text-3xl font-bold text-center mb-6 ">Quản lý đơn hàng</h1>
-        <div className="flex items-center mb-4 p-2 gap-3">
+    <div className="p-6 min-h-screen ">
+      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800 text-white">Quản lý đơn hàng</h1>
+      
+      {/* Search Filters */}
+      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <input
             type="text"
-            placeholder="Tìm theo User ID"
+            placeholder="Tìm theo Order ID"
             value={orderIdFilter}
-            onChange={(e) => {
-              setOrderIdFilter(e.target.value);
-              // handleFilterChange();
-            }}
-            className="px-4 py-2 rounded-md w-4/12"
+            onChange={(e) => setOrderIdFilter(e.target.value)}
+            className="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <input
             type="text"
             placeholder="Tìm theo User ID"
             value={userIdFilter}
-            onChange={(e) => {
-              setUserIdFilter(e.target.value);
-              // handleFilterChange();
-            }}
-            className="px-4 py-2 rounded-md w-4/12"
+            onChange={(e) => setUserIdFilter(e.target.value)}
+            className="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <select
             value={statusFilter}
-            onChange={(e) => {
-              setStatusFilter(e.target.value);
-            }}
-            className="px-4 py-2 rounded-md w-2/12"
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">Tất cả trạng thái</option>
             {Object.entries(ORDER_STATUSES).map(([key, value]) => (
               <option key={key} value={key}>
-                {/* {value} */}
-                {value === "Pending" && <span className="text-yellow-500"><BiLoaderCircle className="mr-2" />Chờ xác nhận đơn</span>}
-                {value === "Confirmed" && <span className="text-orange-500"><GiConfirmed className="mr-2" />Đơn đã xác nhận</span>}
-                {value === "Processing" && <span className="text-yellow-400"><FaDropbox className="mr-2" />Đơn hàng đang đóng gói</span>}
-                {value === "Shipped" && <span className="text-green-500"><LiaShippingFastSolid className="mr-2" />Đơn hàng vận chuyển thành công</span>}
-                {value === "Delivered" && <span className="text-green-600"><LiaShippingFastSolid className="mr-2" />Đơn hàng đang vận chuyển</span>}
-                {value === "Cancelled" && <span className="text-yellow-500"><TbBackpackOff className="mr-2" />Đơn hàng bị hủy</span>}
-                {value === "Returned" && <span className="text-yellow-500"><TbTruckReturn className="mr-2" />Đơn hàng bị hoàn trả</span>}
-
+                {value}
               </option>
             ))}
           </select>
           <button
             onClick={handleFilterChange}
-            className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md w-2/12"
+            className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
           >
             <BsSearch className="mr-2" /> Tìm kiếm
           </button>
         </div>
-        <h2 className="text-xl font-semibold  mb-2">Thao tác</h2>
-        <label htmlFor="txtABillIds" className="font-bold m-5" >Danh sách MÃ HÓA ĐƠN</label>
-        <div className="flex items-center gap-2">
+      </div>
 
-          <textarea name="txtABillIds" id="txtABillIds" className="resize-none w-full h-36 p-3 rounded-xl bg-blue-300 focus:outline-none"
-            placeholder="Mã hóa đơn cần xử lý (Thêm tay hoặc nhấn chọn hóa đơn có trong bảng)"
-            onChange={txtABillIdsCondition}></textarea>
-
-          <div className="grid ">
-            <button className="flex items-center px-4 py-2 bg-red-900 text-white rounded-xl mb-2" onClick={deleteAlltxtABillIds}>
+      {/* Batch Operations */}
+      <div className="bg-white p-4 rounded-lg shadow-md mb-6">
+        <h2 className="text-xl font-semibold mb-4">Thao tác hàng loạt</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="col-span-2">
+            <textarea
+              id="txtABillIds"
+              className="w-full h-36 p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Mã hóa đơn cần xử lý (Thêm tay hoặc nhấn chọn hóa đơn có trong bảng)"
+              onChange={txtABillIdsCondition}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <button 
+              onClick={deleteAlltxtABillIds}
+              className="flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            >
               <AiFillDelete className="mr-2" /> Xóa tất cả
             </button>
             <button
               onClick={exportMultipleBillToPdf}
-              className="flex items-center px-4 py-2 bg-green-900 text-white rounded-md mb-2 gap-2"
+              className="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
             >
-              <FaProjectDiagram className="ease-in-out" /> Xuất PDF
+              <FaProjectDiagram className="mr-2" /> Xuất PDF
+            </button>
+            <button
+              onClick={handleUpdateMultipleStatus}
+              className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            >
+              <BiSelectMultiple className="mr-2" /> Xử lý hàng loạt
             </button>
           </div>
         </div>
-        <div className="flex p-2 gap-3">
-          <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-2">
-            <BiSelectMultiple className="mr-2" /> Cập nhật trạng thái
-          </button>
-          <button className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-2" onClick={handleUpdateMultipleStatus}>
-            <BiSelectMultiple className="mr-2" /> Xử lý hàng loạt
-          </button>
-          <button
-            onClick={exportTableToCsv}
-            className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-2"
-          >
-            <PiFileCsvBold className="ease-in-out" /> Xuất file CSV
-          </button>
+      </div>
 
+      {/* Orders Table */}
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="p-4 border-b border-gray-200">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-semibold">
+              Tổng số đơn hàng: {currentOrders.length}/{filteredOrders.length}
+            </h2>
+            <div className="flex gap-2">
+              <button
+                onClick={addAllIdsToTxtABillIds}
+                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                <BiSelectMultiple className="mr-2" /> Chọn tất cả
+              </button>
+              <button
+                onClick={exportTableToCsv}
+                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+              >
+                <PiFileCsvBold className="mr-2" /> Xuất CSV
+              </button>
+            </div>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
-          <div className="flex gap-2 items-center">
-            <h2 className="text-xl font-semibold mb-2">Tổng số đơn hàng: {currentOrders.length + "/" + filteredOrders.length}</h2>
-            <button
-              onClick={addAllIdsToTxtABillIds}
-              className="flex items-center px-4 py-2 bg-gray-800 text-white rounded-md mb-2"
-            >
-              <PiFileCsvBold className="ease-in-out" /> Thêm tất cả vào Danh sách MÃ HÓA ĐƠN
-            </button>
-          </div>
-
-
-          <div className="table-container max-h-[650px] overflow-y-auto rounded-lg border-none shadow-lg">
-            <table id="order-table" className="min-w-full 
-            bg-white">
-              <thead className="sticky top-0 bg-blue-500 text-black z-100">
-                <tr>
-                  <th
-                    className="py-3 px-6 cursor-pointer hover:underline"
-                    onClick={() => handleSort("id")}
-                  >
-                    MÃ ĐƠN {sortField === "id" && (sortDirection === "asc" ? "↑" : "↓")}
-                  </th>
-                  <th
-                    className="py-3 px-6 cursor-pointer hover:underline"
-                    onClick={() => handleSort("user_id")}
-                  >
-                    KHÁCH {sortField === "user_id" && (sortDirection === "asc" ? "↑" : "↓")}
-                  </th>
-                  <th
-                    className="py-3 px-6 cursor-pointer hover:underline"
-                    onClick={() => handleSort("total_price")}
-                  >
-                    THÀNH TIỀN {sortField === "total_price" && (sortDirection === "asc" ? "↑" : "↓")}
-                  </th>
-                  <th
-                    className="py-3 px-6 cursor-pointer hover:underline"
-                    onClick={() => handleSort("order_date")}
-                  >
-                    THỜI GIAN {sortField === "order_date" && (sortDirection === "asc" ? "↑" : "↓")}
-                  </th>
-
-                  <th
-                    className="py-3 px-6 cursor-pointer hover:underline"
-                    onClick={() => handleSort("shipping_address")}
-                  >
-                    ĐỊA CHỈ {sortField === "shipping_address" && (sortDirection === "asc" ? "↑" : "↓")}
-                  </th>
-                  <th
-                    className="py-3 px-6 cursor-pointer hover:underline"
-                    onClick={() => handleSort("shipping_method")}
-                  >
-                    VẬN CHUYỂN {sortField === "shipping_method" && (sortDirection === "asc" ? "↑" : "↓")}
-                  </th>
-                  {/* <th
-                    className="py-3 px-6 cursor-pointer hover:underline"
-                    onClick={() => handleSort("shipping_fee")}
-                  >
-                    PHÍ VẬN {sortField === "shipping_fee" && (sortDirection === "asc" ? "↑" : "↓")}
-                  </th> */}
-                  <th
-                    className="py-3 px-6 cursor-pointer hover:underline"
-                    onClick={() => handleSort("status")}
-                  >
-                    TRẠNG THÁI {sortField === "status" && (sortDirection === "asc" ? "↑" : "↓")}
-                  </th>
-                  <th
-                    className="py-3 px-6 cursor-pointer"
-                  >
-                    HÀNH ĐỘNG
-                  </th>
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th onClick={() => handleSort('id')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">ID</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Khách hàng</th>
+                <th onClick={() => handleSort('total_price')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">Tổng tiền</th>
+                <th onClick={() => handleSort('status')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">Trạng thái</th>
+                <th onClick={() => handleSort('order_date')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer">Ngày đặt</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentOrders.map((order) => (
+                <tr 
+                  key={order.id}
+                  className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
+                  onClick={() => addValuetotxtABillIds(order.id.toString())}
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{order.id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{order.user?.firstname} {order.user?.lastname}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {formatPrice(order.total_price)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium
+                      ${order.status === ORDER_STATUSES.PENDING ? 'bg-yellow-100 text-yellow-800' : ''}
+                      ${order.status === ORDER_STATUSES.CONFIRMED ? 'bg-blue-100 text-blue-800' : ''}
+                      ${order.status === ORDER_STATUSES.PROCESSING ? 'bg-purple-100 text-purple-800' : ''}
+                      ${order.status === ORDER_STATUSES.SHIPPED ? 'bg-indigo-100 text-indigo-800' : ''}
+                      ${order.status === ORDER_STATUSES.DELIVERED ? 'bg-green-100 text-green-800' : ''}
+                      ${order.status === ORDER_STATUSES.CANCELLED ? 'bg-red-100 text-red-800' : ''}
+                      ${order.status === ORDER_STATUSES.RETURNED ? 'bg-gray-100 text-gray-800' : ''}
+                    `}>
+                      {order.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {formatDate(order.order_date)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <div className="flex items-center space-x-2">
+                      <Tooltip content="Chi tiết">
+                        <button onClick={() => navigate(`/admin/order/${order.id}`)} className="text-blue-600 hover:text-blue-800">
+                          <BiDetail size={20} />
+                        </button>
+                      </Tooltip>
+                      {order.status === "PENDING" && (
+                        <Tooltip content="Xác nhận">
+                          <button onClick={() => confirmOrd(order.id)} className="text-green-600 hover:text-green-800">
+                            <GiConfirmed size={20} />
+                          </button>
+                        </Tooltip>
+                      )}
+                      {order.status === "CONFIRMED" && (
+                        <Tooltip content="Xử lý">
+                          <button onClick={() => progress(order.id)} className="text-purple-600 hover:text-purple-800">
+                            <BiLoaderCircle size={20} />
+                          </button>
+                        </Tooltip>
+                      )}
+                      {order.status === "PROCESSING" && (
+                        <Tooltip content="Giao hàng">
+                          <button onClick={() => ship(order.id)} className="text-orange-600 hover:text-orange-800">
+                            <FaTruck size={20} />
+                          </button>
+                        </Tooltip>
+                      )}
+                    </div>
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {currentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-100 hover:text-black" onClick={() => addValuetotxtABillIds(order.id.toString() || "")}>
-                    <td className="py-3 px-6">{order.id}</td>
-                    <td className="py-3 px-6 hover:underline cursor-pointer" onClick={
-                      (event) => {
-                        event.stopPropagation();
-                        navigate(`/admin/user/${order.user.id}`);
-                      }
-                    }>{order.user.firstname + " " + order.user.lastname}</td>
-                    <td className="py-3 px-6">{formatPrice(order.total_price)}</td>
-                    <td className="py-3 px-6">{formatDate(order.order_date)}</td>
-                    <td className="py-3 px-6">{formatAddress(order.shipping_address)}</td>
-                    <td className="py-3 px-6 font-bold">
-                    <Tooltip text="Giao hàng tiêu chuẩn">
-                      {order.shipping_method === "STANDARD" && <span className="text-yellow-700"><FaTruck /></span>}
-                    </Tooltip>
-                    <Tooltip text="Giao hàng nhanh">
-                      {order.shipping_method === "EXPRESS" && <span className="text-green-700"><FaTruckFast /></span>}
-                    </Tooltip>
-
-                    </td>
-                    {/* <td className="py-3 px-6">{formatPrice(order.shipping_fee)}</td> */}
-                    <td className="py-3 px-6 font-bold">
-                      {/* {order.status} */}
-                      {/* { case for order status */}
-                      <Tooltip text="Đang chờ xác nhận">
-                      {order.status === "PENDING" && <BiLoaderCircle className="" />}
-                      </Tooltip>
-
-                      <Tooltip text="Đơn đã xác nhận">
-                      {order.status === "CONFIRMED" && <GiConfirmed />}
-                      </Tooltip>
-
-                      <Tooltip text="Đơn hàng đang đóng gói">
-                      {order.status === "PROCESSING" && <FaDropbox />}
-                      </Tooltip>
-
-                      <Tooltip text="Giao hàng thành công">
-                      {order.status === "SHIPPED" && <LiaShippingFastSolid />}
-                      </Tooltip>
-
-                      <Tooltip text="Đơn hàng đang vận chuyển">
-                      {order.status === "DELIVERED" && <LiaShippingFastSolid />}
-                      </Tooltip>
-
-                      <Tooltip text="Đã hủy đơn hàng">
-                      {order.status === "CANCELLED" && <TbBackpackOff />}
-                      </Tooltip>
-
-                      <Tooltip text="Yêu cầu hoàn trả">
-                      {order.status === "RETURNED" && <TbTruckReturn />}
-                      </Tooltip>
-                    </td>
-                    <td className="py-3 px-6">
-                      <div className="flex gap-1 font-bold ">
-                        <BiDetail className="text-yellow-900 cursor-pointer" size={20} />
-                        <Tooltip text="Xác nhận đơn hàng">
-                        {order.status === "PENDING" && <span onClick={() => confirmOrd(order.id)} className="text-yellow-500 flex gap-1 items-center cursor-pointer"><GiConfirmed /></span>}
-                        </Tooltip>
-                        <Tooltip text="Đóng gói">
-                        {order.status === "CONFIRMED" && <span onClick={() => progress(order.id)} className="text-orange-500 flex gap-1 items-center cursor-pointer"><FaDropbox /></span>}
-                        </Tooltip>
-                        <Tooltip text="Vận chuyển">
-                        {order.status === "PROCESSING" && <span onClick={() => ship(order.id)} className="text-orange-500 flex gap-1 items-center cursor-pointer"><LiaShippingFastSolid /></span>}
-                        </Tooltip>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
 
-        <div className="flex justify-center mt-4">
+        {/* Pagination */}
+        <div className="flex justify-center items-center gap-4 p-4">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className="mx-2 px-4 py-2 bg-gray-800 text-white rounded-md"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:bg-gray-400 hover:bg-blue-700 transition-colors"
           >
             Trang trước
           </button>
-          <span className="text-white">
+          <span className="text-gray-600">
             Trang {currentPage} / {totalPages}
           </span>
           <button
             onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className="mx-2 px-4 py-2 bg-gray-800 text-white rounded-md"
+            className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:bg-gray-400 hover:bg-blue-700 transition-colors"
           >
             Trang sau
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
