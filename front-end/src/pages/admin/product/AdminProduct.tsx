@@ -53,7 +53,7 @@ const AdminProduct = () => {
     const [filters, setFilters] = useState<Filters>({});
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
-
+    const [isOpenCreateBook, setIsOpenCreateBook] = useState(false);
     const [sortField, setSortField] = useState<keyof Book | null>(null);
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
@@ -98,7 +98,7 @@ const AdminProduct = () => {
         };
 
         fetchBooks();
-    }, [currentPage, filters]);
+    }, [isOpenCreateBook,currentPage, filters]);
 
     const formatMoney = (value: number) => {
         return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
@@ -130,7 +130,7 @@ const AdminProduct = () => {
         });
         setBooks(sortedBooks);
     };
-    const [isOpenCreateBook, setIsOpenCreateBook] = useState(false);
+    
     const openModal = () => {
         setIsOpenCreateBook(true);
     }

@@ -213,7 +213,7 @@ const Orders = () => {
                     <img src={detail.book.cover_img_url} alt={detail.book.title} className="w-16 h-20 mr-4 object-cover rounded" />
                     <div className="flex-1">
                       <h4 className="text-base font-semibold">{detail.book.title}</h4>
-                      <p className="text-sm text-gray-600">Phân loại: {detail.book.category.name}</p>
+                      <p className="text-sm text-gray-600">Phân loại: {detail.book.category?.name || ""}</p>
                       <p className="text-sm text-gray-600">Số lượng: {detail.quantity}</p>
                     </div>
                     <div className="text-right">

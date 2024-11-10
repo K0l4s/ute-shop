@@ -27,15 +27,21 @@ const getTop10BooksByOrderQuantity = async () => {
         Books.publisher_id, 
         Books.author_id, 
         Books.category_id,
-        SUM(detail_orders.quantity) AS totalSell, 
+        (SELECT SUM(detail_orders.quantity)
+         FROM detail_orders 
+         INNER JOIN Orders ON detail_orders.order_id = Orders.id
+         WHERE detail_orders.book_id = Books.id 
+           AND Orders.status NOT IN ('CANCELLED', 'RETURNED')
+        ) AS totalSell, 
         AVG(Reviews.star) AS avgRating,
         COUNT(Reviews.id) AS reviewCount
-      FROM Books 
-      LEFT JOIN detail_orders ON Books.id = detail_orders.book_id 
-      LEFT JOIN Reviews ON Books.id = Reviews.book_id
-      GROUP BY Books.id 
-      ORDER BY totalSell DESC 
-      LIMIT 10;
+FROM Books 
+LEFT JOIN Reviews ON Books.id = Reviews.book_id
+GROUP BY Books.id 
+ORDER BY totalSell DESC 
+LIMIT 10;
+
+
     `;
     const [topBooks, metadata] = await sequelize.query(topBooksQuery);
     if (topBooks.length === 0) {
@@ -246,7 +252,8 @@ const createNewBook = async ({ ISBN,
   year,
   age,
   stock, cover_img_url,
-  author_id }) => {
+  author_id,
+  publisher_id }) => {
   try {
     // Check if required fields are provided
     // if (!ISBN || !title || !price || !salePrice || !year || !age || !stock) {
@@ -264,7 +271,8 @@ const createNewBook = async ({ ISBN,
       age,
       stock,
       cover_img_url,
-      author_id
+      author_id,
+      publisher_id
     }
     const newBook = await Book.create(book);
     return newBook;

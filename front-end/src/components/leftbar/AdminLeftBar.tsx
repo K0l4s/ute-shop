@@ -22,10 +22,6 @@ const AdminLeftBar: React.FC = () => {
         { title: 'Nhà xuất bản', link: '/admin/publishers', icon: FaBoxOpen },
     ];
 
-    const userSubmenus: Submenu[] = [
-        { title: 'Khách hàng', link: '/admin/customers', icon: FaUser },
-        { title: 'Admin', link: '/admin/admins', icon: FaUser },
-    ];
     const voucherSubmenus: Submenu[] = [
         { title: 'Discount', link: '/admin/vouchers', icon: FaUser },
         { title: 'Freeship', link: '/admin/freeships', icon: FaUser },
@@ -48,8 +44,11 @@ const AdminLeftBar: React.FC = () => {
 
                     {/* Menu Groups */}
                     <MenuGroup title="Quản lý sản phẩm" icon={FaBoxOpen} submenus={productSubmenus} />
-                    <MenuGroup title="User" icon={FaUser} submenus={userSubmenus} />
-
+                    {/* <MenuGroup title="User" icon={FaUser} submenus={userSubmenus} /> */}
+                    <Link to={"/admin/users"} className="flex items-center hover:text-gray-500 cursor-pointer duration-300 ease-in-out p-2">
+                        <FaUser className="mr-2" />
+                        <span className="hidden lg:block">Quản lý khách hàng</span>
+                    </Link>
                     <Link to={"/admin/orders"} className="flex items-center hover:text-gray-500 cursor-pointer duration-300 ease-in-out p-2">
                         <FaShoppingCart className="mr-2" />
                         <span className="hidden lg:block">Quản lý đơn</span>

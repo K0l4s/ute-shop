@@ -87,6 +87,7 @@ export const createBook = async (
   stock: number,
   cover_img_url: File | null,
   author_id: number,
+  publisher_id: number
 ) => {
   const formData = new FormData();
   formData.append('ISBN', ISBN);
@@ -98,6 +99,7 @@ export const createBook = async (
   formData.append('age', age.toString());
   formData.append('stock', stock.toString());
   formData.append('author_id', author_id.toString());
+  formData.append('publisher_id', publisher_id.toString());
 
   if (cover_img_url) {
     formData.append('cover_img_url', cover_img_url);

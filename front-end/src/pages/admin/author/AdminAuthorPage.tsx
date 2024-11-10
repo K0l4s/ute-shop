@@ -1,15 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { FaEdit, FaTrash, FaCheck, FaTimes, FaSortUp, FaSortDown, FaPlus } from 'react-icons/fa';
-import { getAllAuthors, updateAuthor } from '../../../apis/author';
+import { createAuthor, getAllAuthors, updateAuthor } from '../../../apis/author';
 import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
-import ModalCreateBook from '../../../components/modals/ModalCreateBook';
 
-interface Author {
-    id: number;
-    name: string;
+import { showToast } from '../../../utils/toastUtils';
+
+interface basicAuthor {
+    id: number,
+    name: string,
+};
+interface Author extends basicAuthor {
     book_count: number;
     isEditing?: boolean; // Trạng thái chỉnh sửa
 }
+
+
 
 type SortOrder = 'asc' | 'desc';
 
@@ -21,13 +26,26 @@ const AdminAuthorPage: React.FC = () => {
     const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [currentPage, setCurrentPage] = useState(1);
     const [authorsPerPage] = useState(8);
-    const [isOpenModal, setIsOpenModal] = useState(false);
-    const opeModal = () => {
-        setIsOpenModal(true);
+
+    const [newAuthorModal, setNewAuthorModal] = useState<basicAuthor>({ id: 0, name: '' });
+
+    const handleNewAuthor = async () => {
+        await createAuthor({ name: newAuthorModal.name }).then((res) => {
+            setNewAuthorModal({ id: 0, name: '' });
+            console.log(res);
+            setAuthors([...authors, res]);
+            setFilteredAuthors([...filteredAuthors, res]);
+            showToast('Thêm tác giả ' + res.name + ' thành công', 'success');
+        })
+            .catch((err) => {
+                console.log(err);
+                showToast('Thêm tác giả thất bại', 'error');
+            });
+
+
     }
-    const closeModal = () => {
-        setIsOpenModal(false);
-    }
+
+
 
     // Thêm trạng thái tạm thời cho dữ liệu đang chỉnh sửa
     const [editedName, setEditedName] = useState<string>('');
@@ -138,6 +156,26 @@ const AdminAuthorPage: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
+                        <tr className="bg-blue-100">
+                            <td className="px-6 py-4">Thêm mới</td>
+                            <td className="px-6 py-4">
+                                <input
+                                    type="text"
+                                    value={newAuthorModal.name}
+                                    onChange={(e) => setNewAuthorModal({ ...newAuthorModal, name: e.target.value })}
+                                    className="border rounded px-2"
+                                />
+                            </td>
+                            <td className="px-6 py-4">0</td>
+                            <td className="px-6 py-4">
+                                <button
+                                    onClick={handleNewAuthor}
+                                    className="text-blue-500 hover:text-blue-700"
+                                >
+                                    <FaPlus />
+                                </button>
+                            </td>
+                        </tr>
                         {currentAuthors.map((author) => (
                             <tr key={author.id} className="border-b hover:bg-blue-200">
                                 <td className="px-6 py-4">{author.id}</td>
