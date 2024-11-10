@@ -17,7 +17,7 @@ export interface Pub {
     name: string;
 }
 const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-    const [categoryList, setCategoryList] = useState<Category[]>([]);
+    const [categoryList] = useState<Category[]>([]);
     const [authorList, setAuthorList] = useState<Author[]>([]);
     const [publisherList, setPublisherList] = useState<Pub[]>([]);
     const [selectedAuthor, setSelectedAuthor] = useState<number | null>(null);

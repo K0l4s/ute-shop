@@ -3,13 +3,10 @@ import { getAllOrder, updateCartStatus, updateMultipleCartStatus } from "../../.
 import { PiFileCsvBold } from "react-icons/pi";
 import { BsSearch } from "react-icons/bs";
 import { BiDetail, BiLoaderCircle, BiSelectMultiple } from "react-icons/bi";
-import { FaDropbox, FaProjectDiagram, FaTruck } from "react-icons/fa";
-import { FaTruckFast } from "react-icons/fa6";
+import {  FaProjectDiagram, FaTruck } from "react-icons/fa";
 import { showToast } from "../../../utils/toastUtils";
 import { AiFillDelete } from "react-icons/ai";
-import { LiaShippingFastSolid } from "react-icons/lia";
 import { GiConfirmed } from "react-icons/gi";
-import { TbBackpackOff, TbTruckReturn } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 import Tooltip from "../../../components/tooltip/Tooltip";
 
@@ -93,7 +90,7 @@ const AdminOrder = () => {
     fetchOrders();
   }, []);
 
-  const formatAddress = (address: string) => address.length > 20 ? address.slice(0, 20) + "..." : address;
+  // const formatAddress = (address: string) => address.length > 20 ? address.slice(0, 20) + "..." : address;
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });

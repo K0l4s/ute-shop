@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { IconType } from "react-icons";
 
 interface Submenu {
     title: string;
     link: string;
-    icon: any;
+    icon: IconType;
 }
 
 interface MenuGroupProps {
-    icon: React.ComponentType;
+    icon: IconType;
     title: string; 
     submenus?: Submenu[];
 }
@@ -44,7 +45,7 @@ const MenuGroup: React.FC<MenuGroupProps> = ({ icon: Icon, title, submenus }) =>
                         isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                     }`}
                 >
-                    {submenus.map((submenu, idx) => {
+                    {submenus.map((submenu) => {
                         const SubIcon = submenu.icon;
                         return (
                             <Link 

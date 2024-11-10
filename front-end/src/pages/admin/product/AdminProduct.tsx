@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { searchBooks } from "../../../apis/book";
 // import { useLocation } from "react-router-dom";
 import { FaEdit, FaEye, FaTrash, FaSortUp, FaSortDown, FaPlus } from "react-icons/fa";
-import Pagination from "../../../components/pagination/Pagination";
+// import Pagination from "../../../components/pagination/Pagination";
 import ModalCreateBook from "../../../components/modals/ModalCreateBook";
 import Papa, { ParseResult } from 'papaparse';
 import * as XLSX from 'xlsx';
