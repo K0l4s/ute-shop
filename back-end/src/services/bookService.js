@@ -59,8 +59,12 @@ const getBooks = async (filters, page = 1, limit = 16) => {
     const { title, minPrice, maxPrice, publisher, minAge, maxAge, sortByPrice } = filters;
 
     // Thiết lập điều kiện tìm kiếm
-    const whereClause = {};
-
+    const whereClause = {
+      stock: {
+        [Op.gt]: 0 // gt = greater than
+      }
+    };
+    
     // Tìm kiếm theo tiêu đề nếu có
     if (title) {
       whereClause.title = { [Op.like]: `%${title}%` };

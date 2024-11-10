@@ -530,11 +530,18 @@ const getDetailOrderByUser = async (userId, orderId) => {
         id: orderId,
         user_id: userId
       },
-      include: {
-        model: OrderTracking,
-        as: 'orderTracking',
-        attributes: ['confirmedAt', 'processedAt', 'deliveredAt', 'shippedAt', 'canceledAt', 'returnedAt']
-      }
+      include: [
+        {
+          model: OrderTracking,
+          as: 'orderTracking',
+          attributes: ['confirmedAt', 'processedAt', 'deliveredAt', 'shippedAt', 'canceledAt', 'returnedAt']
+        },
+        {
+          model: Payment,
+          as: 'payment',
+          attributes: ['payment_date', 'payment_method', 'status']
+        }
+      ]
     });
 
     if (!order) {

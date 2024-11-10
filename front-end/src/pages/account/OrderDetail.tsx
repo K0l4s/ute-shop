@@ -71,10 +71,10 @@ const OrderDetail = ({ orderId, isOpen, onClose }: { orderId: number; onClose: (
         </div>
 
         {/* Order Tracking */}
-        <div className='flex items-center space-x-4 my-4 border border-gray-400 p-4 rounded-t-lg'>
+        <div className='flex items-center space-x-4 my-4 border border-gray-400 p-4'>
           <div className='flex flex-col items-center'>
             <div
-              className={`p-3 rounded-full text-white ${order.status !== 'PENDING' ? 'bg-green-500' : 'bg-gray-300'}`}
+              className={`p-3 rounded-full text-white ${(order.status !== 'PENDING' && order.orderTracking.confirmedAt) ? 'bg-green-500' : 'bg-gray-300'}`}
             >
               <FaFileCircleCheck size={24} />
             </div>
@@ -84,17 +84,17 @@ const OrderDetail = ({ orderId, isOpen, onClose }: { orderId: number; onClose: (
           <div className='flex-grow border-t border-gray-600'></div>
           <div className='flex flex-col items-center'>
             <div
-              className={`p-3 rounded-full ${order.status === 'PENDING' || order.status === 'CONFIRMED' ? 'bg-gray-300' : 'bg-green-500'} text-white`}
+              className={`p-3 rounded-full ${order.status === 'PENDING' || order.status === 'CONFIRMED' || !order.orderTracking.processedAt ? 'bg-gray-300' : 'bg-green-500'} text-white`}
             >
               <FaTruckLoading size={24} />
             </div>
-            <p className='font-semibold text-base'>Đang xử lý</p>
+            <p className='font-semibold text-base'>Đã xử lý</p>
             <span className='text-sm text-gray-600'>{formatDateTime(order.orderTracking.processedAt)}</span>
           </div>
           <div className='flex-grow border-t border-gray-600'></div>
           <div className='flex flex-col items-center'>
             <div
-              className={`p-3 rounded-full ${order.status === 'DELIVERED' || order.status === 'SHIPPED' ? 'bg-green-500' : 'bg-gray-300'} text-white`}
+              className={`p-3 rounded-full ${order.status === 'DELIVERED' || order.status === 'SHIPPED' || order.status === 'RETURNED' ? 'bg-green-500' : 'bg-gray-300'} text-white`}
             >
               <FaTruck size={24} />
             </div>
@@ -104,24 +104,36 @@ const OrderDetail = ({ orderId, isOpen, onClose }: { orderId: number; onClose: (
           <div className='flex-grow border-t border-gray-600'></div>
           <div className='flex flex-col items-center'>
             <div
-              className={`p-3 rounded-full ${order.status === 'SHIPPED' ? 'bg-green-500' : 'bg-gray-300'} text-white`}
+              className={`p-3 rounded-full ${order.status === 'SHIPPED' || order.status === 'RETURNED' ? 'bg-green-500' : 'bg-gray-300'} text-white`}
             >
               <LuPackageCheck size={24} />
             </div>
             <p className='font-semibold text-base'>Đã nhận hàng</p>
             <span className='text-sm text-gray-600'>
-              {order.status === 'SHIPPED' ? formatDateTime(order.orderTracking.shippedAt) : 'N/A'}
+              {order.status === 'SHIPPED' || order.status === 'RETURNED' ? formatDateTime(order.orderTracking.shippedAt) : 'N/A'}
             </span>
           </div>
         </div>
 
         {/* Shipping Address */}
         <div className='border border-gray-400 p-4 bg-white text-base'>
-          <h3 className='text-lg font-semibold mb-2'>Địa chỉ nhận hàng</h3>
-          <div className='flex flex-col gap-2 ml-4'>
+          <h3 className='text-lg font-semibold'>Địa chỉ nhận hàng</h3>
+          <div className='flex flex-col ml-4'>
             <p className='font-semibold'>{receiver}</p>
             <p>{phone}</p>
             <p>{shippingAddress}</p>
+          </div>
+        </div>
+
+        {/* Payment */}
+        <div className='border border-gray-400 p-4 bg-white mt-4'>
+          <h3 className='text-lg font-semibold'>Phương thức thanh toán</h3>
+          <div className='flex flex-col ml-4'>
+            <p className='text-violet-600'>{order.payment.payment_method === 'COD' ? 'Thanh toán khi nhận hàng' : 'Thanh toán VNPay'}</p>
+            {order.payment.payment_date && 
+              <p className='text-green-600'>Ngày thanh toán: {formatDateTime(order.payment.payment_date)}</p>
+            }
+            <p className={`${order.payment.status === 'COMPLETED' ? 'text-green-600' : 'text-red-500'}`}>{order.payment.status === 'COMPLETED' ? 'Đã thanh toán' : 'Chưa thanh toán' }</p>
           </div>
         </div>
 
