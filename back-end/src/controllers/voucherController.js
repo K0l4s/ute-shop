@@ -36,7 +36,7 @@ try {
 const getDiscountByCodeController = async (req, res) => {
     try {
         const { code } = req.params;
-        const discount = await getDiscountByCode(code);
+        const discount = await getDiscountByCode(code); 
         res.status(200).json({
             message: "Success",
             data: discount

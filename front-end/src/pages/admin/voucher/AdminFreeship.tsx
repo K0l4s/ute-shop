@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getFreeshipVouchers, updateFreeshipVoucher } from "../../../apis/voucher";
+import { createFreeshipVoucher, getFreeshipVouchers, updateFreeshipVoucher } from "../../../apis/voucher";
 
 interface Freeship {
   id: number;
@@ -22,12 +22,26 @@ const AdminFreeship = () => {
   const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingRow, setEditingRow] = useState<number | null>(null);
+  const [newFreeship, setNewFreeship] = useState<Freeship>({
+    id: 0,
+    code: "",
+    name: "",
+    discount_perc: null,
+    discount_val: null,
+    min_order_val: null,
+    desc: "",
+    stock: 0,
+    is_active: true,
+    createdAt: "",
+    updatedAt: ""
+  });
   const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getFreeshipVouchers(1000, 0);
+
         setFreeships(response.data);
         setFilteredFreeships(response.data);
       } catch (error) {
@@ -53,29 +67,29 @@ const AdminFreeship = () => {
       direction = "desc";
     }
     setSortConfig({ key, direction });
-  
+
     const sortedData = [...filteredFreeships].sort((a, b) => {
       const valueA = a[key] ?? ""; // Thay thế giá trị null/undefined bằng chuỗi rỗng
       const valueB = b[key] ?? "";
-  
+
       // Kiểm tra nếu giá trị là chuỗi
       if (typeof valueA === "string" && typeof valueB === "string") {
         if (valueA < valueB) return direction === "asc" ? -1 : 1;
         if (valueA > valueB) return direction === "asc" ? 1 : -1;
       }
-  
+
       // Kiểm tra nếu giá trị là số
       if (typeof valueA === "number" && typeof valueB === "number") {
         return direction === "asc" ? valueA - valueB : valueB - valueA;
       }
-  
+
       // Nếu giá trị không phải là chuỗi hoặc số, trả về 0 (không thay đổi vị trí)
       return 0;
     });
-  
+
     setFilteredFreeships(sortedData);
   };
-  
+
 
   const handleSave = async (freeship: Freeship) => {
     try {
@@ -115,6 +129,36 @@ const AdminFreeship = () => {
       console.error("Failed to update freeship status", error);
     }
   };
+  const handleNewFreeshipChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, field: keyof Freeship) => {
+    const { value } = e.target;
+    setNewFreeship((prevFreeship) => ({
+      ...prevFreeship,
+      [field]: field === "is_active" ? value === "active" : value
+    }));
+  };
+  const handleAddFreeship = () => {
+    const newFreeshipEntry = {
+      ...newFreeship,
+      id: Date.now()
+    };
+    createFreeshipVoucher(newFreeshipEntry);
+    setFreeships((prevFreeships) => [newFreeshipEntry, ...prevFreeships]);
+    setFilteredFreeships((prevFiltered) => [newFreeshipEntry, ...prevFiltered]);
+    setNewFreeship({
+      id: 0,
+      code: "",
+      name: "",
+      discount_perc: null,
+      discount_val: null,
+      min_order_val: null,
+      desc: "",
+      stock: 0,
+      is_active: true,
+      createdAt: "",
+      updatedAt: ""
+    });
+  };
+
   return (
     <div className="p-6 min-h-screen">
       <h1 className="text-2xl font-bold text-gray-800 mb-4">Quản lý Freeship</h1>
@@ -148,6 +192,28 @@ const AdminFreeship = () => {
             </tr>
           </thead>
           <tbody>
+            <tr className="bg-blue-200">
+              <td className="p-4 border-t"><input type="text" value={newFreeship.code} onChange={(e) => handleNewFreeshipChange(e, "code")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t"><input type="text" value={newFreeship.name} onChange={(e) => handleNewFreeshipChange(e, "name")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t"><input type="text" value={newFreeship.desc} onChange={(e) => handleNewFreeshipChange(e, "desc")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t"><input type="number" value={newFreeship.discount_perc || ""} onChange={(e) => handleNewFreeshipChange(e, "discount_perc")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t"><input type="text" value={newFreeship.discount_val || ""} onChange={(e) => handleNewFreeshipChange(e, "discount_val")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t"><input type="number" value={newFreeship.stock} onChange={(e) => handleNewFreeshipChange(e, "stock")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t"><input type="text" value={newFreeship.min_order_val || ""} onChange={(e) => handleNewFreeshipChange(e, "min_order_val")} className="border p-1 rounded w-full" /></td>
+              <td className="p-4 border-t">
+                <select
+                  value={newFreeship.is_active ? "active" : "inactive"}
+                  onChange={(e) => handleNewFreeshipChange(e, "is_active")}
+                  className="border p-1 rounded w-full"
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </td>
+              <td className="p-4 border-t">
+                <button onClick={handleAddFreeship} className="px-4 py-2 bg-green-500 text-white rounded">Thêm</button>
+              </td>
+            </tr>
             {paginatedData.map((freeship) => (
               <tr key={freeship.id} className={freeship.is_active ? "bg-white" : "bg-red-100"}>
                 <td className="p-4 border-t">{freeship.code}</td>

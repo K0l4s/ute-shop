@@ -22,3 +22,16 @@
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+@layer utilities {
+  .range-slider {
+    @apply appearance-none w-24 h-2 bg-blue-300 rounded-lg outline-none transition-opacity duration-200;
+  }
+
+  .range-slider::-webkit-slider-thumb {
+    @apply appearance-none w-4 h-4 bg-blue-600 rounded-full cursor-pointer;
+  }
+
+  .range-slider::-moz-range-thumb {
+    @apply w-4 h-4 bg-blue-600 rounded-full cursor-pointer;
+  }
+}
