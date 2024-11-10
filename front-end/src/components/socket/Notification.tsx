@@ -3,10 +3,11 @@ import { FiPackage, FiTag } from 'react-icons/fi'; // Icons for order update and
 import { formatDistanceToNow } from 'date-fns';
 import { format, toZonedTime } from 'date-fns-tz';
 import { useWebSocket } from '../../context/WebSocketContext';
+import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 
 const Notification: React.FC = () => {
-  const { notifications, fetchNotifications } = useWebSocket();
-
+  const { notifications, fetchNotifications, markAllAsRead } = useWebSocket();
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [offset, setOffset] = useState<number>(() => {
     const savedOffset = localStorage.getItem('notificationOffset');
@@ -100,9 +101,26 @@ const Notification: React.FC = () => {
     return formattedTime;
   };
 
+  const handleReadAll = async () => {
+    setLoading(true);
+    try {
+      await markAllAsRead();
+    } catch (err) {
+      setError("Error marking all notifications as read");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="w-full md:w-128 p-4 bg-white rounded-lg shadow-lg flex flex-col justify-center items-center gap-2">
+    <div className="relative w-full md:w-128 p-4 bg-white rounded-lg shadow-lg flex flex-col justify-center items-center gap-2">
       <h2 className="text-lg font-semibold mb-2">Thông báo</h2>
+      <button className='absolute top-0 right-0 px-4 py-4 hover:text-violet-700 hover:underline'
+        onClick={handleReadAll}
+        disabled={loading}>
+
+        {loading ? <AiOutlineLoading3Quarters /> : "Đọc tất cả"}
+      </button>
       {error && <p className="text-red-500">{error}</p>}
       <ul ref={containerRef} className="space-y-2 max-h-128 overflow-y-auto">
         {notifications?.map((notification) => (
