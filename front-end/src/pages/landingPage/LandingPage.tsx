@@ -10,6 +10,7 @@ import lifechangingbooks from "../../assets/images/life-changing-books.jpg";
 import { FaChartLine } from "react-icons/fa";
 
 import { formatStar, saveToHistory } from "../../utils/bookUtils";
+import Event from "../../components/events/Event";
 
 
 interface Book {
@@ -59,10 +60,9 @@ const LandingPage = () => {
   return (
     <div className="bg-gray-100">
       {/* Hero Section */}
-      <section className="bg-white py-10">
+      <section className="bg-white py-2">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4">BÃO SALE MÙA HẠ GOM SÁCH BAO ĐÃ</h1>
-          <p className="text-xl">Khám phá bộ sưu tập sách giảm giá lớn nhất ngay hôm nay!</p>
+          <Event />
         </div>
       </section>
 

@@ -99,10 +99,11 @@ const Navbar = () => {
           </div>
           <div className="flex items-center">
             <ul className="flex space-x-4">
-              <li><Link to="/book" className="text-white">Sách</Link></li>
-              <li><Link to="/publisher" className="text-white">Nhà xuất bản</Link></li>
-              <li><Link to="/about" className="text-white">Về chúng tôi</Link></li>
-              <li><Link to="/contact"className="text-white">Voucher</Link></li>
+              <li><Link to="/" className="text-white hover:text-violet-700">Trang chủ</Link></li>
+              <li><Link to="/book" className="text-white hover:text-violet-700">Sách</Link></li>
+              <li><Link to="/publisher" className="text-white hover:text-violet-700">Nhà xuất bản</Link></li>
+              <li><Link to="/about" className="text-white hover:text-violet-700">Về chúng tôi</Link></li>
+              <li><Link to="/contact"className="text-white hover:text-violet-700">Voucher</Link></li>
             </ul>
           </div>
           <div>
@@ -181,7 +182,7 @@ const Navbar = () => {
                               <Link to="/account/orders" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                                 Đơn hàng của tôi
                               </Link>
-                              <Link to="/account/favorites" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
+                              <Link to="/account/favoriteBooks" className="block px-4 py-2 text-gray-800 hover:bg-gray-200">
                                 Sách yêu thích
                               </Link>
                               {role === 'admin' && (
