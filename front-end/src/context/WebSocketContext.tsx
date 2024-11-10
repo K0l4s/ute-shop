@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { NotificationMessage } from '../models/type';
-import { getNotifications } from '../apis/notification';
+import { getNotifications, readAllNotifications } from '../apis/notification';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 
@@ -12,6 +12,7 @@ interface WebSocketContextType {
   setUnreadCount: React.Dispatch<React.SetStateAction<number>>;
   fetchNotifications: (limit: number, offset: number) => Promise<{ hasMore: boolean; unreadCount: number }>;
   clearNotifications: () => void;
+  markAllAsRead: () => Promise<void>;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -97,8 +98,23 @@ export const WebSocketProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
     setUnreadCount(0);
   };
 
+  const markAllAsRead = async () => {
+    try {
+      await readAllNotifications();
+      setNotifications((prevNotifications) =>
+        prevNotifications.map((notification) => ({
+          ...notification,
+          is_read: true,
+        }))
+      );
+      setUnreadCount(0);
+    } catch (error) {
+      console.error("Failed to mark all notifications as read", error);
+    }
+  };
+
   return (
-    <WebSocketContext.Provider value={{ socket, notifications, unreadCount, setNotifications, setUnreadCount, fetchNotifications, clearNotifications }}>
+    <WebSocketContext.Provider value={{ socket, notifications, unreadCount, setNotifications, setUnreadCount, fetchNotifications, clearNotifications, markAllAsRead }}>
       {children}
     </WebSocketContext.Provider>
   );

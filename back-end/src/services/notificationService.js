@@ -24,6 +24,19 @@ const getAllNotifications = async (userId, limit, offset) => {
   }
 }
 
+const readAllNotifications = async (userId) => {
+  try {
+    const result = await Notification.update(
+      { is_read: true },
+      { where: { user_id: userId, is_read: false } }
+    );
+
+    return result;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
 // Hàm để gửi thông báo qua WebSocket
 const sendNotificationToClient = (wss, message) => {
   console.log('Sending notification to client:', message);
@@ -36,7 +49,6 @@ const sendNotificationToClient = (wss, message) => {
     console.log('Client userId:', client.userId);
     console.log('Message userId:', message.user_id);
     if (client.readyState === WebSocket.OPEN && client.userId == message.user_id) {
-      console.log('Waiting');
       client.send(JSON.stringify({ message }));
     }
   });
@@ -67,6 +79,7 @@ const createAndSendOrderNotification = async (wss, userId, orderId, message) => 
 
 module.exports = {
   getAllNotifications,
+  readAllNotifications,
   sendNotificationToClient,
   createAndSendOrderNotification
 }

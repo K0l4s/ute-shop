@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 import DiscountCode from '../../components/voucher/DiscountCode';
@@ -6,8 +6,10 @@ import { IoWarning } from 'react-icons/io5';
 import { Link, useNavigate } from 'react-router-dom';
 import { getDistance } from '../../apis/maps';
 import { checkOutByVNPay, placeOrder } from '../../apis/order';
-import { decodeCartData, encodeCartData } from '../../apis/cart';
+import { checkStock, decodeCartData, encodeCartData } from '../../apis/cart';
 import { showToast } from '../../utils/toastUtils';
+import { useDispatch } from 'react-redux';
+import { deselectVoucher } from '../../redux/reducers/voucherSlice';
 
 const Checkout: React.FC = () => {
   interface Product {
@@ -20,6 +22,7 @@ const Checkout: React.FC = () => {
     publisher: string;
   }
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [productsToCheckout, setProductsToCheckout] = useState<Product[]>([]);
   const [shippingFee, setShippingFee] = useState<number>(20000);
   const [estimatedDeliveryDate, setEstimatedDeliveryDate] = useState<string>("");
@@ -52,6 +55,12 @@ const Checkout: React.FC = () => {
   const selectedDiscountVoucher = discountVouchers.find(voucher => voucher.id === selectedDiscountVoucherId);
   const selectedFreeshipVoucher = freeshipVouchers.find(voucher => voucher.id === selectedFreeshipVoucherId);
   
+  const productsToCheckoutRef = useRef(productsToCheckout);
+
+  useEffect(() => {
+    productsToCheckoutRef.current = productsToCheckout;
+  }, [productsToCheckout]);
+
   useEffect(() => {
     const fetchDecodedData = async () => {
       const queryParams = new URLSearchParams(location.search);
@@ -65,6 +74,9 @@ const Checkout: React.FC = () => {
           setPaymentMethod(decodedData.payment_method || "COD");
           setAmount(decodedData.totalAmount || 0);
           setLastEncodedData(dataFromUrl);
+          // sessionStorage.setItem('selectedItems', JSON.stringify(decodedData.selectedItems || []));
+          // sessionStorage.setItem('discountVoucher', JSON.stringify(selectedDiscountVoucherRef.current || null));
+          // sessionStorage.setItem('freeshipVoucher', JSON.stringify(selectedFreeshipVoucherRef.current || null));
         } catch (error) {
           console.error("Failed to decode cart data:", error);
         }
@@ -73,13 +85,13 @@ const Checkout: React.FC = () => {
   
     fetchDecodedData();
   }, [location.search, lastEncodedData]);
-
+  
   const encryptCartData = async (newPaymentMethod: string, newShippingMethod: string) => {
     const cartData = {
       selectedItems: productsToCheckout,
       shipping_method: newShippingMethod,
       payment_method: newPaymentMethod,
-      amount
+      totalAmount: amount
     };
 
     try {
@@ -182,6 +194,15 @@ const Checkout: React.FC = () => {
 
   }, [productsToCheckout, selectedDiscountVoucher, selectedFreeshipVoucher, shippingFee]);
   
+  // useEffect(() => {
+  //   return () => {
+  //     console.log("Releasing stock and vouchers...");
+  //     // Hoàn trả lại số lượng sách nếu người dùng không hoàn tất thanh toán
+  //     const selectedItems = productsToCheckoutRef.current;
+  //     releaseStockAndVouchers({ selectedItems });
+  //   };
+  // }, []);
+
   const handlePlaceOrder = async () => {
     const orderItems = productsToCheckout.map(item => ({
       book_id: item.id,
@@ -201,9 +222,18 @@ const Checkout: React.FC = () => {
     };
 
     try {
+      await checkStock({
+        selectedItems: productsToCheckout,
+        discountVoucher: selectedDiscountVoucher,
+        freeshipVoucher: selectedFreeshipVoucher
+      });
+
       if (paymentMethod === "COD") {
         await placeOrder(orderData);
         showToast("Đơn hàng đã được đặt thành công!", "success");
+        // Clear selected vouchers
+        dispatch(deselectVoucher('discount'));
+        dispatch(deselectVoucher('freeship'));
         navigate("/account/orders");
         window.scrollTo(0, 0);
       }
@@ -213,8 +243,9 @@ const Checkout: React.FC = () => {
           window.location.href = res.paymentUrl;
         }
       }
-    } catch (error) {
-      console.error('Failed to place order:', error);
+    } catch (error: any) {
+      console.error('Thất bại: ', error.response?.data.message);
+      showToast(error.response?.data.message, "error");
     }
   };
 
@@ -237,7 +268,7 @@ const Checkout: React.FC = () => {
   }, [user]);
 
   return (
-    <div className="container mx-auto px-16 py-8">
+    <div className="md:w-9/12 mx-auto px-16 py-8">
       <h1 className="text-xl text-violet-700 font-bold mb-4">XÁC NHẬN THANH TOÁN</h1>
       
       {/* Địa Chỉ Giao Hàng */}
@@ -358,7 +389,7 @@ const Checkout: React.FC = () => {
             <a href="/" className="text-blue-600 underline">Điều khoản và điều kiện của UTE Shop</a>
           </label>
         </div>
-        <button className="bg-red-500 text-white font-bold py-3 px-6 rounded shadow hover:bg-red-600"
+        <button className="bg-red-500 text-white font-bold py-3 px-6 text-sm md:text-base rounded shadow hover:bg-red-600"
           onClick={handlePlaceOrder}>
           XÁC NHẬN THANH TOÁN
         </button>

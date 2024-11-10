@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { getDataReturnVNPay, getOrder } from "../../apis/order";
 import { FaRegCheckCircle } from "react-icons/fa";
+import { VscError } from "react-icons/vsc";
 import { Link } from "react-router-dom";
+// import { releaseStockAndVouchers } from "../../apis/cart";
 
 interface Order {
   order_id: number;
@@ -60,6 +62,11 @@ const PaymentSuccess: React.FC = () => {
       if (vnp_TransactionStatus) {
         handleVNPayResponse();
       }
+      
+      // if (vnp_TransactionStatus !== "00") {
+      //   const selectedItems: any =  []; // hot fix
+      //   releaseStockAndVouchers({ selectedItems, discountVoucher, freeshipVoucher });
+      // }
       sessionStorage.setItem('notificationSent', 'true');
     }
   }, [vnp_TxnRef]);
@@ -68,6 +75,9 @@ const PaymentSuccess: React.FC = () => {
     // Reset notificationSent when component unmounts
     return () => {
       sessionStorage.removeItem('notificationSent');
+      sessionStorage.removeItem('selectedItems');
+      sessionStorage.removeItem('discountVoucher');
+      sessionStorage.removeItem('freeshipVoucher');
     };
   }, []);
 
@@ -82,7 +92,7 @@ const PaymentSuccess: React.FC = () => {
 
         ) : (
           <h1 className="flex flex-col items-center text-2xl font-semibold text-center text-red-600 mb-4">
-          <FaRegCheckCircle size={64}/>
+          <VscError size={64}/>
           Thanh toán thất bại
         </h1>
 
@@ -118,7 +128,14 @@ const PaymentSuccess: React.FC = () => {
 
           </div>
         ) : (
+          <>
           <p className="text-red-600 text-center">Payment failed or incomplete. Please try again.</p>
+            <div className="flex justify-end gap-4 mt-8">
+              <button>
+                <Link to="/" className="p-2 text-red-600 border border-red-600 rounded hover:bg-red-600 hover:text-white transition duration-300">Về trang chủ</Link>
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>
