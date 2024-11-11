@@ -10,6 +10,7 @@ import { checkStock, decodeCartData, encodeCartData } from '../../apis/cart';
 import { showToast } from '../../utils/toastUtils';
 import { useDispatch } from 'react-redux';
 import { deselectVoucher } from '../../redux/reducers/voucherSlice';
+import TermOfUseModal from '../../components/modals/TermOfUseModal';
 
 const Checkout: React.FC = () => {
   interface Product {
@@ -23,6 +24,7 @@ const Checkout: React.FC = () => {
   }
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [productsToCheckout, setProductsToCheckout] = useState<Product[]>([]);
   const [shippingFee, setShippingFee] = useState<number>(20000);
   const [estimatedDeliveryDate, setEstimatedDeliveryDate] = useState<string>("");
@@ -56,6 +58,14 @@ const Checkout: React.FC = () => {
   const selectedFreeshipVoucher = freeshipVouchers.find(voucher => voucher.id === selectedFreeshipVoucherId);
   
   const productsToCheckoutRef = useRef(productsToCheckout);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  }
 
   useEffect(() => {
     productsToCheckoutRef.current = productsToCheckout;
@@ -386,7 +396,7 @@ const Checkout: React.FC = () => {
           <input type="checkbox" id="agree" />
           <label htmlFor="agree" className="ml-2 text-sm">
             Bằng việc tiến hành mua hàng, bạn đã đồng ý với{' '}
-            <a href="/" className="text-blue-600 underline">Điều khoản và điều kiện của UTE Shop</a>
+            <p className="text-violet-600 underline cursor-pointer" onClick = {handleOpenModal}>Điều khoản và điều kiện của UTE Shop</p>
           </label>
         </div>
         <button className="bg-red-500 text-white font-bold py-3 px-6 text-sm md:text-base rounded shadow hover:bg-red-600"
@@ -394,6 +404,7 @@ const Checkout: React.FC = () => {
           XÁC NHẬN THANH TOÁN
         </button>
       </div>
+      <TermOfUseModal isOpen = {isModalOpen} onClose={handleCloseModal} />
     </div>
   );
 };

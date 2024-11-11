@@ -28,6 +28,7 @@ import AdminVoucher from '../pages/admin/voucher/AdminVoucher'
 import AdminEvent from '../pages/admin/eventPage/AdminEvent'
 import AdminCategory from '../pages/admin/category/AdminCategory'
 import AdminFreeship from '../pages/admin/voucher/AdminFreeship'
+import RedirectIfAuthenticated from './layout/RedirectIfAuthenticated'
 // import OrderDetailModal from '../components/modals/OrderDetailModal'
 
 
@@ -37,13 +38,47 @@ const Router = () => {
   return (
     <>
       <Routes>
-        <Route >
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/active" element={<ActiveAccount />} />
-          <Route path="/forgot" element={<ForgotPassword />} />
-          <Route path="/reset/password" element={<ResetPassword />} />
-        </Route>
+        <Route
+          path="/login"
+          element={
+            <RedirectIfAuthenticated>
+              <Login />
+            </RedirectIfAuthenticated>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <RedirectIfAuthenticated>
+              <Register />
+            </RedirectIfAuthenticated>
+          }
+        />
+        <Route
+          path="/active"
+          element={
+            <RedirectIfAuthenticated>
+              <ActiveAccount />
+            </RedirectIfAuthenticated>
+          }
+        />
+        <Route
+          path="/forgot"
+          element={
+            <RedirectIfAuthenticated>
+              <ForgotPassword />
+            </RedirectIfAuthenticated>
+          }
+        />
+        <Route
+          path="/reset/password"
+          element={
+            <RedirectIfAuthenticated>
+              <ResetPassword />
+            </RedirectIfAuthenticated>
+          }
+        />
+
         <Route element={<CustomerLayout />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/cart" element={<RequireAuth><Cart /></RequireAuth>} />
