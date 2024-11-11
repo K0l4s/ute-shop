@@ -462,6 +462,9 @@ const updateOrder = async (orderId, status, userId, wss) => {
     }
     if (status == orderStatus.CANCELLED ) {
       order = await cancelOrder(orderId);
+      await releaseStock(orderId);
+      const messageToAdmin = `Đơn hàng #${orderId} đã bị hủy`;
+      await sendOrderNotificationToAdmins(wss, orderId, messageToAdmin);
     }
     else if (status == orderStatus.RETURNED ) {
       order = await returnOrder(orderId);
@@ -631,6 +634,49 @@ const getDetailOrderByUser = async (userId, orderId) => {
     return { order, orderDetails };
   } catch (error) {
     throw new Error(error.message);
+  }
+};
+
+const releaseStock = async (orderId) => {
+  try {
+    // Lấy thông tin chi tiết của đơn hàng
+    const orderDetails = await Detail_Order.findAll({ where: { order_id: orderId } });
+
+    // Giải phóng stock và sold của từng sản phẩm trong đơn hàng
+    for (const detail of orderDetails) {
+      const book = await Book.findByPk(detail.book_id);
+      if (book) {
+        book.stock += detail.quantity;
+        book.sold -= detail.quantity;
+        await book.save();
+      }
+    }
+
+    // Lấy thông tin của đơn hàng
+    const order = await Order.findByPk(orderId);
+
+    // Giải phóng stock của discount nếu có
+    if (order.discount_id) {
+      const discountVoucher = await Discount.findByPk(order.discount_id);
+      if (discountVoucher) {
+        discountVoucher.stock += 1;
+        await discountVoucher.save();
+      }
+    }
+
+    // Giải phóng stock của freeship nếu có
+    if (order.freeship_id) {
+      const freeshipVoucher = await Freeship.findByPk(order.freeship_id);
+      if (freeshipVoucher) {
+        freeshipVoucher.stock += 1;
+        await freeshipVoucher.save();
+      }
+    }
+
+    console.log('Stock and sold released for order #${orderId}');
+  } catch (error) {
+    console.error('Error releasing stock for order #${orderId}:', error);
+    throw new Error('Error releasing stock');
   }
 };
 

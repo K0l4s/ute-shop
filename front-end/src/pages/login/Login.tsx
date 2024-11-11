@@ -20,7 +20,7 @@ const Login: React.FC<LoginProps> = () => {
     setIsLoading(true);
     try {
       const data = await loginApi(email, password);
-      showToast('Đăng nhập thành công!', 'success',);
+      showToast('Đăng nhập thành công!', 'success');
       
       // Lưu thông tin người dùng vào Redux
       dispatch(login());
@@ -44,7 +44,7 @@ const Login: React.FC<LoginProps> = () => {
       const from = location.state?.from?.pathname || '/';
       navigate(from);
     } catch (err) {
-      showToast('Đăng nhập thất bại!', 'error',);
+      showToast('Đăng nhập thất bại!', 'error');
       // if (data?.error === "Error logging in: User not active") {
       //   navigate('/active');
       // }

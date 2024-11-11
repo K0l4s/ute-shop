@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { showToast } from '../../utils/toastUtils';
 
 interface RegisterProps {}
 
@@ -18,7 +19,7 @@ const Register: React.FC<RegisterProps> = () => {
     e.preventDefault();
 
     if (password !== repeat_psswd) {
-      alert('Mật khẩu và xác nhận mật khẩu không khớp!');
+      showToast('Mật khẩu và xác nhận mật khẩu không khớp!', 'error');
       return;
     }
 
@@ -41,14 +42,14 @@ const Register: React.FC<RegisterProps> = () => {
       });
 
       if (response.ok) {
-        alert('Đăng ký thành công!');
+        showToast('Đăng ký thành công!', 'success');
         navigate('/active');
       } else {
-        alert('Đăng ký thất bại!');
+        showToast('Đăng ký thất bại!', 'error');
       }
     } catch (err) {
       console.error('Có lỗi xảy ra: ', err);
-      alert('Đăng ký thất bại!');
+      showToast('Đăng ký thất bại!', 'error');
     }
   };
 
