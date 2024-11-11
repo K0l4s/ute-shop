@@ -1,4 +1,4 @@
-const { getBooks, getBookDetailById, getTop10BooksByOrderQuantity, createNewBook, getBooksByListId } = require("../services/bookService.js");
+const { getBooks, getBookDetailById, getTop10BooksByOrderQuantity, createNewBook, getBooksByListId, getPurchasedBooksByUser } = require("../services/bookService.js");
 const { uploadBookImage } = require("../services/uploadService.js");
 // const { createBook } = require("../services/bookService.js");
 const { uploadBookService } = require("../services/uploadService.js");
@@ -95,10 +95,25 @@ const getBooksByListIdController = async (req, res) => {
   }
 }
 
+const getPurchasedBooksByUserController = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const books = await getPurchasedBooksByUser(userId);
+    return res.status(200).json({
+      message: "success",
+      data: books
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
 module.exports = {
   getBooksController,
   getBookDetailByIdController,
   getTop10Books,
   createBookController,
-  getBooksByListIdController
+  getBooksByListIdController,
+  getPurchasedBooksByUserController
 };

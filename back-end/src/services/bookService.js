@@ -410,12 +410,102 @@ const getBooksByListId = async (ids) => {
     throw error;
   }
 };
+
+const getPurchasedBooksByUser = async (userId) => {
+  try {
+    // Lấy tất cả các đơn hàng đã hoàn thành của user
+    const orders = await Order.findAll({
+      where: { user_id: userId, status: 'SHIPPED' },
+      include: [{
+        model: Detail_Order,
+        as: 'orderDetails',
+        include: {
+          model: Book,
+          as: 'book'
+        }
+      }],
+      order: [['order_date', 'DESC']]
+    });
+
+    const bookMap = new Map();
+
+    orders.forEach(order => {
+      order.orderDetails.forEach(detail => {
+        const bookId = detail.book_id;
+        const quantity = detail.quantity;
+        const orderDate = order.order_date;
+
+        if (bookMap.has(bookId)) {
+          const existingEntry = bookMap.get(bookId);
+          existingEntry.quantity += quantity;
+          existingEntry.order_date = orderDate > existingEntry.order_date ? orderDate : existingEntry.order_date;
+          bookMap.set(bookId, existingEntry);
+        } else {
+          bookMap.set(bookId, { quantity, order_date: orderDate });
+        }
+      });
+    });
+
+    const purchasedBooks = [];
+
+    const bookIds = Array.from(bookMap.keys());
+
+    const books = await Book.findAll({
+      attributes: {
+        include: [
+          [
+            sequelize.fn('AVG', sequelize.col('Reviews.star')),
+            'avgRating'
+          ],
+          [
+            sequelize.fn('COUNT', sequelize.col('Reviews.id')),
+            'reviewCount'
+          ]
+        ]
+      },
+      where: {
+        id: {
+          [Op.in]: bookIds
+        }
+      },
+      include: [
+        {
+          model: Review,
+          as: 'Reviews',
+          attributes: [] // Exclude individual review attributes
+        }
+      ],
+      group: ['Book.id']
+    });
+
+    books.forEach(book => {
+      const { id, avgRating, reviewCount } = book;
+      const { quantity, order_date } = bookMap.get(id);
+      purchasedBooks.push({
+        book,
+        quantity,
+        order_date,
+        avgRating,
+        reviewCount
+      });
+    });
+
+    // Sắp xếp sách theo thời gian của quyển sách mới nhất được order
+    purchasedBooks.sort((a, b) => b.order_date - a.order_date);
+
+    return purchasedBooks;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   // searchBooksByTitle,
   getTop10BooksByOrderQuantity,
   getBooks,
   getBookDetailById,
   createNewBook,
-  getBooksByListId
+  getBooksByListId,
+  getPurchasedBooksByUser
 };
 

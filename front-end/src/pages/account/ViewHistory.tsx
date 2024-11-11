@@ -114,11 +114,13 @@ const ViewHistory: React.FC = () => {
               <h3 className="font-semibold">{book.title}</h3>
               <div>
                 <p className="text-xl text-red-500 font-semibold min-h-[24px]">
-                  {book.salePrice ? `${formatPrice(book.salePrice)}` : ''}
+                  {formatPrice(book.salePrice || book.price || '0')}
                 </p>
-                <p className="line-through text-gray-500 min-h-[24px]">
-                  {book.price ? `${formatPrice(book.price)}` : ''}
-                </p>
+                {book.salePrice && (
+                  <p className="line-through text-gray-500 min-h-[24px]">
+                    {formatPrice(book.price || '0')}
+                  </p>
+                )}
               </div>
               <div className="flex items-center my-2">
                 <label className='text-2xl flex'>{formatStar(book.avgRating)}</label>

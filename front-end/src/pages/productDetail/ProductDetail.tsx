@@ -262,9 +262,15 @@ const ProductDetail: React.FC = () => {
 
               <p className='font-semibold text-green-600'>Tình trạng: {book.stock > book.sold_count + 1 ? 'Còn hàng' : 'Hết hàng'}</p>
               <div className="flex items-center space-x-2">
-                <span className="text-3xl text-red-600 font-semibold">{formatMoney(book.salePrice || 0)} VND</span>
-                <span className="line-through text-gray-500">{formatMoney(book.price || 0)} VND</span>
-              </div>
+              <span className="text-3xl text-red-600 font-semibold">
+                {formatMoney(book.salePrice || book.price || 0)} VND
+              </span>
+              {book.salePrice && (
+                <span className="line-through text-gray-500">
+                  {formatMoney(book.price || 0)} VND
+                </span>
+              )}
+            </div>
               <div className="flex items-center space-x-2">
                 <label className='text-2xl flex'>
                   {formatStar(averageRating)}
