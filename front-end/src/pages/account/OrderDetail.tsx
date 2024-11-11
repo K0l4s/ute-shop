@@ -52,6 +52,11 @@ const OrderDetail = ({ orderId, isOpen, onClose }: { orderId: number; onClose: (
     return orderDetails.reduce((acc, detail) => acc + Number(detail.price) * detail.quantity, 0);
   };
 
+  const calculateDiscountPercent = (discountPerc: any, orderDetails: any) => {
+    const amount = sumPrice(orderDetails);
+    return formatPriceToVND(amount * parseInt(discountPerc) / 100);
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -88,7 +93,7 @@ const OrderDetail = ({ orderId, isOpen, onClose }: { orderId: number; onClose: (
             >
               <FaTruckLoading size={24} />
             </div>
-            <p className='font-semibold text-base'>Đã xử lý</p>
+            <p className='font-semibold text-base'>Đang xử lý</p>
             <span className='text-sm text-gray-600'>{formatDateTime(order.orderTracking.processedAt)}</span>
           </div>
           <div className='flex-grow border-t border-gray-600'></div>
@@ -189,11 +194,11 @@ const OrderDetail = ({ orderId, isOpen, onClose }: { orderId: number; onClose: (
               </tr>
               <tr>
                 <td className='border border-gray-400 px-4 py-2 font-semibold text-right'>Miễn vận chuyển</td>
-                <td className='border border-gray-400 px-4 py-2 text-right'>- {order.freeship_id ? 'Áp dụng' : '0'}</td>
+                <td className='border border-gray-400 px-4 py-2 text-right'>- {order.freeship ? `${(order.freeship.discount_val) || calculateDiscountPercent(order.discount.discount_perc, orderDetails)}` : '0'} đ</td>
               </tr>
               <tr>
                 <td className='border border-gray-400 px-4 py-2 font-semibold text-right'>Giảm giá</td>
-                <td className='border border-gray-400 px-4 py-2 text-right'>- {order.discount_id ? 'Áp dụng' : '0'}</td>
+                <td className='border border-gray-400 px-4 py-2 text-right'>- {order.discount ? `${(order.discount.discount_val) || calculateDiscountPercent(order.discount.discount_perc, orderDetails)}` : '0'} đ</td>
               </tr>
               <tr>
                 <td className='border border-gray-400 px-4 py-2 font-semibold text-right'>Thành tiền</td>

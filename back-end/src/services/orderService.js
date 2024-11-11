@@ -7,7 +7,7 @@ const Category = db.Category;
 const Payment = db.Payment;
 const User = db.User;
 const Discount = db.Discount;
-const FreeShip = db.Freeship;
+const Freeship = db.Freeship;
 const Cart = db.Cart;
 const orderStatus = require('../enums/orderStatus');
 const { createAndSendOrderNotification } = require('./notificationService');
@@ -98,7 +98,7 @@ const createOrder = async (userId, orderData, transaction, wss) => {
 
     // Trừ stock cho voucher freeship
     if (freeship_id) {
-      const freeshipVoucher = await FreeShip.findByPk(freeship_id, { transaction });
+      const freeshipVoucher = await Freeship.findByPk(freeship_id, { transaction });
       if (freeshipVoucher) {
         freeshipVoucher.stock -= 1;
         await freeshipVoucher.save({ transaction });
@@ -239,7 +239,12 @@ const shipOrder = async (orderId) => {
       throw new Error(`Order with ID ${orderId} has been returned`);
     }
 
-    await order.update({ status: 'SHIPPED' });
+    await order.update({ status: 'SHIPPED' , updatedAt: new Date()});
+
+    const orderTracking = await OrderTracking.findOne({ where: { order_id: orderId } });
+    if (orderTracking) {
+      await orderTracking.update({ shippedAt: new Date() });
+    }
 
     return order;
   } catch (error) {
@@ -276,7 +281,12 @@ const cancelOrder = async (orderId) => {
     }
 
 
-    await order.update({ status: 'CANCELLED' });
+    await order.update({ status: 'CANCELLED' , updatedAt: new Date()});
+
+    const orderTracking = await OrderTracking.findOne({ where: { order_id: orderId } });
+    if (orderTracking) {
+      await orderTracking.update({ canceledAt: new Date() });
+    }
 
     return order;
   } catch (error) {
@@ -316,7 +326,12 @@ const returnOrder = async (orderId) => {
     else if (diff > 24 * 60 && order.status == orderStatus.DELIVERED) {
       throw new Error('Order cannot be returned after 24 hours');
     }
-    await order.update({ status: 'RETURNED' });
+    await order.update({ status: 'RETURNED', updatedAt: new Date() });
+
+    const orderTracking = await OrderTracking.findOne({ where: { order_id: orderId } });
+    if (orderTracking) {
+      await orderTracking.update({ returnedAt: new Date() });
+    }
 
     return order;
   }
@@ -346,7 +361,12 @@ const confirmOrder = async (orderId) => {
     else if (order.status === orderStatus.DELIVERED) {
       throw new Error(`Order with ID ${orderId} has been delivered`);
     }
-    await order.update({ status: 'CONFIRMED' });
+    await order.update({ status: 'CONFIRMED', updatedAt: new Date() });
+
+    const orderTracking = await OrderTracking.findOne({ where: { order_id: orderId } });
+    if (orderTracking) {
+      await orderTracking.update({ confirmedAt: new Date() });
+    }
 
     return order;
   } catch (error) {
@@ -374,7 +394,12 @@ const processOrder = async (orderId) => {
     else if (order.status === orderStatus.SHIPPED) {
       throw new Error(`Order with ID ${orderId} has been shipped`);
     }
-    await order.update({ status: 'PROCESSING' });
+    await order.update({ status: 'PROCESSING' , updatedAt: new Date()});
+
+    const orderTracking = await OrderTracking.findOne({ where: { order_id: orderId } });
+    if (orderTracking) {
+      await orderTracking.update({ processedAt: new Date() });
+    }
 
     return order;
   } catch (error) {
@@ -399,7 +424,12 @@ const deliverOrder = async (orderId) => {
     else if (order.status === orderStatus.SHIPPED) {
       throw new Error(`Order with ID ${orderId} has been shipped`);
     }
-    await order.update({ status: 'DELIVERED' });
+    await order.update({ status: 'DELIVERED', updatedAt: new Date() });
+
+    const orderTracking = await OrderTracking.findOne({ where: { order_id: orderId } });
+    if (orderTracking) {
+      await orderTracking.update({ deliveredAt: new Date() });
+    }
 
     return order;
   } catch (error) {
@@ -540,7 +570,17 @@ const getDetailOrderByUser = async (userId, orderId) => {
           model: Payment,
           as: 'payment',
           attributes: ['payment_date', 'payment_method', 'status']
-        }
+        },
+        {
+          model: Discount,
+          as: 'discount',
+          attributes: ['code', 'discount_val', 'discount_perc']
+        },
+        {
+          model: Freeship,
+          as: 'freeship',
+          attributes: ['code', 'discount_val', 'discount_perc']
+        },
       ]
     });
 

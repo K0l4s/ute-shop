@@ -125,9 +125,9 @@ router.get('/vnpay_ipn', async function (req, res, next) {
                 //paymentStatus = '1'
                 // Ở đây cập nhật trạng thái giao dịch thanh toán thành công vào CSDL của bạn
                 // Thanh toán thành công, cập nhật trạng thái đơn hàng và thanh toán
-                await Order.update({ status: 'PROCESSING' }, { where: { id: orderId }, transaction: t});
+                // await Order.update({ status: 'PROCESSING' }, { where: { id: orderId }, transaction: t});
                 await Payment.update({ status: 'COMPLETED', payment_date: new Date() }, { where: { order_id: orderId }, transaction: t});
-                await OrderTracking.update({ confirmedAt: new Date() }, { where: { order_id: orderId }, transaction: t });
+                // await OrderTracking.update({ confirmedAt: new Date() }, { where: { order_id: orderId }, transaction: t });
                 
                 const orderItems = await Detail_Order.findAll({ where: { order_id: orderId }, transaction: t });
                 // Xóa các mục tương ứng trong giỏ hàng

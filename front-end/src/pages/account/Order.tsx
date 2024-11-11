@@ -117,7 +117,7 @@ const Orders = () => {
       const params = new URLSearchParams(location.search);
       params.set('status', 'CANCELLED');
       navigate({ search: params.toString() });
-      // fetchOrders('CANCELLED', 5, 0);
+      showToast('Hủy đơn hàng thành công', 'success');
     }).catch((err) => {
       console.log(err);
       showToast('Có lỗi xảy ra khi hủy đơn hàng: ' + err.message, 'error');
@@ -126,6 +126,7 @@ const Orders = () => {
 
   const handleReorder = (orderId: number) => {
     console.log(`Reorder #${orderId}`);
+    showToast('Chức năng mua lại đơn hàng đang được phát triển', 'success');
     // Code để mua lại đơn hàng tại đây
   };
 
@@ -135,6 +136,7 @@ const Orders = () => {
       const params = new URLSearchParams(location.search);
       params.set('status', 'SHIPPED');
       navigate({ search: params.toString() });
+      showToast('Xác nhận nhận hàng thành công', 'success');
     }).catch((err) => {
       console.log(err);
       showToast('Có lỗi xảy ra khi xác nhận nhận hàng: ' + err.message, 'error');
@@ -147,6 +149,7 @@ const Orders = () => {
       const params = new URLSearchParams(location.search);
       params.set('status', 'RETURNED');
       navigate({ search: params.toString() });
+      showToast("Yêu cầu trả hàng đã được gửi", 'success');
     }).catch((err) => {
       console.log(err);
       showToast('Có lỗi xảy ra khi yêu cầu trả hàng: ' + err.message, 'error');
