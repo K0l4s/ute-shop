@@ -108,6 +108,7 @@ export const WebSocketProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
         }))
       );
       setUnreadCount(0);
+      localStorage.setItem('unreadCount', '0');
     } catch (error) {
       console.error("Failed to mark all notifications as read", error);
     }

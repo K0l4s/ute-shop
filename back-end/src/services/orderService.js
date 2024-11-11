@@ -11,6 +11,7 @@ const Freeship = db.Freeship;
 const Cart = db.Cart;
 const orderStatus = require('../enums/orderStatus');
 const { createAndSendOrderNotification, sendOrderNotificationToAdmins } = require('./notificationService');
+const { sendOrderDetailsEmail } = require('./emailService');
 
 const createOrder = async (userId, orderData, transaction, wss) => {
   try {
@@ -443,6 +444,14 @@ const updateOrder = async (orderId, status, userId, wss) => {
   try {
     order = await Order.findByPk(orderId);
     const order_user_id = order.user_id;
+    const user = await User.findByPk(order_user_id);
+    const orderDetails = await Detail_Order.findAll({
+      where: { order_id: orderId },
+      include: {
+        model: Book,
+        as: 'book'
+      }
+    });
 
     let order = null;
     if ((status == orderStatus.CANCELLED ||
@@ -468,6 +477,8 @@ const updateOrder = async (orderId, status, userId, wss) => {
     else if (status == orderStatus.DELIVERED) {
       order = await deliverOrder(orderId);
       await createAndSendOrderNotification(wss, order_user_id, orderId, `Đơn hàng #${orderId} đang giao đến cho bạn. Vui lòng chú ý điện thoại.`);
+      //Send mail to user
+      await sendOrderDetailsEmail(user.email, order, orderDetails);
     }
     else if (status == orderStatus.SHIPPED) {
       order = await shipOrder(orderId);
