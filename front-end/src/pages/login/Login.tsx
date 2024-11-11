@@ -4,6 +4,7 @@ import { login, setUser } from '../../redux/reducers/authSlice';
 import { useDispatch } from 'react-redux';
 import { loginApi } from '../../apis/auth';
 import { showToast } from '../../utils/toastUtils';
+import { FaSpinner } from 'react-icons/fa';
 interface LoginProps {}
 
 const Login: React.FC<LoginProps> = () => {
@@ -87,8 +88,9 @@ const Login: React.FC<LoginProps> = () => {
             <button
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-24 rounded focus:outline-none focus:shadow-outline"
+              disabled={isLoading}
             >
-              Sign in
+              {isLoading ? <FaSpinner className="animate-spin" /> : 'Sign in'} {/*Hiển thị khi đang loading*/}
             </button>
           </div>
         </form>
