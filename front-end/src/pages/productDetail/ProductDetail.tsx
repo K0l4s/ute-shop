@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -62,6 +62,7 @@ const ProductDetail: React.FC = () => {
   const [showLoginRequired, setShowLoginRequired] = useState(false);
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const [reviewList, setReviewList] = useState<Reviews[]>([]); // Review list
+  const contentRef = useRef<HTMLTextAreaElement>(null);
   // user address from redux
   const userAddress = useSelector((state: RootState) => state.auth.user?.address + ', ' + state.auth.user?.ward + ', ' + state.auth.user?.district + ', ' + state.auth.user?.province);
   const { id } = useParams<{ id: string }>();  // Get the book ID from route params
@@ -119,12 +120,19 @@ const ProductDetail: React.FC = () => {
     return money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
   
+  
+
   const submitReview = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent default form submission
 
     // Get form values
     const rating = event.currentTarget.rating.value; // Get rating from select
-    const content = event.currentTarget.content.value; // Get content from textarea
+    const content = contentRef.current?.value;
+
+    if (!content) {
+      showToast('Vui lòng điền đầy đủ thông tin đánh giá', 'error');
+      return;
+    } // Get content from textarea
 
     const review = {
       bookId: book.id,
@@ -138,10 +146,12 @@ const ProductDetail: React.FC = () => {
 
         // Update review list
         setReviewList([...reviewList, response.data]);
-        alert('Review submitted successfully!');
+        showToast('Đánh giá của bạn đã được gửi thành công', 'success');
+        if (contentRef.current) contentRef.current.value = '';
       })
       .catch((err) => {
         console.error('Error submitting review:', err);
+        showToast('Có lỗi xảy ra khi gửi đánh giá', 'error');
       });
   };
 
@@ -338,7 +348,7 @@ const ProductDetail: React.FC = () => {
                 </div>
                 <div>
                   <label htmlFor="content" className="text-lg">Nội dung</label>
-                  <textarea name="content" id="content" className="border border-gray-300 rounded-lg p-2 w-full h-32"></textarea>
+                  <textarea ref={contentRef} name="content" id="content" className="border border-gray-300 rounded-lg p-2 w-full h-32"></textarea>
                 </div>
                 <button type="submit" className="w-24 bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-2 rounded-lg">Gửi</button>
               </form>
