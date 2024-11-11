@@ -17,7 +17,7 @@ const FreeShip = db.Freeship;
 const Cart = db.Cart;
 const querystring = require('qs');
 const crypto = require('crypto');
-const { sendNotificationToClient } = require('../services/notificationService');
+const { sendNotificationToClient, sendOrderNotificationToAdmins } = require('../services/notificationService');
 // 
 router.post('/create_payment_url', authenticateJWT, async function (req, res, next) {
   const userId = req.user.id; // Lấy userId từ req.user sau khi authenticateJWT
@@ -154,6 +154,10 @@ router.get('/vnpay_ipn', async function (req, res, next) {
                 await t.commit();
                 // Gửi thông báo qua WebSocket
                 sendNotificationToClient(req.wss, newNotification);
+
+                // Send to admin
+                const messageToAdmin = `Có đơn hàng mới #${orderId} cần xử lý từ khách hàng #${userId}`;
+                await sendOrderNotificationToAdmins(req.wss, orderId, messageToAdmin);
 
                 res.status(200).json({RspCode: '00', Message: 'Success'})
               }

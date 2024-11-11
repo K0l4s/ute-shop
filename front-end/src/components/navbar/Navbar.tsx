@@ -48,7 +48,7 @@ const Navbar = () => {
         dispatch(logout());
         localStorage.clear();
         clearNotifications();
-        alert('Đăng xuất thành công!');
+        // alert('Đăng xuất thành công!');
         // Có thể điều hướng về trang đăng nhập hoặc trang chủ
         navigate('/login');
       } else {

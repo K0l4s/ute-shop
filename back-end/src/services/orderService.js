@@ -10,7 +10,7 @@ const Discount = db.Discount;
 const Freeship = db.Freeship;
 const Cart = db.Cart;
 const orderStatus = require('../enums/orderStatus');
-const { createAndSendOrderNotification } = require('./notificationService');
+const { createAndSendOrderNotification, sendOrderNotificationToAdmins } = require('./notificationService');
 
 const createOrder = async (userId, orderData, transaction, wss) => {
   try {
@@ -110,6 +110,9 @@ const createOrder = async (userId, orderData, transaction, wss) => {
     if (payment_method === "COD") {
       const message = `Đơn hàng #${newOrder.id} của bạn đã được đặt thành công và đang chờ xử lý.`;
       await createAndSendOrderNotification(wss, userId, newOrder.id, message);
+      
+      const messageToAdmin = `Có đơn hàng mới #${newOrder.id} cần xử lý từ khách hàng #${userId}`;
+      await sendOrderNotificationToAdmins(wss, newOrder.id, messageToAdmin);
     }
 
     return { newOrder, newPayment, newOrderTracking };
@@ -177,7 +180,7 @@ const getOrdersByUserId = async (id, status, limit, offset) => {
           },
         }
       ],
-      order: [['order_date', 'DESC']],
+      order: [['updatedAt', 'DESC']],
       limit: limit,
       offset: offset
     });
@@ -436,8 +439,11 @@ const deliverOrder = async (orderId) => {
     throw new Error(error.message);
   }
 }
-const updateOrder = async (orderId, status, userId) => {
+const updateOrder = async (orderId, status, userId, wss) => {
   try {
+    order = await Order.findByPk(orderId);
+    const order_user_id = order.user_id;
+
     let order = null;
     if ((status == orderStatus.CANCELLED ||
       status == orderStatus.RETURNED ||
@@ -453,15 +459,21 @@ const updateOrder = async (orderId, status, userId) => {
     }
     else if (status == orderStatus.CONFIRMED) {
       order = await confirmOrder(orderId);
+      await createAndSendOrderNotification(wss, order_user_id, orderId, `Đơn hàng #${orderId} của bạn đã được xác nhận.`);
     }
     else if (status == orderStatus.PROCESSING) {
       order = await processOrder(orderId);
+      await createAndSendOrderNotification(wss, order_user_id, orderId, `Đơn hàng #${orderId} của bạn đang được xử lý.`);
     }
     else if (status == orderStatus.DELIVERED) {
       order = await deliverOrder(orderId);
+      await createAndSendOrderNotification(wss, order_user_id, orderId, `Đơn hàng #${orderId} đang giao đến cho bạn. Vui lòng chú ý điện thoại.`);
     }
     else if (status == orderStatus.SHIPPED) {
       order = await shipOrder(orderId);
+      const messageToAdmin = `Đơn hàng #${orderId} đã giao thành công`;
+      await createAndSendOrderNotification(wss, order_user_id, orderId, `Đơn hàng #${orderId} đã giao thành công.`);
+      await sendOrderNotificationToAdmins(wss, orderId, messageToAdmin);
     }
     else {
       throw new Error('Invalid status');
