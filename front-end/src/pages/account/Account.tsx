@@ -7,6 +7,7 @@ import { updateProfileApis } from '../../apis/user';
 import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { BsKey } from 'react-icons/bs';
 import ChangePassword from '../../components/modals/ChangePassword';
+import { showToast } from '../../utils/toastUtils';
 
 const Account = () => {
   const dispatch = useDispatch();
@@ -95,7 +96,7 @@ const Account = () => {
         avatar_url: response.data.avatar_url || updatedUser.avatarUrl
       }));
     } else {
-      alert('Error saving changes: ' + (response?.message || 'Unknown error'));
+      showToast('Lưu thay đổi thất bại!', 'error');
     }
   };
 
@@ -106,12 +107,12 @@ const Account = () => {
       const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
 
       if (!allowedTypes.includes(fileType)) {
-        alert('Chỉ cho phép các định dạng ảnh jpeg, jpg và png!');
+        showToast('Chỉ cho phép các định dạng ảnh jpeg, jpg và png!', 'error');
         return;
       }
 
       setAvatar(file);
-      alert('Ảnh đã được chọn!');
+      showToast('Ảnh đã được chọn!', 'success');
     }
   };
 
