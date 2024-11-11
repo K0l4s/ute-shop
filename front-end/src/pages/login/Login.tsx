@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { login, setUser } from '../../redux/reducers/authSlice';
 import { useDispatch } from 'react-redux';
 import { loginApi } from '../../apis/auth';
+import { showToast } from '../../utils/toastUtils';
 interface LoginProps {}
 
 const Login: React.FC<LoginProps> = () => {
@@ -11,12 +12,14 @@ const Login: React.FC<LoginProps> = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const data = await loginApi(email, password);
-      alert('Đăng nhập thành công!');
+      showToast('Đăng nhập thành công!', 'success',);
       
       // Lưu thông tin người dùng vào Redux
       dispatch(login());
@@ -40,10 +43,12 @@ const Login: React.FC<LoginProps> = () => {
       const from = location.state?.from?.pathname || '/';
       navigate(from);
     } catch (err) {
-      alert('Đăng nhập thất bại!');
+      showToast('Đăng nhập thất bại!', 'error',);
       // if (data?.error === "Error logging in: User not active") {
       //   navigate('/active');
       // }
+    } finally{
+      setIsLoading(false);
     }
     
   };
