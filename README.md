@@ -32,7 +32,7 @@ Follow these steps to run the project locally:
 ### Steps  
 1. Clone the repository:  
    ```bash  
-   git clone https://github.com/your-username/ute-shop.git  
+   git clone https://github.com/K0l4s/ute-shop.git  
    cd ute-shop
 2. Install package
    ```bash
