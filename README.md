@@ -114,4 +114,5 @@ Examples include helper functions for formatting dates, calculating values, or h
 
 Feel free to extend the structure as needed for your project requirements.
 
+# [More](https://github.com/K0l4s/ute-shop/wiki)
 
