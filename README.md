@@ -1,6 +1,23 @@
 # UTE SHOP  
 
 **UTE Shop** is an e-commerce website specializing in selling economics books, offering users an intuitive shopping experience and a rich collection of resources.  
+## Collobrations
+#### Size: 3 Members
+
+| **Student ID** | **Fullname** | **Role** | **Contact** |
+|-----------------|--------------|----------|-----------|
+| 21110223 | Huỳnh Trung Kiên| Full-stack Developer| [Github](https://github.com/k0l4s) |
+| 21110314 | Ngô Minh Thuận | Full-stack Developer| [Github](https://github.com/nauht1) |
+| 21110300 | Nguyễn Thế Thành | Full-stack Developer| [Github](https://github.com/thanhnt932) |
+
+## Task Assignment
+
+| **ID** | **Task**          | **Member**                     |
+|--------|--------------------|-------------------------------|
+| 1      | Setup Project      | Huỳnh Trung Kiên <br> Ngô Minh Thuận |
+| 2 | ||
+
+
 
 ## Key Features  
 - **User-Friendly Interface**:  
