@@ -55,12 +55,16 @@ const FavoriteBooks: React.FC = () => {
   const handleRemoveAllFavorite = () => {
     localStorage.removeItem('favoriteBooks');
     setFavoriteBooks([]);
+    if (favoriteBooks.length > 0) {
+      showToast('Đã xóa tất cả khỏi danh sách yêu thích', 'success');
+    }
   }
   
   const handleRemoveFromFavorite = (bookId: number) => {
     const updatedBookIds = JSON.parse(localStorage.getItem('favoriteBooks') || '[]').filter((id: number) => id !== bookId);
     localStorage.setItem('favoriteBooks', JSON.stringify(updatedBookIds));
     setFavoriteBooks(favoriteBooks.filter(book => book.id !== bookId));
+    showToast('Đã xóa khỏi danh sách yêu thích', 'success');
   }
 
   const handleAddToCart = async (book: Book) => {

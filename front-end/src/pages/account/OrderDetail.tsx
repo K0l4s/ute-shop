@@ -138,7 +138,7 @@ const OrderDetail = ({ orderId, isOpen, onClose }: { orderId: number; onClose: (
             {order.payment.payment_date && 
               <p className='text-green-600'>Ngày thanh toán: {formatDateTime(order.payment.payment_date)}</p>
             }
-            <p className={`${order.payment.status === 'COMPLETED' ? 'text-green-600' : 'text-red-500'}`}>{order.payment.status === 'COMPLETED' ? 'Đã thanh toán' : 'Chưa thanh toán' }</p>
+            {/* <p className={`${order.payment.status === 'COMPLETED' ? 'text-green-600' : 'text-red-500'}`}>{order.payment.status === 'COMPLETED' ? 'Đã thanh toán' : 'Chưa thanh toán' }</p> */}
           </div>
         </div>
 

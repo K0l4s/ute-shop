@@ -54,12 +54,16 @@ const ViewHistory: React.FC = () => {
   const handleRemoveAllHistory = () => {
     localStorage.removeItem('viewedBooks');
     setViewedBooks([]);
+    if (viewedBooks.length > 0) {
+      showToast('Đã xóa tất cả lịch sử xem', 'success');
+    }
   }
   
   const handleRemoveFromHistory = (bookId: number) => {
     const updatedBookIds = JSON.parse(localStorage.getItem('viewedBooks') || '[]').filter((id: number) => id !== bookId);
     localStorage.setItem('viewedBooks', JSON.stringify(updatedBookIds));
     setViewedBooks(viewedBooks.filter(book => book.id !== bookId));
+    showToast('Đã xóa khỏi lịch sử xem', 'success');
   }
 
   const handleAddToCart = async (book: Book) => {
