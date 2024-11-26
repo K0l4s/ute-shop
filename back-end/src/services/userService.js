@@ -81,9 +81,21 @@ const getAllUser = async () => {
   });
 };
 
+const getAdminUsers = async () => {
+  try {
+    const admins = await db.User.findAll({
+      where: { role: 'admin' }
+    });
+    return admins;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+};
+
 module.exports = {
   getUserById,
   updateUserById,
   updateUserLocationById,
   getAllUser,
+  getAdminUsers
 };

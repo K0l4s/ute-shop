@@ -59,8 +59,12 @@ const getBooks = async (filters, page = 1, limit = 16) => {
     const { title, minPrice, maxPrice, publisher, minAge, maxAge, sortByPrice } = filters;
 
     // Thiết lập điều kiện tìm kiếm
-    const whereClause = {};
-
+    const whereClause = {
+      stock: {
+        [Op.gt]: 0 // gt = greater than
+      }
+    };
+    
     // Tìm kiếm theo tiêu đề nếu có
     if (title) {
       whereClause.title = { [Op.like]: `%${title}%` };
@@ -68,15 +72,24 @@ const getBooks = async (filters, page = 1, limit = 16) => {
 
     // Lọc theo khoảng giá nếu có
     if (minPrice || maxPrice) {
-      whereClause.price = {
+      whereClause[Op.or] = [
+        {
+          salePrice: {
         ...(minPrice ? { [Op.gte]: minPrice } : {}),
         ...(maxPrice ? { [Op.lte]: maxPrice } : {}),
-      };
+          }
+        },
+        {
+          price: {
+        ...(minPrice ? { [Op.gte]: minPrice } : {}),
+        ...(maxPrice ? { [Op.lte]: maxPrice } : {}),
+          }
+        }
+      ];
     }
 
     // Lọc theo khoảng độ tuổi nếu có
     if (minAge || maxAge) {
-
       whereClause.age = {
         ...(minAge ? { [Op.gte]: minAge } : {}),
         ...(maxAge ? { [Op.lte]: maxAge } : {}),
@@ -89,11 +102,13 @@ const getBooks = async (filters, page = 1, limit = 16) => {
       order.push(['price', sortByPrice === 'asc' ? 'ASC' : 'DESC']);
     }
 
+    // Decode the publisher
+    const decodedPublisher = publisher ? decodeURIComponent(publisher) : null;
     // Sử dụng include với where để áp dụng điều kiện lọc publisher
     const includePublisher = {
       model: Publisher,
       attributes: ['name'],
-      ...(publisher ? { where: { name: { [Op.eq]: publisher } } } : {}),
+      ...(decodedPublisher ? { where: { name: { [Op.eq]: decodedPublisher } } } : {}),
     };
 
     // Lấy tổng số lượng sách thỏa mãn điều kiện
@@ -108,6 +123,11 @@ const getBooks = async (filters, page = 1, limit = 16) => {
       where: whereClause,
       include: [
         {
+          model: Publisher,
+          attributes: ['name'],
+          ...(decodedPublisher ? { where: { name: { [Op.eq]: decodedPublisher } } } : {}),
+        },
+        {
           model: Genre,
           as: 'genres', // Alias for Genre association
           attributes: ['name'],
@@ -117,10 +137,10 @@ const getBooks = async (filters, page = 1, limit = 16) => {
           model: Author,
           as: 'Author' // Ensure this matches the association alias
         },
-        {
-          model: Publisher,
-          as: 'Publisher' // Ensure this matches the association alias
-        },
+        // {
+        //   model: Publisher,
+        //   as: 'Publisher' // Ensure this matches the association alias
+        // },
         {
           model: Review,
           as: 'Reviews', // Ensure this matches the association alias
@@ -141,20 +161,36 @@ const getBooks = async (filters, page = 1, limit = 16) => {
       attributes: {
         include: [
           [
-            db.sequelize.literal(`(
-                      SELECT COUNT(*)
-                      FROM Books AS BookSold
-                      WHERE BookSold.author_id = Book.author_id
-                  )`),
+            sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM Books AS BookSold
+              WHERE BookSold.author_id = Book.author_id
+            )`),
             'sold_count'
           ],
           [
-            db.sequelize.literal(`(
-                      SELECT SUM(detail_orders.quantity)
-                      FROM detail_orders
-                      WHERE detail_orders.book_id = Book.id
-                  )`),
+            sequelize.literal(`(
+              SELECT SUM(detail_orders.quantity)
+              FROM detail_orders
+              WHERE detail_orders.book_id = Book.id
+            )`),
             'total_sold'
+          ],
+          [
+            sequelize.literal(`(
+              SELECT AVG(Reviews.star)
+              FROM Reviews
+              WHERE Reviews.book_id = Book.id
+            )`),
+            'avgRating'
+          ],
+          [
+            sequelize.literal(`(
+              SELECT COUNT(Reviews.id)
+              FROM Reviews
+              WHERE Reviews.book_id = Book.id
+            )`),
+            'reviewCount'
           ]
         ]
       },
@@ -162,6 +198,7 @@ const getBooks = async (filters, page = 1, limit = 16) => {
       offset: offset,
       limit: limit,
     });
+
     return {
       books: books,
       currentPage: page,
@@ -231,10 +268,10 @@ const getBookDetailById = async (id) => {
         book_id: id
       }
     });
-    console.log(totalSold);
+    // console.log(totalSold);
     // add totalSold to book
     book.sold = totalSold;
-    console.log(book);
+    // console.log(book);
     // Check if the book was found
     if (!book) {
       return null;
@@ -373,12 +410,102 @@ const getBooksByListId = async (ids) => {
     throw error;
   }
 };
+
+const getPurchasedBooksByUser = async (userId) => {
+  try {
+    // Lấy tất cả các đơn hàng đã hoàn thành của user
+    const orders = await Order.findAll({
+      where: { user_id: userId, status: 'SHIPPED' },
+      include: [{
+        model: Detail_Order,
+        as: 'orderDetails',
+        include: {
+          model: Book,
+          as: 'book'
+        }
+      }],
+      order: [['order_date', 'DESC']]
+    });
+
+    const bookMap = new Map();
+
+    orders.forEach(order => {
+      order.orderDetails.forEach(detail => {
+        const bookId = detail.book_id;
+        const quantity = detail.quantity;
+        const orderDate = order.order_date;
+
+        if (bookMap.has(bookId)) {
+          const existingEntry = bookMap.get(bookId);
+          existingEntry.quantity += quantity;
+          existingEntry.order_date = orderDate > existingEntry.order_date ? orderDate : existingEntry.order_date;
+          bookMap.set(bookId, existingEntry);
+        } else {
+          bookMap.set(bookId, { quantity, order_date: orderDate });
+        }
+      });
+    });
+
+    const purchasedBooks = [];
+
+    const bookIds = Array.from(bookMap.keys());
+
+    const books = await Book.findAll({
+      attributes: {
+        include: [
+          [
+            sequelize.fn('AVG', sequelize.col('Reviews.star')),
+            'avgRating'
+          ],
+          [
+            sequelize.fn('COUNT', sequelize.col('Reviews.id')),
+            'reviewCount'
+          ]
+        ]
+      },
+      where: {
+        id: {
+          [Op.in]: bookIds
+        }
+      },
+      include: [
+        {
+          model: Review,
+          as: 'Reviews',
+          attributes: [] // Exclude individual review attributes
+        }
+      ],
+      group: ['Book.id']
+    });
+
+    books.forEach(book => {
+      const { id, avgRating, reviewCount } = book;
+      const { quantity, order_date } = bookMap.get(id);
+      purchasedBooks.push({
+        book,
+        quantity,
+        order_date,
+        avgRating,
+        reviewCount
+      });
+    });
+
+    // Sắp xếp sách theo thời gian của quyển sách mới nhất được order
+    purchasedBooks.sort((a, b) => b.order_date - a.order_date);
+
+    return purchasedBooks;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   // searchBooksByTitle,
   getTop10BooksByOrderQuantity,
   getBooks,
   getBookDetailById,
   createNewBook,
-  getBooksByListId
+  getBooksByListId,
+  getPurchasedBooksByUser
 };
 

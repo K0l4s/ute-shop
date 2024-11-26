@@ -25,6 +25,23 @@ export interface Book {
     returnedAt: string
   }
 
+  export interface Payment {
+    payment_date: string;
+    payment_method: 'COD' | 'VNPAY';
+    status: 'PENDING' | 'COMPLETED' | 'FAILED';
+  }
+
+  export interface Discount {
+    code: string;
+    discount_val: string;
+    discount_perc: string;
+  }
+
+  export interface Freeship {
+    code: string;
+    discount_val: string;
+    discount_perc: string;
+  }
   export interface Order {
     id: number;
     freeship_id: number | null;
@@ -38,5 +55,8 @@ export interface Book {
     updatedAt: string;
     orderTracking: OrderTracking
     orderDetails: OrderDetail[];
+    payment: Payment;
+    discount: Discount;
+    freeship: Freeship;
   }
   

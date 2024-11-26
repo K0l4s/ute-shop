@@ -58,6 +58,7 @@ const getAllOrdersController = async (req, res) => {
 const updateOrderController = async (req, res) => {
   const orderId = req.params.id;
   const status = req.body;
+  const wss = req.wss;
   console.log(status);
   const user = req.user;
   const userDetail = await userService.getUserById(user.id);
@@ -73,7 +74,7 @@ const updateOrderController = async (req, res) => {
     )) {
       throw new Error('You do not have permission to perform this action');
     }
-    const updatedOrder = await orderService.updateOrder(orderId, status.status,user.id);
+    const updatedOrder = await orderService.updateOrder(orderId, status.status,user.id, wss);
     res.status(200).json(updatedOrder);
   } catch (error) {
     res.status(400).json({ message: error.message });

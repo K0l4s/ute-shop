@@ -6,7 +6,17 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Scrollbar, A11y, Autoplay } from 'swiper/modules';
 import { useNavigate } from "react-router-dom";
 import { getTop10BooksAPI } from "../../apis/book";
-import lifechangingbooks from "../../assets/images/life-changing-books.jpg";
+// import lifechangingbooks from "../../assets/images/life-changing-books.jpg";
+import bosuutaptet from "../../assets/images/bo_suu_tap_tet.jpg";
+import bosuutaphe from "../../assets/images/bo_suu_tap_he.webp";
+import bosuutapvanhockinhdien from "../../assets/images/bo_van_hoc_kinh_dien.jpeg";
+import bosuutapthieunhi from "../../assets/images/nhung-cuon-sach-van-hoc-thieu-nhi-min.jpg";
+
+import sachdanhnhanxahoi from "../../assets/images/sach_danh_nhan_xa_hoi.jpg";
+import sachkhamphatrithuc from "../../assets/images/sach_kham_pha_tri_thuc.jpg";
+import tusachphapluat from "../../assets/images/tu_sach_phap_luat.jpg";
+import sachkynangsong from "../../assets/images/sach_ky_nang_song.jpg";
+
 import { FaChartLine } from "react-icons/fa";
 
 import { formatStar, saveToHistory } from "../../utils/bookUtils";
@@ -69,17 +79,24 @@ const LandingPage = () => {
       {/* Product Collections */}
       <section className="py-10">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold mb-6 text-center text-balck">Bộ sưu tập đáng chú ý</h2>
+          <h2 className="text-3xl font-bold mb-6 text-center text-black">Bộ sưu tập đáng chú ý</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-gradient-to-b from-yellow-400 to-yellow-600 p-4 
-              shadow-lg rounded-lg transition-transform transform hover:scale-105">
-                {/* <div className="bg-red-200 h-32 mb-2"></div> */}
-                <img src={lifechangingbooks} alt="" className="object-fit object-cover h-32 mb-2 m-auto rounded-xl shadow-xl" />
-                <p className="mt-2 text-center font-semibold text-white">Product {i + 1}</p>
-              </div>
-
-            ))}
+            <div className="bg-gradient-to-b from-red-400 to-red-600 p-4 shadow-lg rounded-lg transition-transform transform hover:scale-105">
+              <img src={bosuutaptet} alt="Bộ sưu tập Tết" className="object-fit object-cover h-32 mb-2 m-auto rounded-xl shadow-xl" />
+              <p className="mt-2 text-center font-semibold text-white">Bộ sưu tập Tết</p>
+            </div>
+            <div className="bg-gradient-to-b from-yellow-400 to-yellow-600 p-4 shadow-lg rounded-lg transition-transform transform hover:scale-105">
+              <img src={bosuutaphe} alt="Bộ sưu tập Hè" className="object-fit object-cover h-32 mb-2 m-auto rounded-xl shadow-xl" />
+              <p className="mt-2 text-center font-semibold text-white">Bộ sưu tập mùa Hè</p>
+            </div>
+            <div className="bg-gradient-to-b from-green-400 to-green-600 p-4 shadow-lg rounded-lg transition-transform transform hover:scale-105">
+              <img src={bosuutapvanhockinhdien} alt="Bộ sưu tập Văn học Kinh điển" className="object-fit object-cover h-32 mb-2 m-auto rounded-xl shadow-xl" />
+              <p className="mt-2 text-center font-semibold text-white">Bộ sưu tập văn học Kinh điển</p>
+            </div>
+            <div className="bg-gradient-to-b from-blue-400 to-blue-600 p-4 shadow-lg rounded-lg transition-transform transform hover:scale-105">
+              <img src={bosuutapthieunhi} alt="Bộ sưu tập Thiếu nhi" className="object-fit object-cover h-32 mb-2 m-auto rounded-xl shadow-xl" />
+              <p className="mt-2 text-center font-semibold text-white">Bộ sưu tập sách thiếu nhi</p>
+            </div>
           </div>
         </div>
       </section>
@@ -169,7 +186,7 @@ const LandingPage = () => {
       </section>
 
       {/* Partner Publishers */}
-      <section className="py-10">
+      {/* <section className="py-10">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold mb-6 text-center text-balck">Nhà xuất bản cộng tác</h2>
           <div className="flex justify-center flex-wrap gap-6">
@@ -181,19 +198,29 @@ const LandingPage = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Hot Categories */}
       <section className="py-10 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-bold mb-6 text-center">Danh mục HOT</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
-            {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-white p-4 shadow-lg rounded-lg text-center transition-transform transform hover:scale-105">
-                <div className="bg-blue-200 h-32 w-32 mx-auto mb-2"></div>
-                <p>Danh mục {i + 1}</p>
-              </div>
-            ))}
+            <div className="bg-white p-4 shadow-lg rounded-lg text-center transition-transform transform hover:scale-105">
+              <img src={sachdanhnhanxahoi} alt="Sách Danh Nhân Xã Hội" className="object-fit object-cover h-48 w-48 mx-auto mb-2 rounded-xl shadow-xl" />
+              <p>Sách Danh Nhân Xã Hội</p>
+            </div>
+            <div className="bg-white p-4 shadow-lg rounded-lg text-center transition-transform transform hover:scale-105">
+              <img src={sachkhamphatrithuc} alt="Sách Khám Phá Tri Thức" className="object-fit object-cover h-48 w-48 mx-auto mb-2 rounded-xl shadow-xl" />
+              <p>Sách Khám Phá Tri Thức</p>
+            </div>
+            <div className="bg-white p-4 shadow-lg rounded-lg text-center transition-transform transform hover:scale-105">
+              <img src={tusachphapluat} alt="Tủ Sách Pháp Luật" className="object-fit object-cover h-48 w-48 mx-auto mb-2 rounded-xl shadow-xl" />
+              <p>Tủ Sách Pháp Luật</p>
+            </div>
+            <div className="bg-white p-4 shadow-lg rounded-lg text-center transition-transform transform hover:scale-105">
+              <img src={sachkynangsong} alt="Sách Kỹ Năng Sống" className="object-fit object-cover h-48 w-48 mx-auto mb-2 rounded-xl shadow-xl" />
+              <p>Sách Kỹ Năng Sống</p>
+            </div>
           </div>
         </div>
       </section>

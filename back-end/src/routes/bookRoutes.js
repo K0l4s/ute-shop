@@ -1,5 +1,5 @@
 const express = require("express");
-const { getBooksController, getBookDetailByIdController,getTop10Books, createBookController, getBooksByListIdController } = require("../controllers/bookController");
+const { getBooksController, getBookDetailByIdController,getTop10Books, createBookController, getBooksByListIdController, getPurchasedBooksByUserController } = require("../controllers/bookController");
 const multer = require('multer');
 const upload = multer();
 const router = express.Router();
@@ -12,4 +12,5 @@ router.get("/:id", getBookDetailByIdController);
 router.get('/top/10', getTop10Books);
 router.post('/create',upload.single('cover_img_url'),createBookController);
 router.post("/getByList", authenticateJWT, getBooksByListIdController)
+router.post("/purchased", authenticateJWT, getPurchasedBooksByUserController);
 module.exports = router;

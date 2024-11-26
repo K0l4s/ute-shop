@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
 import ReviewSection from '../../components/reviewSection/ReviewSection';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getBookById } from '../../apis/product';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Link } from 'react-router-dom';
@@ -24,6 +24,7 @@ import ImageViewSwiperModal from '../../components/modals/ImageViewSwiperModal';
 
 import { formatStar } from '../../utils/bookUtils';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import LoginRequired from '../../components/modals/LoginRequired';
 
 
 interface Reviews {
@@ -57,7 +58,11 @@ interface Book {
 Modal.setAppElement('#root');
 
 const ProductDetail: React.FC = () => {
+  const navigate = useNavigate();
+  const [showLoginRequired, setShowLoginRequired] = useState(false);
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const [reviewList, setReviewList] = useState<Reviews[]>([]); // Review list
+  const contentRef = useRef<HTMLTextAreaElement>(null);
   // user address from redux
   const userAddress = useSelector((state: RootState) => state.auth.user?.address + ', ' + state.auth.user?.ward + ', ' + state.auth.user?.district + ', ' + state.auth.user?.province);
   const { id } = useParams<{ id: string }>();  // Get the book ID from route params
@@ -115,12 +120,19 @@ const ProductDetail: React.FC = () => {
     return money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
   
+  
+
   const submitReview = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent default form submission
 
     // Get form values
     const rating = event.currentTarget.rating.value; // Get rating from select
-    const content = event.currentTarget.content.value; // Get content from textarea
+    const content = contentRef.current?.value;
+
+    if (!content) {
+      showToast('Vui lòng điền đầy đủ thông tin đánh giá', 'error');
+      return;
+    } // Get content from textarea
 
     const review = {
       bookId: book.id,
@@ -134,10 +146,12 @@ const ProductDetail: React.FC = () => {
 
         // Update review list
         setReviewList([...reviewList, response.data]);
-        alert('Review submitted successfully!');
+        showToast('Đánh giá của bạn đã được gửi thành công', 'success');
+        if (contentRef.current) contentRef.current.value = '';
       })
       .catch((err) => {
         console.error('Error submitting review:', err);
+        showToast('Có lỗi xảy ra khi gửi đánh giá', 'error');
       });
   };
 
@@ -153,6 +167,11 @@ const ProductDetail: React.FC = () => {
   const images = [book.cover_img_url, ...book.Images.map(image => image.url)];
 
   const handleAddToCart = async () => {
+    if (!isAuthenticated) {
+      setShowLoginRequired(true);
+      return;
+    }
+
     const cartItem = {
       id: book.id,
       title: book.title,
@@ -243,9 +262,15 @@ const ProductDetail: React.FC = () => {
 
               <p className='font-semibold text-green-600'>Tình trạng: {book.stock > book.sold_count + 1 ? 'Còn hàng' : 'Hết hàng'}</p>
               <div className="flex items-center space-x-2">
-                <span className="text-3xl text-red-600 font-semibold">{formatMoney(book.salePrice || 0)} VND</span>
-                <span className="line-through text-gray-500">{formatMoney(book.price || 0)} VND</span>
-              </div>
+              <span className="text-3xl text-red-600 font-semibold">
+                {formatMoney(book.salePrice || book.price || 0)} VND
+              </span>
+              {book.salePrice && (
+                <span className="line-through text-gray-500">
+                  {formatMoney(book.price || 0)} VND
+                </span>
+              )}
+            </div>
               <div className="flex items-center space-x-2">
                 <label className='text-2xl flex'>
                   {formatStar(averageRating)}
@@ -307,33 +332,46 @@ const ProductDetail: React.FC = () => {
             </div>
           )}
         </div>
-        <div>
-          {/* Thêm review */}
-          <div className="rounded-xl bg-white p-8">
-            <div className="flex items-center gap-2">
-              <IoCreateOutline className="text-2xl text-violet-700 mb-1" size={32} />
-              <h2 className="text-2xl font-semibold">Thêm đánh giá</h2>
-            </div>
-            <form action="" className="mt-4 space-y-4" onSubmit={submitReview}>
-              <div className="flex items-center space-x-4">
-                <label htmlFor="rating" className="text-lg">Đánh giá</label>
-                <select name="rating" id="rating" className="border border-gray-300 rounded-lg p-2 bg-white focus:outline-none">
-                  <option value="5">5 sao</option>
-                  <option value="4">4 sao</option>
-                  <option value="3">3 sao</option>
-                  <option value="2">2 sao</option>
-                  <option value="1">1 sao</option>
-                </select>
+        
+        {isAuthenticated ? (
+          <div>
+            {/* Thêm review */}
+            <div className="rounded-xl bg-white p-8">
+              <div className="flex items-center gap-2">
+                <IoCreateOutline className="text-2xl text-violet-700 mb-1" size={32} />
+                <h2 className="text-2xl font-semibold">Thêm đánh giá</h2>
               </div>
-              <div>
-                <label htmlFor="content" className="text-lg">Nội dung</label>
-                <textarea name="content" id="content" className="border border-gray-300 rounded-lg p-2 w-full h-32"></textarea>
-              </div>
-              <button type="submit" className="w-24 bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-2 rounded-lg">Gửi</button>
-            </form>
+              <form action="" className="mt-4 space-y-4" onSubmit={submitReview}>
+                <div className="flex items-center space-x-4">
+                  <label htmlFor="rating" className="text-lg">Đánh giá</label>
+                  <select name="rating" id="rating" className="border border-gray-300 rounded-lg p-2 bg-white focus:outline-none">
+                    <option value="5">5 sao</option>
+                    <option value="4">4 sao</option>
+                    <option value="3">3 sao</option>
+                    <option value="2">2 sao</option>
+                    <option value="1">1 sao</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="content" className="text-lg">Nội dung</label>
+                  <textarea ref={contentRef} name="content" id="content" className="border border-gray-300 rounded-lg p-2 w-full h-32"></textarea>
+                </div>
+                <button type="submit" className="w-24 bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-2 rounded-lg">Gửi</button>
+              </form>
 
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="rounded-xl bg-white p-8 mt-8">
+            <p className="text-base">Để thêm đánh giá, vui lòng 
+              {' '}
+              <span className="text-violet-600 font-semibold hover:underline" 
+                onClick={() => navigate('/login')}>
+                  Đăng nhập
+              </span>
+            </p>
+          </div>
+        )}
       </main>
       <ImageViewSwiperModal
         isOpen={modalIsOpen}
@@ -341,6 +379,8 @@ const ProductDetail: React.FC = () => {
         images={images}
         initialSlide={selectedImageIndex}
       />
+
+      {showLoginRequired && <LoginRequired isOpen={showLoginRequired} onClose={() => setShowLoginRequired(false)} />}
     </div>
   );
 };

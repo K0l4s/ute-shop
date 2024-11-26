@@ -11,8 +11,13 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { formatDateTime } from '../../utils/dateUtils';
 
 const Orders = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const params = new URLSearchParams(location.search);
+  const initialStatus = params.get('status') as 'ALL' | 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'DELIVERED' | 'SHIPPED' | 'CANCELLED' | 'RETURNED' || 'ALL';
   const [orders, setOrders] = useState<Order[]>([]);
-  const [filteredStatus, setFilteredStatus] = useState<'ALL' | 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' | 'RETURNED'>('ALL');
+  const [filteredStatus, setFilteredStatus] = useState<'ALL' | 'PENDING' | 'CONFIRMED' | 'PROCESSING' | 'DELIVERED' | 'SHIPPED' | 'CANCELLED' | 'RETURNED'>(initialStatus);
   const [selectedOrder, setSelectedOrder] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -20,9 +25,8 @@ const Orders = () => {
   const [hasMore, setHasMore] = useState(true);
   // const [totalOrders, setTotalOrders] = useState(0); 
 
-  const navigate = useNavigate();
-  const location = useLocation();
-
+  
+  
   const fetchOrders = async (status: string, limit: number, offset: number) => {
     try {
       const newOrders = await getOrderByUser(status, limit, offset);
@@ -67,6 +71,10 @@ const Orders = () => {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const orderId = params.get('orderId');
+    const status = params.get('status');
+    if (status) {
+      setFilteredStatus(status as typeof filteredStatus);
+    }
     if (orderId) {
       setSelectedOrder(Number(orderId));
       setIsModalOpen(true);
@@ -96,6 +104,9 @@ const Orders = () => {
 
   const filterOrders = (status: typeof filteredStatus) => {
     setFilteredStatus(status);
+    const params = new URLSearchParams(location.search);
+    params.set('status', status);
+    navigate({ search: params.toString() });
   };
 
   // const filteredOrders = filteredStatus === 'ALL' ? orders : orders.filter(order => order.status === filteredStatus);
@@ -103,20 +114,29 @@ const Orders = () => {
   const handleCancelOrder = (orderId: number) => {
     console.log(`Cancel order #${orderId}`);
     updateCartStatus(orderId.toString(), 'CANCELLED').then(() => {
-      fetchOrders(filteredStatus, 5, 0);
+      const params = new URLSearchParams(location.search);
+      params.set('status', 'CANCELLED');
+      navigate({ search: params.toString() });
+      showToast('Hủy đơn hàng thành công', 'success');
+    }).catch((err) => {
+      console.log(err);
+      showToast('Có lỗi xảy ra khi hủy đơn hàng: ' + err.message, 'error');
     });
-    // Code để hủy đơn hàng tại đây
   };
 
   const handleReorder = (orderId: number) => {
     console.log(`Reorder #${orderId}`);
+    showToast('Chức năng mua lại đơn hàng đang được phát triển', 'success');
     // Code để mua lại đơn hàng tại đây
   };
 
   const handleConfirmDelivery = (orderId: number) => {
     console.log(`Confirm delivery of order #${orderId}`);
     updateCartStatus(orderId.toString(), 'SHIPPED').then(() => {
-      fetchOrders(filteredStatus, 5, 0);
+      const params = new URLSearchParams(location.search);
+      params.set('status', 'SHIPPED');
+      navigate({ search: params.toString() });
+      showToast('Xác nhận nhận hàng thành công', 'success');
     }).catch((err) => {
       console.log(err);
       showToast('Có lỗi xảy ra khi xác nhận nhận hàng: ' + err.message, 'error');
@@ -126,7 +146,10 @@ const Orders = () => {
   const handleReturn = (orderId: number) => {
     console.log(`Request return of order #${orderId}`);
     updateCartStatus(orderId.toString(), 'RETURNED').then(() => {
-      fetchOrders(filteredStatus, 5, 0);
+      const params = new URLSearchParams(location.search);
+      params.set('status', 'RETURNED');
+      navigate({ search: params.toString() });
+      showToast("Yêu cầu trả hàng đã được gửi", 'success');
     }).catch((err) => {
       console.log(err);
       showToast('Có lỗi xảy ra khi yêu cầu trả hàng: ' + err.message, 'error');
@@ -149,13 +172,19 @@ const Orders = () => {
   const openModal = (orderId: number) => {
     setSelectedOrder(orderId);
     setIsModalOpen(true);
-    navigate(`?orderId=${orderId}`);
+    const params = new URLSearchParams(location.search);
+    params.set('orderId', orderId.toString());
+    navigate({ search: params.toString() });
+    // navigate(`?orderId=${orderId}`);
   };
 
   const closeModal = () => {
     setSelectedOrder(null);
     setIsModalOpen(false);
-    navigate(location.pathname);
+    const params = new URLSearchParams(location.search);
+    params.delete('orderId');
+    navigate({ search: params.toString() });
+    // navigate(location.pathname);
   };
 
   const filteredOrdersBySearch = orders.filter(order =>

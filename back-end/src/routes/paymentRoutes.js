@@ -17,7 +17,7 @@ const FreeShip = db.Freeship;
 const Cart = db.Cart;
 const querystring = require('qs');
 const crypto = require('crypto');
-const { sendNotificationToClient } = require('../services/notificationService');
+const { sendNotificationToClient, sendOrderNotificationToAdmins } = require('../services/notificationService');
 // 
 router.post('/create_payment_url', authenticateJWT, async function (req, res, next) {
   const userId = req.user.id; // Lấy userId từ req.user sau khi authenticateJWT
@@ -125,9 +125,9 @@ router.get('/vnpay_ipn', async function (req, res, next) {
                 //paymentStatus = '1'
                 // Ở đây cập nhật trạng thái giao dịch thanh toán thành công vào CSDL của bạn
                 // Thanh toán thành công, cập nhật trạng thái đơn hàng và thanh toán
-                await Order.update({ status: 'PROCESSING' }, { where: { id: orderId }, transaction: t});
+                // await Order.update({ status: 'PROCESSING' }, { where: { id: orderId }, transaction: t});
                 await Payment.update({ status: 'COMPLETED', payment_date: new Date() }, { where: { order_id: orderId }, transaction: t});
-                await OrderTracking.update({ confirmedAt: new Date() }, { where: { order_id: orderId }, transaction: t });
+                // await OrderTracking.update({ confirmedAt: new Date() }, { where: { order_id: orderId }, transaction: t });
                 
                 const orderItems = await Detail_Order.findAll({ where: { order_id: orderId }, transaction: t });
                 // Xóa các mục tương ứng trong giỏ hàng
@@ -154,6 +154,10 @@ router.get('/vnpay_ipn', async function (req, res, next) {
                 await t.commit();
                 // Gửi thông báo qua WebSocket
                 sendNotificationToClient(req.wss, newNotification);
+
+                // Send to admin
+                const messageToAdmin = `Có đơn hàng mới #${orderId} cần xử lý từ khách hàng #${userId}`;
+                await sendOrderNotificationToAdmins(req.wss, orderId, messageToAdmin);
 
                 res.status(200).json({RspCode: '00', Message: 'Success'})
               }

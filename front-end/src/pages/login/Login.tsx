@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { login, setUser } from '../../redux/reducers/authSlice';
 import { useDispatch } from 'react-redux';
 import { loginApi } from '../../apis/auth';
+import { showToast } from '../../utils/toastUtils';
+import { FaSpinner } from 'react-icons/fa';
 interface LoginProps {}
 
 const Login: React.FC<LoginProps> = () => {
@@ -10,12 +12,15 @@ const Login: React.FC<LoginProps> = () => {
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       const data = await loginApi(email, password);
-      alert('Đăng nhập thành công!');
+      showToast('Đăng nhập thành công!', 'success');
       
       // Lưu thông tin người dùng vào Redux
       dispatch(login());
@@ -35,12 +40,16 @@ const Login: React.FC<LoginProps> = () => {
         role: data.data.role,
       }));
       localStorage.setItem('userData', JSON.stringify(data.data));
-      navigate('/');
+      // Redirect to the previous page or home if no previous page
+      const from = location.state?.from?.pathname || '/';
+      navigate(from);
     } catch (err) {
-      alert('Đăng nhập thất bại!');
+      showToast('Đăng nhập thất bại!', 'error');
       // if (data?.error === "Error logging in: User not active") {
       //   navigate('/active');
       // }
+    } finally{
+      setIsLoading(false);
     }
     
   };
@@ -79,8 +88,9 @@ const Login: React.FC<LoginProps> = () => {
             <button
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-24 rounded focus:outline-none focus:shadow-outline"
+              disabled={isLoading}
             >
-              Sign in
+              {isLoading ? <FaSpinner className="animate-spin" /> : 'Sign in'} {/*Hiển thị khi đang loading*/}
             </button>
           </div>
         </form>

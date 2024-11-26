@@ -132,3 +132,14 @@ export const getBooksByListId = async (ids: number[]) => {
     console.error('Something went wrong: ', error);
   }
 };
+
+export const getPurchasedBooksByUser = async () => {
+  try {
+    const response = await axios.post(BASE_URL + '/book/purchased', {},
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Something went wrong: ', error);
+  }
+};

@@ -7,10 +7,11 @@ const Category = db.Category;
 const Payment = db.Payment;
 const User = db.User;
 const Discount = db.Discount;
-const FreeShip = db.Freeship;
+const Freeship = db.Freeship;
 const Cart = db.Cart;
 const orderStatus = require('../enums/orderStatus');
-const { createAndSendOrderNotification } = require('./notificationService');
+const { createAndSendOrderNotification, sendOrderNotificationToAdmins } = require('./notificationService');
+const { sendOrderDetailsEmail } = require('./emailService');
 
 const createOrder = async (userId, orderData, transaction, wss) => {
   try {
@@ -98,7 +99,7 @@ const createOrder = async (userId, orderData, transaction, wss) => {
 
     // Trừ stock cho voucher freeship
     if (freeship_id) {
-      const freeshipVoucher = await FreeShip.findByPk(freeship_id, { transaction });
+      const freeshipVoucher = await Freeship.findByPk(freeship_id, { transaction });
       if (freeshipVoucher) {
         freeshipVoucher.stock -= 1;
         await freeshipVoucher.save({ transaction });
@@ -110,6 +111,9 @@ const createOrder = async (userId, orderData, transaction, wss) => {
     if (payment_method === "COD") {
       const message = `Đơn hàng #${newOrder.id} của bạn đã được đặt thành công và đang chờ xử lý.`;
       await createAndSendOrderNotification(wss, userId, newOrder.id, message);
+      
+      const messageToAdmin = `Có đơn hàng mới #${newOrder.id} cần xử lý từ khách hàng #${userId}`;
+      await sendOrderNotificationToAdmins(wss, newOrder.id, messageToAdmin);
     }
 
     return { newOrder, newPayment, newOrderTracking };
@@ -177,7 +181,7 @@ const getOrdersByUserId = async (id, status, limit, offset) => {
           },
         }
       ],
-      order: [['order_date', 'DESC']],
+      order: [['updatedAt', 'DESC']],
       limit: limit,
       offset: offset
     });
@@ -239,7 +243,12 @@ const shipOrder = async (orderId) => {
       throw new Error(`Order with ID ${orderId} has been returned`);
     }
 
-    await order.update({ status: 'SHIPPED' });
+    await order.update({ status: 'SHIPPED' , updatedAt: new Date()});
+
+    const orderTracking = await OrderTracking.findOne({ where: { order_id: orderId } });
+    if (orderTracking) {
+      await orderTracking.update({ shippedAt: new Date() });
+    }
 
     return order;
   } catch (error) {
@@ -276,7 +285,12 @@ const cancelOrder = async (orderId) => {
     }
 
 
-    await order.update({ status: 'CANCELLED' });
+    await order.update({ status: 'CANCELLED' , updatedAt: new Date()});
+
+    const orderTracking = await OrderTracking.findOne({ where: { order_id: orderId } });
+    if (orderTracking) {
+      await orderTracking.update({ canceledAt: new Date() });
+    }
 
     return order;
   } catch (error) {
@@ -316,7 +330,12 @@ const returnOrder = async (orderId) => {
     else if (diff > 24 * 60 && order.status == orderStatus.DELIVERED) {
       throw new Error('Order cannot be returned after 24 hours');
     }
-    await order.update({ status: 'RETURNED' });
+    await order.update({ status: 'RETURNED', updatedAt: new Date() });
+
+    const orderTracking = await OrderTracking.findOne({ where: { order_id: orderId } });
+    if (orderTracking) {
+      await orderTracking.update({ returnedAt: new Date() });
+    }
 
     return order;
   }
@@ -346,7 +365,12 @@ const confirmOrder = async (orderId) => {
     else if (order.status === orderStatus.DELIVERED) {
       throw new Error(`Order with ID ${orderId} has been delivered`);
     }
-    await order.update({ status: 'CONFIRMED' });
+    await order.update({ status: 'CONFIRMED', updatedAt: new Date() });
+
+    const orderTracking = await OrderTracking.findOne({ where: { order_id: orderId } });
+    if (orderTracking) {
+      await orderTracking.update({ confirmedAt: new Date() });
+    }
 
     return order;
   } catch (error) {
@@ -374,7 +398,12 @@ const processOrder = async (orderId) => {
     else if (order.status === orderStatus.SHIPPED) {
       throw new Error(`Order with ID ${orderId} has been shipped`);
     }
-    await order.update({ status: 'PROCESSING' });
+    await order.update({ status: 'PROCESSING' , updatedAt: new Date()});
+
+    const orderTracking = await OrderTracking.findOne({ where: { order_id: orderId } });
+    if (orderTracking) {
+      await orderTracking.update({ processedAt: new Date() });
+    }
 
     return order;
   } catch (error) {
@@ -399,15 +428,31 @@ const deliverOrder = async (orderId) => {
     else if (order.status === orderStatus.SHIPPED) {
       throw new Error(`Order with ID ${orderId} has been shipped`);
     }
-    await order.update({ status: 'DELIVERED' });
+    await order.update({ status: 'DELIVERED', updatedAt: new Date() });
+
+    const orderTracking = await OrderTracking.findOne({ where: { order_id: orderId } });
+    if (orderTracking) {
+      await orderTracking.update({ deliveredAt: new Date() });
+    }
 
     return order;
   } catch (error) {
     throw new Error(error.message);
   }
 }
-const updateOrder = async (orderId, status, userId) => {
+const updateOrder = async (orderId, status, userId, wss) => {
   try {
+    order = await Order.findByPk(orderId);
+    const order_user_id = order.user_id;
+    const user = await User.findByPk(order_user_id);
+    const orderDetails = await Detail_Order.findAll({
+      where: { order_id: orderId },
+      include: {
+        model: Book,
+        as: 'book'
+      }
+    });
+
     let order = null;
     if ((status == orderStatus.CANCELLED ||
       status == orderStatus.RETURNED ||
@@ -417,21 +462,32 @@ const updateOrder = async (orderId, status, userId) => {
     }
     if (status == orderStatus.CANCELLED ) {
       order = await cancelOrder(orderId);
+      await releaseStock(orderId);
+      const messageToAdmin = `Đơn hàng #${orderId} đã bị hủy`;
+      await sendOrderNotificationToAdmins(wss, orderId, messageToAdmin);
     }
     else if (status == orderStatus.RETURNED ) {
       order = await returnOrder(orderId);
     }
     else if (status == orderStatus.CONFIRMED) {
       order = await confirmOrder(orderId);
+      await createAndSendOrderNotification(wss, order_user_id, orderId, `Đơn hàng #${orderId} của bạn đã được xác nhận.`);
     }
     else if (status == orderStatus.PROCESSING) {
       order = await processOrder(orderId);
+      await createAndSendOrderNotification(wss, order_user_id, orderId, `Đơn hàng #${orderId} của bạn đang được xử lý.`);
     }
     else if (status == orderStatus.DELIVERED) {
       order = await deliverOrder(orderId);
+      await createAndSendOrderNotification(wss, order_user_id, orderId, `Đơn hàng #${orderId} đang giao đến cho bạn. Vui lòng chú ý điện thoại.`);
+      //Send mail to user
+      await sendOrderDetailsEmail(user.email, order, orderDetails);
     }
     else if (status == orderStatus.SHIPPED) {
       order = await shipOrder(orderId);
+      const messageToAdmin = `Đơn hàng #${orderId} đã giao thành công`;
+      await createAndSendOrderNotification(wss, order_user_id, orderId, `Đơn hàng #${orderId} đã giao thành công.`);
+      await sendOrderNotificationToAdmins(wss, orderId, messageToAdmin);
     }
     else {
       throw new Error('Invalid status');
@@ -530,11 +586,28 @@ const getDetailOrderByUser = async (userId, orderId) => {
         id: orderId,
         user_id: userId
       },
-      include: {
-        model: OrderTracking,
-        as: 'orderTracking',
-        attributes: ['confirmedAt', 'processedAt', 'deliveredAt', 'shippedAt', 'canceledAt', 'returnedAt']
-      }
+      include: [
+        {
+          model: OrderTracking,
+          as: 'orderTracking',
+          attributes: ['confirmedAt', 'processedAt', 'deliveredAt', 'shippedAt', 'canceledAt', 'returnedAt']
+        },
+        {
+          model: Payment,
+          as: 'payment',
+          attributes: ['payment_date', 'payment_method', 'status']
+        },
+        {
+          model: Discount,
+          as: 'discount',
+          attributes: ['code', 'discount_val', 'discount_perc']
+        },
+        {
+          model: Freeship,
+          as: 'freeship',
+          attributes: ['code', 'discount_val', 'discount_perc']
+        },
+      ]
     });
 
     if (!order) {
@@ -561,6 +634,49 @@ const getDetailOrderByUser = async (userId, orderId) => {
     return { order, orderDetails };
   } catch (error) {
     throw new Error(error.message);
+  }
+};
+
+const releaseStock = async (orderId) => {
+  try {
+    // Lấy thông tin chi tiết của đơn hàng
+    const orderDetails = await Detail_Order.findAll({ where: { order_id: orderId } });
+
+    // Giải phóng stock và sold của từng sản phẩm trong đơn hàng
+    for (const detail of orderDetails) {
+      const book = await Book.findByPk(detail.book_id);
+      if (book) {
+        book.stock += detail.quantity;
+        book.sold -= detail.quantity;
+        await book.save();
+      }
+    }
+
+    // Lấy thông tin của đơn hàng
+    const order = await Order.findByPk(orderId);
+
+    // Giải phóng stock của discount nếu có
+    if (order.discount_id) {
+      const discountVoucher = await Discount.findByPk(order.discount_id);
+      if (discountVoucher) {
+        discountVoucher.stock += 1;
+        await discountVoucher.save();
+      }
+    }
+
+    // Giải phóng stock của freeship nếu có
+    if (order.freeship_id) {
+      const freeshipVoucher = await Freeship.findByPk(order.freeship_id);
+      if (freeshipVoucher) {
+        freeshipVoucher.stock += 1;
+        await freeshipVoucher.save();
+      }
+    }
+
+    console.log('Stock and sold released for order #${orderId}');
+  } catch (error) {
+    console.error('Error releasing stock for order #${orderId}:', error);
+    throw new Error('Error releasing stock');
   }
 };
 
