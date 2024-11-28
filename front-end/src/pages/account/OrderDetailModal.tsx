@@ -16,7 +16,7 @@ import { useNavigate } from 'react-router-dom'
 
 Modal.setAppElement('#root')
 
-const OrderDetail = ({ orderId, isOpen, onClose }: { orderId: number; onClose: () => void; isOpen: boolean }) => {
+const OrderDetailModal = ({ orderId, isOpen, onClose }: { orderId: number; onClose: () => void; isOpen: boolean }) => {
   const user = useSelector((state: RootState) => state.auth.user)
 
   const [order, setOrder] = useState<Order | null>(null)
@@ -214,4 +214,4 @@ const OrderDetail = ({ orderId, isOpen, onClose }: { orderId: number; onClose: (
   )
 }
 
-export default OrderDetail
+export default OrderDetailModal;

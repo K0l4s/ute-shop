@@ -3,12 +3,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import authReducer from './reducers/authSlice';
 import cartReducer from './reducers/cartSlice';
 import voucherReducer from './reducers/voucherSlice';
+import walletReducer from './reducers/walletSlice';
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
     cart: cartReducer,
-    voucher: voucherReducer
+    voucher: voucherReducer,
+    wallet: walletReducer,
   },
 });
 

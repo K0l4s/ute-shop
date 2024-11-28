@@ -11,6 +11,7 @@ module.exports = (sequelize) => {
 
       User.belongsToMany(models.Discount, { through: 'UserDiscounts', as: 'discounts' });
       User.belongsToMany(models.Freeship, { through: 'UserFreeships', as: 'freeships' });
+      User.hasOne(models.Wallet, { foreignKey: 'userId', as: 'wallet' });
     }
   }
 

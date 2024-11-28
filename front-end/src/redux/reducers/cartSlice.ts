@@ -5,12 +5,12 @@ interface CartItem {
   title: string;
   price: number;
   salePrice?: number;
-  stars: number;
+  stars?: number;
   image: string;
   quantity: number;
   stock: number;
-  age: string;
-  publisher: string;
+  age?: string;
+  publisher?: string;
   checked: boolean;
 }
 
@@ -65,9 +65,12 @@ const cartSlice = createSlice({
         return total;
       }, 0);
     },
+    removeItemsByIds: (state, action: PayloadAction<number[]>) => {
+      state.items = state.items.filter(item => !action.payload.includes(item.id));
+    },
   },
 });
 
-export const { setItems, addItem, removeItem, updateQuantity, toggleCheck, toggleSelectAll, calculateTotal } = cartSlice.actions;
+export const { setItems, addItem, removeItem, updateQuantity, toggleCheck, toggleSelectAll, calculateTotal, removeItemsByIds } = cartSlice.actions;
 
 export default cartSlice.reducer;

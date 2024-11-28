@@ -4,11 +4,12 @@ import logo from '../../assets/images/logo.png'
 // import { SiAwssecretsmanager } from "react-icons/si";
 import { BiSearch } from 'react-icons/bi';
 import { BsMenuButtonWideFill } from 'react-icons/bs';
+import { RiCopperCoinLine } from "react-icons/ri";
 import { FaRegUserCircle } from 'react-icons/fa';
 import { FiShoppingCart } from 'react-icons/fi';
 import { IoMdNotificationsOutline } from 'react-icons/io';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { AppDispatch, RootState } from '../../redux/store';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/reducers/authSlice';
 import { useNavigate, Link } from 'react-router-dom';
@@ -16,9 +17,13 @@ import Menu from '../menu/Menu';
 import Notification from '../socket/Notification';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useWebSocket } from '../../context/WebSocketContext';
+import { fetchWallet } from '../../redux/reducers/walletSlice';
+import { LuWallet } from 'react-icons/lu';
+import { getUserCart } from '../../apis/cart';
+import { setItems } from '../../redux/reducers/cartSlice';
 
 const Navbar = () => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -27,6 +32,9 @@ const Navbar = () => {
   const [openNoti, setOpenNoti] = useState(false);
   const [openAcc, setOpenAcc] = useState(false);
   const { unreadCount, fetchNotifications, clearNotifications } = useWebSocket();
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const walletBalance = useSelector((state: RootState) => state.wallet.balance);
+  const [openWallet, setOpenWallet] = useState(false);
 
   const handleCategoryClick = (category: string) => {
     setActiveCategory(category);
@@ -36,6 +44,39 @@ const Navbar = () => {
   // const isAdmin = true;
   // const user = useSelector((state: RootState) => state.auth.user);
   const role = useSelector((state: RootState) => state.auth.user?.role);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchWallet());
+    }
+  }, [isAuthenticated, dispatch]);
+
+  // Fix temporary
+  useEffect(() => {
+    const fetchCart = async () => {
+      try{
+        const response = await getUserCart();
+        const cartItems = response.data.map((item:any) => ({
+          id: item.book.id,
+          title: item.book.title,
+          price: parseFloat(item.book.price),
+          salePrice: item.book.salePrice ? parseFloat(item.book.salePrice) : undefined,
+          image: item.book.cover_img_url,
+          stars: item.book.stars || 0,
+          age: item.book.age || '',
+          publisher: item.book.publisher || '',
+          quantity: item.quantity,
+          stock: item.book.stock,
+          checked: item.checked,
+        }));
+        dispatch(setItems(cartItems));
+      } catch(error){
+        console.error("Failed to fetch cart:", error);
+      }
+    };
+    fetchCart();
+  }, [dispatch]);
+
   const handleLogout = async () => {
     try {
       const response = await fetch('http://localhost:8080/api/v1/auth/logout', {
@@ -122,6 +163,33 @@ const Navbar = () => {
             {isAuthenticated ? (
               <div>
                 <ul className="flex space-x-4 items-center">
+                  <li
+                    className='text-white hover:text-violet-700 cursor-pointer relative'
+                    onMouseEnter={() => setOpenWallet(true)}
+                    onMouseLeave={() => setOpenWallet(false)}
+                  >
+                    <LuWallet size={24} className='inline-block mr-2' />
+                    <AnimatePresence>
+                    {openWallet && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 8 }}
+                        exit={{ opacity: 0, y: 15 }}
+                        style={{ translateX: "-50%", willChange: 'transform, opacity', backfaceVisibility: 'hidden' }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute left-5 bg-white rounded-lg shadow-lg group-hover:block" 
+                      >
+                        <div className="w-36 py-2 px-2 text-gray-800">
+                          Số dư: {walletBalance}
+                          <RiCopperCoinLine className='inline-block mb-1 ml-1'/>
+
+                          <div className='text-rose-700 text-sm'>1 <RiCopperCoinLine className='inline-block mb-1' /> = 1000 VND </div>
+                        </div>
+                      </motion.div>
+                    )}
+                    </AnimatePresence>
+                    
+                  </li>
                   <li>
                     {/* Notification Icon with Dropdown */}
                     <div
@@ -157,10 +225,15 @@ const Navbar = () => {
                       </AnimatePresence>
                     </div>
                   </li>
-                  <li>
+                  <li className='relative'>
                     <Link to="/cart" className="text-white">
                       <div className="py-2">
                         <FiShoppingCart size={34} className='hover:text-violet-700' />
+                        {cartItems.length > 0 && (
+                          <span className="absolute -top-1 -right-3 h-5 w-5 bg-red-600 text-white rounded-full text-sm flex items-center justify-center">
+                          {cartItems.length}
+                        </span>
+                        )}
                       </div>
                     </Link>
                   </li>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getOrderByUser, searchOrdersByUser, updateCartStatus } from '../../apis/order';
-import { Order } from '../../models/OrderType';
-import OrderDetail from './OrderDetail';
+import { Order, Book, OrderDetail } from '../../models/OrderType';
+import OrderDetailModal from './OrderDetailModal';
 import { showToast } from '../../utils/toastUtils';
 import { FiPackage } from 'react-icons/fi';
 import { IoInformationCircleOutline, IoSearchSharp } from 'react-icons/io5';
@@ -9,6 +9,10 @@ import { formatStatus } from '../../utils/orderUtils';
 import { formatPriceToVND } from '../../utils/bookUtils';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { formatDateTime } from '../../utils/dateUtils';
+import { addToCart } from '../../apis/cart';
+import { useDispatch } from 'react-redux';
+import { addItem } from '../../redux/reducers/cartSlice';
+import ReviewModal from '../../components/modals/ReviewModal';
 
 const Orders = () => {
   const navigate = useNavigate();
@@ -23,10 +27,12 @@ const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedOrderForReview, setSelectedOrderForReview] = useState<Order | null>(null);
   // const [totalOrders, setTotalOrders] = useState(0); 
 
-  
-  
+  const dispatch = useDispatch();
+
   const fetchOrders = async (status: string, limit: number, offset: number) => {
     try {
       const newOrders = await getOrderByUser(status, limit, offset);
@@ -111,6 +117,38 @@ const Orders = () => {
 
   // const filteredOrders = filteredStatus === 'ALL' ? orders : orders.filter(order => order.status === filteredStatus);
 
+  const handleAddToCart = async (book: Book) => {
+    if (book.stock === 0) {
+      showToast('Sản phẩm đã hết hàng', 'error');
+      return;
+    }
+
+    try {
+      await addToCart(book.id, 1);
+      dispatch(addItem({
+        id: book.id,
+        title: book.title,
+        price: parseFloat(book.price),
+        salePrice: undefined,
+        stars: undefined,
+        image: book.cover_img_url,
+        quantity: 1,
+        stock: 1,
+        age: undefined,
+        publisher: undefined,
+        checked: false,
+      }));
+      showToast('Đã thêm sản phẩm #' + book.id + ' giỏ', 'success');
+    } catch(error){
+      showToast('Đã xảy ra lỗi, vui lòng kiểm tra giỏ hàng', 'error');
+    }  
+  };
+  
+  const calculateCoins = (totalPrice: string) => {
+    const total = parseFloat(totalPrice);
+    return Math.floor(total / 20000);
+  }
+
   const handleCancelOrder = (orderId: number) => {
     console.log(`Cancel order #${orderId}`);
     updateCartStatus(orderId.toString(), 'CANCELLED').then(() => {
@@ -124,10 +162,10 @@ const Orders = () => {
     });
   };
 
-  const handleReorder = (orderId: number) => {
-    console.log(`Reorder #${orderId}`);
-    showToast('Chức năng mua lại đơn hàng đang được phát triển', 'success');
-    // Code để mua lại đơn hàng tại đây
+  const handleReorder = async (orderDetails: OrderDetail[]) => {
+    for (const detail of orderDetails) {
+      await handleAddToCart(detail.book);
+    }
   };
 
   const handleConfirmDelivery = (orderId: number) => {
@@ -155,6 +193,16 @@ const Orders = () => {
       showToast('Có lỗi xảy ra khi yêu cầu trả hàng: ' + err.message, 'error');
     });
     // Code để yêu cầu trả hàng tại đây
+  };
+
+  const openReviewModal = (order: Order) => {
+    setSelectedOrderForReview(order);
+    setIsReviewModalOpen(true);
+  };
+
+  const closeReviewModal = () => {
+    setSelectedOrderForReview(null);
+    setIsReviewModalOpen(false);
   };
 
   const isWithinCancelPeriod = (orderDate: string) => {
@@ -239,7 +287,7 @@ const Orders = () => {
               <div className="bg-blue-50 p-4 rounded">
                 {order.orderDetails.map(detail => (
                   <div key={detail.book.id} className="flex items-center mb-4 cursor-pointer" onClick={() => navigate(`/products/${detail.book.id}`)}>
-                    <img src={detail.book.cover_img_url} alt={detail.book.title} className="w-16 h-20 mr-4 object-cover rounded" />
+                    <img src={detail.book.cover_img_url} alt={detail.book.title} className="w-16 h-20 mr-4 object-fit rounded" />
                     <div className="flex-1">
                       <h4 className="text-base font-semibold">{detail.book.title}</h4>
                       <p className="text-sm text-gray-600">Phân loại: {detail.book.category?.name || ""}</p>
@@ -268,8 +316,8 @@ const Orders = () => {
                     (
                       <button onClick={() => handleCancelOrder(order.id)} className="bg-red-500 font-semibold text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">Hủy đơn</button>
                   )}
-                  {(order.status === 'SHIPPED' || order.status === 'CANCELLED' || order.status === 'RETURNED') && (
-                    <button onClick={() => handleReorder(order.id)} className="bg-red-500 font-semibold text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">Mua lại</button>
+                  {(order.status === 'CANCELLED' || order.status === 'RETURNED') && (
+                    <button onClick={() => handleReorder(order.orderDetails)} className="bg-red-500 font-semibold text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">Mua lại</button>
                   )}
                   {order.status === 'DELIVERED' && (
                     <button onClick={() => handleConfirmDelivery(order.id)} className="bg-green-500 font-semibold text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-300">Nhận hàng</button>
@@ -277,7 +325,15 @@ const Orders = () => {
                   {order.status === 'SHIPPED' && isWithinReturnPeriod(order.updatedAt) &&(
                     <button onClick={() => handleReturn(order.id)} className="border border-red-600 font-semibold text-red-600 px-4 py-2 rounded-md hover:bg-red-500 hover:text-white transition duration-300">Yêu cầu trả hàng</button>
                   )}
+                  {(order.status === 'SHIPPED' && !order.isReviewed) && (
+                    <button onClick={() => openReviewModal(order)} className="bg-red-500 font-semibold text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">Đánh giá</button>
+                  )}
                 </div>
+
+                {(!order.isReviewed && order.status === 'SHIPPED') && (
+                  <span className='text-base font-medium text-yellow-600'>Đánh giá ngay để nhận {calculateCoins(order.total_price)} xu bạn nhé !</span>
+                )}
+
               </div>
             </div>
           ))}
@@ -288,12 +344,18 @@ const Orders = () => {
             </div>
           )}
 
+          <ReviewModal
+            isOpen={isReviewModalOpen}
+            onRequestClose={closeReviewModal}
+            order={selectedOrderForReview}
+          />
+
         </div>
       )}
       
       {/* Modal for Order Details */}
       {isModalOpen && selectedOrder && (
-        <OrderDetail orderId={selectedOrder} onClose={closeModal} isOpen={isModalOpen}/>
+        <OrderDetailModal orderId={selectedOrder} onClose={closeModal} isOpen={isModalOpen}/>
       )}
     </div>
   );

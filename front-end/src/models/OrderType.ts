@@ -8,6 +8,7 @@ export interface Book {
     price: string;
     category: Category;
     cover_img_url: string;
+    stock?: number;
   }
   
   export interface OrderDetail {
@@ -44,6 +45,7 @@ export interface Book {
   }
   export interface Order {
     id: number;
+    user_id: number;
     freeship_id: number | null;
     discount_id: number | null;
     order_date: string;
@@ -58,5 +60,6 @@ export interface Book {
     payment: Payment;
     discount: Discount;
     freeship: Freeship;
+    isReviewed: boolean;
   }
   
