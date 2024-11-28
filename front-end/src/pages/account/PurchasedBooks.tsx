@@ -6,6 +6,8 @@ import { LuPackageCheck } from 'react-icons/lu';
 import { formatStar } from '../../utils/bookUtils';
 import { useNavigate } from 'react-router-dom';
 import { formatDateTime } from '../../utils/dateUtils';
+import { useDispatch } from 'react-redux';
+import { addItem } from '../../redux/reducers/cartSlice';
 
 interface Book {
   id: number;
@@ -35,6 +37,7 @@ const PurchasedBooks: React.FC = () => {
   const itemsPerPage = 10;
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchPurchasedBooks = async () => {
@@ -57,6 +60,19 @@ const PurchasedBooks: React.FC = () => {
 
     try {
       await addToCart(book.id, 1);
+      dispatch(addItem({
+        id: book.id,
+        title: book.title,
+        price: parseFloat(book.price),
+        salePrice: book.salePrice ? parseFloat(book.salePrice) : undefined,
+        stars: book.avgRating,
+        image: book.cover_img_url,
+        quantity: 1,
+        stock: book.stock,
+        age: book.age.toString(),
+        publisher: undefined,
+        checked: false,
+      }));
       showToast('Đã thêm thành công', 'success');
     } catch (error) {
       showToast('Đã xảy ra lỗi, vui lòng kiểm tra giỏ hàng', 'error');
@@ -118,13 +134,9 @@ const PurchasedBooks: React.FC = () => {
                       text-black font-semibold px-4 py-2 rounded mr-2 cursor-not-allowed">Hết hàng</button>
                   ) : (
                     <button onClick={(e) => { e.stopPropagation(); handleAddToCart(book) }}
-                      className="w-36 border-2 border-violet-600 bg-violet-600 hover:bg-violet-700 
+                      className="w-full border-2 border-violet-600 bg-violet-600 hover:bg-violet-700 
                       text-white font-semibold px-4 py-2 rounded mr-2 transition duration-300">Thêm vào giỏ</button>
                   )}
-
-                    <button onClick={(e) => { e.stopPropagation(); }} 
-                      className="w-24 border-2 border-rose-600 hover:bg-rose-600 
-                        text-black hover:text-white font-semibold px-4 py-2 rounded transition duration-300">Mua lại</button>
                 </div>
               </div>
             ))}

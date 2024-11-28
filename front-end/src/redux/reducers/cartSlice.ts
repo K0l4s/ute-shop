@@ -9,8 +9,8 @@ interface CartItem {
   image: string;
   quantity: number;
   stock: number;
-  age: string;
-  publisher: string;
+  age?: string;
+  publisher?: string;
   checked: boolean;
 }
 

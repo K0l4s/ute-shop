@@ -5,6 +5,8 @@ import { formatStar } from "../../utils/bookUtils";
 import { addToCart } from "../../apis/cart";
 import { showToast } from "../../utils/toastUtils";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { addItem } from "../../redux/reducers/cartSlice";
 
 interface Book {
   id: number;
@@ -30,6 +32,7 @@ const ViewHistory: React.FC = () => {
   const itemsPerPage = 10;
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchViewedBooks = async () => {
@@ -74,6 +77,19 @@ const ViewHistory: React.FC = () => {
 
     try {
       await addToCart(book.id, 1);
+      dispatch(addItem({
+        id: book.id,
+        title: book.title,
+        price: parseFloat(book.price),
+        salePrice: book.salePrice ? parseFloat(book.salePrice) : undefined,
+        stars: book.avgRating,
+        image: book.cover_img_url,
+        quantity: 1,
+        stock: book.stock,
+        age: undefined,
+        publisher: undefined,
+        checked: false,
+      }));
       showToast('Đã thêm thành công', 'success');
     } catch(error){
       showToast('Đã xảy ra lỗi, vui lòng kiểm tra giỏ hàng', 'error');
