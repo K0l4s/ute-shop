@@ -4,11 +4,12 @@ import logo from '../../assets/images/logo.png'
 // import { SiAwssecretsmanager } from "react-icons/si";
 import { BiSearch } from 'react-icons/bi';
 import { BsMenuButtonWideFill } from 'react-icons/bs';
+import { RiCopperCoinLine } from "react-icons/ri";
 import { FaRegUserCircle } from 'react-icons/fa';
 import { FiShoppingCart } from 'react-icons/fi';
 import { IoMdNotificationsOutline } from 'react-icons/io';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { AppDispatch, RootState } from '../../redux/store';
 import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/reducers/authSlice';
 import { useNavigate, Link } from 'react-router-dom';
@@ -16,9 +17,11 @@ import Menu from '../menu/Menu';
 import Notification from '../socket/Notification';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useWebSocket } from '../../context/WebSocketContext';
+import { fetchWallet } from '../../redux/reducers/walletSlice';
+import { LuWallet } from 'react-icons/lu';
 
 const Navbar = () => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -28,7 +31,9 @@ const Navbar = () => {
   const [openAcc, setOpenAcc] = useState(false);
   const { unreadCount, fetchNotifications, clearNotifications } = useWebSocket();
   const cartItems = useSelector((state: RootState) => state.cart.items);
-  
+  const walletBalance = useSelector((state: RootState) => state.wallet.balance);
+  const [openWallet, setOpenWallet] = useState(false);
+
   const handleCategoryClick = (category: string) => {
     setActiveCategory(category);
     setIsVisible(!isVisible); // Toggle visibility when clicking on the category
@@ -37,6 +42,13 @@ const Navbar = () => {
   // const isAdmin = true;
   // const user = useSelector((state: RootState) => state.auth.user);
   const role = useSelector((state: RootState) => state.auth.user?.role);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchWallet());
+    }
+  }, [isAuthenticated, dispatch]);
+
   const handleLogout = async () => {
     try {
       const response = await fetch('http://localhost:8080/api/v1/auth/logout', {
@@ -123,6 +135,31 @@ const Navbar = () => {
             {isAuthenticated ? (
               <div>
                 <ul className="flex space-x-4 items-center">
+                  <li
+                    className='text-white hover:text-violet-700 cursor-pointer relative'
+                    onMouseEnter={() => setOpenWallet(true)}
+                    onMouseLeave={() => setOpenWallet(false)}
+                  >
+                    <LuWallet size={24} className='inline-block mr-2' />
+                    <AnimatePresence>
+                    {openWallet && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 15 }}
+                        animate={{ opacity: 1, y: 8 }}
+                        exit={{ opacity: 0, y: 15 }}
+                        style={{ translateX: "-50%", willChange: 'transform, opacity', backfaceVisibility: 'hidden' }}
+                        transition={{ duration: 0.2, ease: "easeOut" }}
+                        className="absolute left-5 bg-white rounded-lg shadow-lg group-hover:block" 
+                      >
+                        <div className="w-36 py-2 px-2 text-gray-800">
+                          Số dư: {walletBalance}
+                          <RiCopperCoinLine className='inline-block mb-1 ml-1'/>
+                        </div>
+                      </motion.div>
+                    )}
+                    </AnimatePresence>
+                    
+                  </li>
                   <li>
                     {/* Notification Icon with Dropdown */}
                     <div
