@@ -65,9 +65,12 @@ const cartSlice = createSlice({
         return total;
       }, 0);
     },
+    removeItemsByIds: (state, action: PayloadAction<number[]>) => {
+      state.items = state.items.filter(item => !action.payload.includes(item.id));
+    },
   },
 });
 
-export const { setItems, addItem, removeItem, updateQuantity, toggleCheck, toggleSelectAll, calculateTotal } = cartSlice.actions;
+export const { setItems, addItem, removeItem, updateQuantity, toggleCheck, toggleSelectAll, calculateTotal, removeItemsByIds } = cartSlice.actions;
 
 export default cartSlice.reducer;

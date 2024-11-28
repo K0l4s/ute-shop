@@ -11,6 +11,7 @@ import { showToast } from '../../utils/toastUtils';
 import { useDispatch } from 'react-redux';
 import { deselectVoucher } from '../../redux/reducers/voucherSlice';
 import TermOfUseModal from '../../components/modals/TermOfUseModal';
+import { removeItemsByIds } from '../../redux/reducers/cartSlice';
 
 const Checkout: React.FC = () => {
   interface Product {
@@ -244,6 +245,8 @@ const Checkout: React.FC = () => {
         // Clear selected vouchers
         dispatch(deselectVoucher('discount'));
         dispatch(deselectVoucher('freeship'));
+        const orderedItemIds = productsToCheckout.map(item => item.id);
+        dispatch(removeItemsByIds(orderedItemIds));
         navigate("/account/orders");
         window.scrollTo(0, 0);
       }
