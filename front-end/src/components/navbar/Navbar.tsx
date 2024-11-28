@@ -19,6 +19,8 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useWebSocket } from '../../context/WebSocketContext';
 import { fetchWallet } from '../../redux/reducers/walletSlice';
 import { LuWallet } from 'react-icons/lu';
+import { getUserCart } from '../../apis/cart';
+import { setItems } from '../../redux/reducers/cartSlice';
 
 const Navbar = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -48,6 +50,32 @@ const Navbar = () => {
       dispatch(fetchWallet());
     }
   }, [isAuthenticated, dispatch]);
+
+  // Fix temporary
+  useEffect(() => {
+    const fetchCart = async () => {
+      try{
+        const response = await getUserCart();
+        const cartItems = response.data.map((item:any) => ({
+          id: item.book.id,
+          title: item.book.title,
+          price: parseFloat(item.book.price),
+          salePrice: item.book.salePrice ? parseFloat(item.book.salePrice) : undefined,
+          image: item.book.cover_img_url,
+          stars: item.book.stars || 0,
+          age: item.book.age || '',
+          publisher: item.book.publisher || '',
+          quantity: item.quantity,
+          stock: item.book.stock,
+          checked: item.checked,
+        }));
+        dispatch(setItems(cartItems));
+      } catch(error){
+        console.error("Failed to fetch cart:", error);
+      }
+    };
+    fetchCart();
+  }, [dispatch]);
 
   const handleLogout = async () => {
     try {
@@ -154,6 +182,8 @@ const Navbar = () => {
                         <div className="w-36 py-2 px-2 text-gray-800">
                           Số dư: {walletBalance}
                           <RiCopperCoinLine className='inline-block mb-1 ml-1'/>
+
+                          <div className='text-rose-700 text-sm'>1 <RiCopperCoinLine className='inline-block mb-1' /> = 1000 VND </div>
                         </div>
                       </motion.div>
                     )}
@@ -199,9 +229,11 @@ const Navbar = () => {
                     <Link to="/cart" className="text-white">
                       <div className="py-2">
                         <FiShoppingCart size={34} className='hover:text-violet-700' />
-                        <span className="absolute -top-1 -right-3 h-5 w-5 bg-red-600 text-white rounded-full text-sm flex items-center justify-center">
+                        {cartItems.length > 0 && (
+                          <span className="absolute -top-1 -right-3 h-5 w-5 bg-red-600 text-white rounded-full text-sm flex items-center justify-center">
                           {cartItems.length}
                         </span>
+                        )}
                       </div>
                     </Link>
                   </li>
