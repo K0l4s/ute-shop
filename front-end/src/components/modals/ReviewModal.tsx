@@ -79,7 +79,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ isOpen = false, onRequestClos
           </div>
         </div>
         ))}
-        <button onClick={onRequestClose} className="absolute top-2 right-0 text-black p-1 rounded-full hover:bg-gray-400 transition duration-300">
+        <button onClick={onRequestClose} className="absolute top-2 right-2 text-black p-1 rounded-full hover:bg-gray-400 transition duration-300">
           <IoClose size={32} />
         </button>
         <div className="flex justify-end space-x-4">

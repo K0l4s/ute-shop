@@ -330,7 +330,7 @@ const Orders = () => {
                   )}
                 </div>
 
-                {!order.isReviewed && (
+                {(!order.isReviewed && order.status === 'SHIPPED') && (
                   <span className='text-base font-medium text-yellow-600'>Đánh giá ngay để nhận {calculateCoins(order.total_price)} xu bạn nhé !</span>
                 )}
 
