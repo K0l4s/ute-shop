@@ -27,7 +27,8 @@ const Navbar = () => {
   const [openNoti, setOpenNoti] = useState(false);
   const [openAcc, setOpenAcc] = useState(false);
   const { unreadCount, fetchNotifications, clearNotifications } = useWebSocket();
-
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  
   const handleCategoryClick = (category: string) => {
     setActiveCategory(category);
     setIsVisible(!isVisible); // Toggle visibility when clicking on the category
@@ -158,9 +159,12 @@ const Navbar = () => {
                     </div>
                   </li>
                   <li>
-                    <Link to="/cart" className="text-white">
+                    <Link to="/cart" className="text-white relative">
                       <div className="py-2">
                         <FiShoppingCart size={34} className='hover:text-violet-700' />
+                        <span className="absolute top-0 -right-3 h-5 w-5 bg-red-600 text-white rounded-full text-sm flex items-center justify-center">
+                          {cartItems.length}
+                        </span>
                       </div>
                     </Link>
                   </li>
