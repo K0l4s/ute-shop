@@ -1,8 +1,9 @@
 const express = require('express');
-const { createReviewController } = require('../controllers/reviewController');
+const { createReviewController, createReviewsMultipleItemsController } = require('../controllers/reviewController');
 const { authenticateJWT } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
 
-router.post('/', authenticateJWT, createReviewController);
+router.post('/add', authenticateJWT, createReviewController);
+router.post("/add/multiple", authenticateJWT, createReviewsMultipleItemsController);
 module.exports = router;

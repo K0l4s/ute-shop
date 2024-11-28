@@ -92,6 +92,11 @@ module.exports = (sequelize) => {
       allowNull: false,
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW
+    },
+    isReviewed: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     }
   }, {
     sequelize,
