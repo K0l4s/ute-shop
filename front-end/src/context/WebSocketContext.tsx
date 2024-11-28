@@ -3,6 +3,8 @@ import { NotificationMessage } from '../models/type';
 import { getNotifications, readAllNotifications } from '../apis/notification';
 import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
+import { showToast } from '../utils/toastUtils';
+import order_coming from "../assets/audio/order_coming.mp3";
 
 interface WebSocketContextType {
   socket: WebSocket | null;
@@ -22,6 +24,11 @@ export const WebSocketProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
   const [notifications, setNotifications] = useState<NotificationMessage[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const user = useSelector((state: RootState) => state.auth.user);
+
+  const playSound = debounce(() => {
+    const audio = new Audio(order_coming);
+    audio.play().catch(error => console.error('Error playing sound:', error));
+  }, 1000);
 
   useEffect(() => {
     if (!user?.id) {
@@ -53,6 +60,12 @@ export const WebSocketProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
         setUnreadCount(unreadCountFromLocalStorage);
         return updatedNotifications;
       });
+
+      // Show toast notification for admins
+      if (user?.role === 'admin' && notification.type === 'ORDER_UPDATE') {
+        showToast(notification.message, 'info');
+        playSound();
+      }
 
       // const unreadCount = [newNotification, ...notifications].filter(n => !n.is_read).length;
       // setUnreadCount(unreadCount);
@@ -128,3 +141,11 @@ export const useWebSocket = () => {
   }
   return context;
 };
+
+function debounce(func: (...args: any[]) => void, wait: number) {
+  let timeout: NodeJS.Timeout;
+  return (...args: any[]) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(null, args), wait);
+  };
+}

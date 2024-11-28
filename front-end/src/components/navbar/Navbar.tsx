@@ -158,11 +158,11 @@ const Navbar = () => {
                       </AnimatePresence>
                     </div>
                   </li>
-                  <li>
-                    <Link to="/cart" className="text-white relative">
+                  <li className='relative'>
+                    <Link to="/cart" className="text-white">
                       <div className="py-2">
                         <FiShoppingCart size={34} className='hover:text-violet-700' />
-                        <span className="absolute top-0 -right-3 h-5 w-5 bg-red-600 text-white rounded-full text-sm flex items-center justify-center">
+                        <span className="absolute -top-1 -right-3 h-5 w-5 bg-red-600 text-white rounded-full text-sm flex items-center justify-center">
                           {cartItems.length}
                         </span>
                       </div>
