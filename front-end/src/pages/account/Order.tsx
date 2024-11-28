@@ -12,6 +12,7 @@ import { formatDateTime } from '../../utils/dateUtils';
 import { addToCart } from '../../apis/cart';
 import { useDispatch } from 'react-redux';
 import { addItem } from '../../redux/reducers/cartSlice';
+import ReviewModal from '../../components/modals/ReviewModal';
 
 const Orders = () => {
   const navigate = useNavigate();
@@ -26,6 +27,8 @@ const Orders = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [selectedOrderForReview, setSelectedOrderForReview] = useState<Order | null>(null);
   // const [totalOrders, setTotalOrders] = useState(0); 
 
   const dispatch = useDispatch();
@@ -141,6 +144,11 @@ const Orders = () => {
     }  
   };
   
+  const calculateCoins = (totalPrice: string) => {
+    const total = parseFloat(totalPrice);
+    return Math.floor(total / 20000);
+  }
+
   const handleCancelOrder = (orderId: number) => {
     console.log(`Cancel order #${orderId}`);
     updateCartStatus(orderId.toString(), 'CANCELLED').then(() => {
@@ -185,6 +193,16 @@ const Orders = () => {
       showToast('Có lỗi xảy ra khi yêu cầu trả hàng: ' + err.message, 'error');
     });
     // Code để yêu cầu trả hàng tại đây
+  };
+
+  const openReviewModal = (order: Order) => {
+    setSelectedOrderForReview(order);
+    setIsReviewModalOpen(true);
+  };
+
+  const closeReviewModal = () => {
+    setSelectedOrderForReview(null);
+    setIsReviewModalOpen(false);
   };
 
   const isWithinCancelPeriod = (orderDate: string) => {
@@ -269,7 +287,7 @@ const Orders = () => {
               <div className="bg-blue-50 p-4 rounded">
                 {order.orderDetails.map(detail => (
                   <div key={detail.book.id} className="flex items-center mb-4 cursor-pointer" onClick={() => navigate(`/products/${detail.book.id}`)}>
-                    <img src={detail.book.cover_img_url} alt={detail.book.title} className="w-16 h-20 mr-4 object-cover rounded" />
+                    <img src={detail.book.cover_img_url} alt={detail.book.title} className="w-16 h-20 mr-4 object-fit rounded" />
                     <div className="flex-1">
                       <h4 className="text-base font-semibold">{detail.book.title}</h4>
                       <p className="text-sm text-gray-600">Phân loại: {detail.book.category?.name || ""}</p>
@@ -307,7 +325,15 @@ const Orders = () => {
                   {order.status === 'SHIPPED' && isWithinReturnPeriod(order.updatedAt) &&(
                     <button onClick={() => handleReturn(order.id)} className="border border-red-600 font-semibold text-red-600 px-4 py-2 rounded-md hover:bg-red-500 hover:text-white transition duration-300">Yêu cầu trả hàng</button>
                   )}
+                  {(order.status === 'SHIPPED' && !order.isReviewed) && (
+                    <button onClick={() => openReviewModal(order)} className="bg-red-500 font-semibold text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-300">Đánh giá</button>
+                  )}
                 </div>
+
+                {!order.isReviewed && (
+                  <span className='text-base font-medium text-yellow-600'>Đánh giá ngay để nhận {calculateCoins(order.total_price)} xu bạn nhé !</span>
+                )}
+
               </div>
             </div>
           ))}
@@ -317,6 +343,12 @@ const Orders = () => {
               <button onClick={handleLoadMore} className="px-4 py-2 text-violet-700 border hover:border-violet-700 rounded">Xem thêm</button>
             </div>
           )}
+
+          <ReviewModal
+            isOpen={isReviewModalOpen}
+            onRequestClose={closeReviewModal}
+            order={selectedOrderForReview}
+          />
 
         </div>
       )}
