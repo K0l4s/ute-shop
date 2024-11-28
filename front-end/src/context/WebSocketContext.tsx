@@ -62,7 +62,9 @@ export const WebSocketProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
       });
 
       // Show toast notification for admins
-      if (user?.role === 'admin' && notification.type === 'ORDER_UPDATE') {
+      if (user?.role === 'admin' && notification.type === 'ORDER_UPDATE'
+        && notification.message.includes("Có đơn hàng mới")
+      ) {
         showToast(notification.message, 'info');
         playSound();
       }

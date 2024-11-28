@@ -1,20 +1,17 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { Navigation, Pagination, Scrollbar, A11y } from 'swiper/modules';
-import ReviewSection from '../../components/reviewSection/ReviewSection';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { getBookById } from '../../apis/product';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Link } from 'react-router-dom';
-import { IoCreateOutline } from 'react-icons/io5';
 import { useDispatch } from 'react-redux';
 import { addItem } from '../../redux/reducers/cartSlice';
 
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { createReview } from '../../apis/review';
 import { CiDeliveryTruck } from "react-icons/ci";
 import './product.css';
 import { showToast } from '../../utils/toastUtils';
@@ -58,11 +55,9 @@ interface Book {
 Modal.setAppElement('#root');
 
 const ProductDetail: React.FC = () => {
-  const navigate = useNavigate();
   const [showLoginRequired, setShowLoginRequired] = useState(false);
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const [reviewList, setReviewList] = useState<Reviews[]>([]); // Review list
-  const contentRef = useRef<HTMLTextAreaElement>(null);
   // user address from redux
   const userAddress = useSelector((state: RootState) => state.auth.user?.address + ', ' + state.auth.user?.ward + ', ' + state.auth.user?.district + ', ' + state.auth.user?.province);
   const { id } = useParams<{ id: string }>();  // Get the book ID from route params
@@ -120,41 +115,6 @@ const ProductDetail: React.FC = () => {
     return money.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   };
   
-  
-
-  const submitReview = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Prevent default form submission
-
-    // Get form values
-    const rating = event.currentTarget.rating.value; // Get rating from select
-    const content = contentRef.current?.value;
-
-    if (!content) {
-      showToast('Vui lòng điền đầy đủ thông tin đánh giá', 'error');
-      return;
-    } // Get content from textarea
-
-    const review = {
-      bookId: book.id,
-      content: content,
-      star: parseInt(rating), // Convert rating to an integer
-    };
-
-    createReview(review.bookId, review.content, review.star)
-      .then((response) => {
-        console.log('Review submitted:', response);
-
-        // Update review list
-        setReviewList([...reviewList, response.data]);
-        showToast('Đánh giá của bạn đã được gửi thành công', 'success');
-        if (contentRef.current) contentRef.current.value = '';
-      })
-      .catch((err) => {
-        console.error('Error submitting review:', err);
-        showToast('Có lỗi xảy ra khi gửi đánh giá', 'error');
-      });
-  };
-
   const openModal = (index: number) => {
     setSelectedImageIndex(index);
     setModalIsOpen(true);
@@ -210,7 +170,7 @@ const ProductDetail: React.FC = () => {
   };
 
   return (
-    <div className="font-sans">
+    <div className="font-sans pb-8">
 
       <main className="container mx-auto mt-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-4">
@@ -313,8 +273,7 @@ const ProductDetail: React.FC = () => {
           </div>
         </div>
         {/* Review Section */}
-        <ReviewSection />
-        <div className='section rounded-xl bg-white p-10 mb-8'>
+        <div className='section rounded-xl bg-white p-10 mb-8 mt-8'>
           <div className="flex justify-between items-center">
             <h2 className="section__title text-2xl font-semibold mb-4">Chi tiết đánh giá</h2>
           </div>
@@ -332,46 +291,6 @@ const ProductDetail: React.FC = () => {
             </div>
           )}
         </div>
-        
-        {isAuthenticated ? (
-          <div>
-            {/* Thêm review */}
-            <div className="rounded-xl bg-white p-8">
-              <div className="flex items-center gap-2">
-                <IoCreateOutline className="text-2xl text-violet-700 mb-1" size={32} />
-                <h2 className="text-2xl font-semibold">Thêm đánh giá</h2>
-              </div>
-              <form action="" className="mt-4 space-y-4" onSubmit={submitReview}>
-                <div className="flex items-center space-x-4">
-                  <label htmlFor="rating" className="text-lg">Đánh giá</label>
-                  <select name="rating" id="rating" className="border border-gray-300 rounded-lg p-2 bg-white focus:outline-none">
-                    <option value="5">5 sao</option>
-                    <option value="4">4 sao</option>
-                    <option value="3">3 sao</option>
-                    <option value="2">2 sao</option>
-                    <option value="1">1 sao</option>
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="content" className="text-lg">Nội dung</label>
-                  <textarea ref={contentRef} name="content" id="content" className="border border-gray-300 rounded-lg p-2 w-full h-32"></textarea>
-                </div>
-                <button type="submit" className="w-24 bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-2 rounded-lg">Gửi</button>
-              </form>
-
-            </div>
-          </div>
-        ) : (
-          <div className="rounded-xl bg-white p-8 mt-8">
-            <p className="text-base">Để thêm đánh giá, vui lòng 
-              {' '}
-              <span className="text-violet-600 font-semibold hover:underline" 
-                onClick={() => navigate('/login')}>
-                  Đăng nhập
-              </span>
-            </p>
-          </div>
-        )}
       </main>
       <ImageViewSwiperModal
         isOpen={modalIsOpen}

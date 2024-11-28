@@ -8,6 +8,7 @@ export interface Book {
     price: string;
     category: Category;
     cover_img_url: string;
+    stock?: number;
   }
   
   export interface OrderDetail {
