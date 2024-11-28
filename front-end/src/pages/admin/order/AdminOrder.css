@@ -1,0 +1,19 @@
+@media print {
+    body * {
+      visibility: hidden; /* Ẩn tất cả các phần tử */
+    }
+  
+    #order-list, #order-list * {
+      visibility: visible; /* Hiển thị phần tử order-list và các phần tử con */
+    }
+  
+    /* Đảm bảo rằng phần tử order-list sẽ được in đầy đủ */
+    #order-list {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
+    }
+  }
+  

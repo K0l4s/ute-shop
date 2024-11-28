@@ -356,9 +356,9 @@ const Orders = () => {
       {/* Modal for Order Details */}
       {isModalOpen && selectedOrder && (
         <OrderDetailModal orderId={selectedOrder} onClose={closeModal} isOpen={isModalOpen}/>
-      )}
+      )} 
     </div>
-  );
+  ); 
 };
 
 export default Orders;
