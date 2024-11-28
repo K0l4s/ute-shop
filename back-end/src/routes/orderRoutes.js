@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { placeOrder,getAllOrdersByUser,getOrder, getAllOrdersController, updateOrderController,updateMultipleOrderStatusController, searchOrdersByUserController, getDetailOrderByUserController  } = require('../controllers/orderController.js');
+const { placeOrder,getAllOrdersByUser,getOrder, getAllOrdersController, updateOrderController,updateMultipleOrderStatusController, searchOrdersByUserController, getDetailOrderByUserController, getOrderDetailController  } = require('../controllers/orderController.js');
 
 const { authenticateJWT } = require("../middlewares/authMiddleware.js");
 
@@ -13,4 +13,5 @@ router.put('/status/:id', authenticateJWT, updateOrderController);
 router.post('/multi/status',authenticateJWT,updateMultipleOrderStatusController);
 router.get('/search', authenticateJWT, searchOrdersByUserController);
 router.get('/detail/:id', authenticateJWT, getDetailOrderByUserController);
+router.get('/detail_order/:id',authenticateJWT,getOrderDetailController);
 module.exports = router;

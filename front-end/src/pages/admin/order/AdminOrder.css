@@ -15,5 +15,12 @@
       width: 100%;
       height: auto;
     }
+  
+    /* Ngăn không cho đơn hàng bị chia cắt giữa các trang */
+    .order-item {
+      page-break-inside: avoid;
+      break-inside: avoid; /* Đảm bảo tương thích với các trình duyệt */
+      margin-bottom: 20px; /* Thêm khoảng cách giữa các đơn hàng khi in */
+    }
   }
   

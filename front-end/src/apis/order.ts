@@ -58,6 +58,16 @@ export const getAllOrder = async () => {
   }
 }
 
+export const getOrderDetailByOrderId = async (id:number) => {
+  try {
+    const response = await axios.get(BASE_URL + '/order/detail_order/'+id, { withCredentials: true });
+    return response.data;
+  } catch (error) {
+    console.error('Error checking out:', error);
+    throw error;
+  }
+}
+
 export const getOrder = async (orderId: string) => {
   try {
     const response = await axios.get(BASE_URL + '/order/get/' + orderId, { withCredentials: true });

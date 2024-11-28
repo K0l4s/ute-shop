@@ -1,17 +1,22 @@
 import { useEffect, useState } from "react";
-import { getAllOrder, updateCartStatus, updateMultipleCartStatus } from "../../../apis/order";
+import {
+  getAllOrder,
+  getOrderDetailByOrderId,
+  updateCartStatus,
+  updateMultipleCartStatus,
+} from "../../../apis/order";
 import { PiFileCsvBold } from "react-icons/pi";
 import { BsSearch } from "react-icons/bs";
 import { BiDetail, BiLoaderCircle, BiPrinter, BiSelectMultiple } from "react-icons/bi";
-import { FaProjectDiagram, FaTruck } from "react-icons/fa";
+import { FaTruck } from "react-icons/fa";
 import { showToast } from "../../../utils/toastUtils";
-import { AiFillDelete } from "react-icons/ai";
 import { GiConfirmed } from "react-icons/gi";
 import { useNavigate } from "react-router-dom";
-import Tooltip from "../../../components/tooltip/Tooltip";
-import './AdminOrder.css'
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
+import './AdminOrder.css';
+import { RootState } from "../../../redux/store";
+import { useSelector } from "react-redux";
+import { FiDelete } from "react-icons/fi";
+
 const ORDER_STATUSES = {
   ALL: "Tất cả",
   PENDING: "PENDING",
@@ -45,7 +50,7 @@ interface OrderDetail {
     publisher_id: number;
     author_id: number;
     category_id: number;
-  }
+  };
 }
 
 interface Order {
@@ -62,7 +67,7 @@ interface Order {
   updatedAt: string;
   orderDetails: OrderDetail[];
   user: {
-    id: number,
+    id: number;
     firstname: string;
     lastname: string;
   };
@@ -72,7 +77,7 @@ const AdminOrder = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(9);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>(orders);
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [userIdFilter, setUserIdFilter] = useState<string>("");
@@ -91,16 +96,12 @@ const AdminOrder = () => {
     fetchOrders();
   }, []);
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
-  };
+  const formatDate = (date: string) => new Date(date).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
 
-  const formatPrice = (price: string) => {
-    return new Intl.NumberFormat("vi-VN", {
-      style: "currency",
-      currency: "VND",
-    }).format(parseInt(price));
-  };
+  const formatPrice = (price: string) => new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+  }).format(parseInt(price));
 
   const indexOfLastOrder = currentPage * itemsPerPage;
   const indexOfFirstOrder = indexOfLastOrder - itemsPerPage;
@@ -117,8 +118,6 @@ const AdminOrder = () => {
     setFilteredOrders(filtered);
     setCurrentPage(1);
   };
-
-
 
   const exportTableToCsv = () => {
     const csvRows = [
@@ -148,50 +147,6 @@ const AdminOrder = () => {
     window.URL.revokeObjectURL(url);
   };
 
-  const exportPDF = () => {
-    const element = document.getElementById('order-list'); // ID của phần tử muốn xuất PDF
-
-    if (element) {
-      html2canvas(element).then((canvas) => {
-        const doc = new jsPDF();
-        const imgData = canvas.toDataURL("image/png");
-
-        const pageWidth = doc.internal.pageSize.width;
-        const pageHeight = doc.internal.pageSize.height;
-
-        const imgWidth = canvas.width;
-        const imgHeight = canvas.height;
-        const aspectRatio = imgWidth / imgHeight;
-
-        // Tính toán chiều rộng và chiều cao sao cho ảnh vừa với trang PDF
-        let scaledWidth = pageWidth;
-        let scaledHeight = pageWidth / aspectRatio;
-
-        // Nếu chiều cao ảnh lớn hơn chiều cao trang, điều chỉnh lại chiều cao và chiều rộng sao cho vừa
-        if (scaledHeight > pageHeight) {
-          scaledHeight = pageHeight;
-          scaledWidth = pageHeight * aspectRatio;
-        }
-
-        let yOffset = 0; // Khởi tạo offset cho phần tử đầu tiên
-
-        // Thêm ảnh vào PDF và điều chỉnh độ dài của mỗi phần tử sao cho hợp lý với chiều cao của trang
-        while (yOffset < imgHeight) {
-          if (yOffset > 0) {
-            doc.addPage(); // Thêm trang mới khi cần thiết
-          }
-
-          doc.addImage(imgData, 'PNG', 0, yOffset, scaledWidth, scaledHeight);
-          yOffset += pageHeight; // Cập nhật offset sau khi vẽ ảnh vào trang
-        }
-
-        doc.save("orders.pdf"); // Lưu PDF
-      });
-    }
-  };
-
-
-
   useEffect(() => {
     handleFilterChange();
   }, [statusFilter, userIdFilter, orderIdFilter]);
@@ -205,87 +160,72 @@ const AdminOrder = () => {
     txtABillIds.value += allBillIds;
   };
 
-  const confirmOrd = async (orderId: number) => {
+  const updateOrderStatus = async (orderId: number, status: string, successMessage: string) => {
     try {
-      await updateCartStatus(orderId.toString(), 'CONFIRMED');
-      showToast("Đã xác nhận đơn hàng", "success");
-      setFilteredOrders(prev =>
-        prev.map(order => order.id === orderId ? { ...order, status: "CONFIRMED" } : order)
-      );
+      await updateCartStatus(orderId.toString(), status);
+      showToast(successMessage, "success");
+      setFilteredOrders(prev => prev.map(order => order.id === orderId ? { ...order, status } : order));
     } catch (err: any) {
       console.log(err);
-      showToast('Có lỗi xảy ra khi xác nhận đơn hàng: ' + err.message, 'error');
+      showToast(`Có lỗi xảy ra khi ${successMessage.toLowerCase()}: ${err.message}`, 'error');
     }
   };
 
-  const progress = async (orderId: number) => {
-    try {
-      await updateCartStatus(orderId.toString(), 'PROCESSING');
-      showToast("Đã xử lý đơn hàng", "success");
-      setFilteredOrders(prev =>
-        prev.map(order => order.id === orderId ? { ...order, status: "PROCESSING" } : order)
-      );
-    } catch (err: any) {
-      console.log(err);
-      showToast('Có lỗi xảy ra khi xử lý đơn hàng: ' + err.message, 'error');
-    }
+  const confirmOrd = (orderId: number) => updateOrderStatus(orderId, 'CONFIRMED', "Đã xác nhận đơn hàng");
+  const progress = (orderId: number) => updateOrderStatus(orderId, 'PROCESSING', "Đã xử lý đơn hàng");
+  const ship = (orderId: number) => updateOrderStatus(orderId, 'DELIVERED', "Đã gửi hàng");
+
+  // const handleUpdateMultipleStatus = async () => {
+  //   const txtABillIds = document.getElementById("txtABillIds") as HTMLTextAreaElement;
+  //   const billIds = txtABillIds.value.split(",").map(id => parseInt(id.trim()));
+
+  //   try {
+  //     await updateMultipleCartStatus(billIds);
+  //     showToast("Đã xử lý hàng loạt đơn hàng", "success");
+  //     setFilteredOrders(prev => prev.map(order => billIds.includes(order.id) ? { ...order, status: "DELIVERED" } : order));
+  //   } catch (err: any) {
+  //     console.log(err);
+  //     showToast('Có lỗi xảy ra khi xử lý hàng loạt đơn hàng: ' + err.message, 'error');
+  //   }
+  // };
+
+  const handlePrint = () => window.print();
+
+  const getStatusClassName = (status: string) => {
+    const statusClasses: Record<string, string> = {
+      PENDING: 'bg-yellow-100 text-yellow-800',
+      CONFIRMED: 'bg-blue-100 text-blue-800',
+      PROCESSING: 'bg-purple-100 text-purple-800',
+      SHIPPED: 'bg-indigo-100 text-indigo-800',
+      DELIVERED: 'bg-green-100 text-green-800',
+      CANCELLED: 'bg-red-100 text-red-800',
+      RETURNED: 'bg-gray-100 text-gray-800',
+    };
+    return statusClasses[status] || 'bg-gray-200 text-gray-600';
   };
 
-  const ship = async (orderId: number) => {
-    try {
-      await updateCartStatus(orderId.toString(), 'DELIVERED');
-      showToast("Đã gửi hàng", "success");
-      setFilteredOrders(prev =>
-        prev.map(order => order.id === orderId ? { ...order, status: "DELIVERED" } : order)
-      );
-    } catch (err: any) {
-      console.log(err);
-      showToast('Có lỗi xảy ra khi gửi hàng: ' + err.message, 'error');
-    }
+  const orderId = useSelector((state: RootState) => state.newOrder.orderId);
+  const [newOrderList, setNewOrderList] = useState<Order[]>([]);
+
+  useEffect(() => {
+    const fetchNewOrder = async () => {
+      if (orderId) {
+        const newOrder = await getOrderDetailByOrderId(orderId);
+        setNewOrderList(prev => [...prev, newOrder]);
+      }
+    };
+    fetchNewOrder();
+  }, [orderId]);
+
+  const removeOrderFromList = (orderId: number) => {
+    setNewOrderList(prev => prev.filter(order => order.id !== orderId));
   };
 
-  const handleUpdateMultipleStatus = async () => {
-    const txtABillIds = document.getElementById("txtABillIds") as HTMLTextAreaElement;
-    const billIds = txtABillIds.value.split(",").map(id => parseInt(id.trim()));
-
-    try {
-      await updateMultipleCartStatus(billIds);
-      showToast("Đã xử lý hàng loạt đơn hàng", "success");
-      setFilteredOrders(prev =>
-        prev.map(order => billIds.includes(order.id) ? { ...order, status: "DELIVERED" } : order)
-      );
-    } catch (err: any) {
-      console.log(err);
-      showToast('Có lỗi xảy ra khi xử lý hàng loạt đơn hàng: ' + err.message, 'error');
-    }
-  }; const handlePrint = () => {
-    window.print();  // Gọi trình in của trình duyệt
-  };
-
-  const getStatusClassName = (status: any) => {
-    switch (status) {
-      case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'CONFIRMED':
-        return 'bg-blue-100 text-blue-800';
-      case 'PROCESSING':
-        return 'bg-purple-100 text-purple-800';
-      case 'SHIPPED':
-        return 'bg-indigo-100 text-indigo-800';
-      case 'DELIVERED':
-        return 'bg-green-100 text-green-800';
-      case 'CANCELLED':
-        return 'bg-red-100 text-red-800';
-      case 'RETURNED':
-        return 'bg-gray-100 text-gray-800';
-      default:
-        return 'bg-gray-200 text-gray-600';
-    }
-  };
+  const removeAllNewOrder = () => setNewOrderList([]);
 
   return (
-    <div className="p-6 min-h-screen ">
-      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800 text-white">Quản lý đơn hàng</h1>
+    <div className="p-6 min-h-screen">
+      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Quản lý đơn hàng</h1>
 
       {/* Search Filters */}
       <div className="bg-white p-4 rounded-lg shadow-md mb-6">
@@ -323,16 +263,7 @@ const AdminOrder = () => {
           </button>
         </div>
       </div>
-      <div className="flex space-x-2 mb-4 overflow-x-auto bg-white justify-around border-gray-400 border rounded-t-lg">
-        <button onClick={() => setStatusFilter('ALL')} className={`px-4 py-2 font-semibold ${statusFilter === 'ALL' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Tất cả</button>
-        <button onClick={() => setStatusFilter('PENDING')} className={`px-4 py-2 font-semibold ${statusFilter === 'PENDING' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Đang chờ</button>
-        <button onClick={() => setStatusFilter('CONFIRMED')} className={`px-4 py-2 font-semibold ${statusFilter === 'CONFIRMED' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Đã xác nhận</button>
-        <button onClick={() => setStatusFilter('PROCESSING')} className={`px-4 py-2 font-semibold ${statusFilter === 'PROCESSING' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Đang xử lý</button>
-        <button onClick={() => setStatusFilter('DELIVERED')} className={`px-4 py-2 font-semibold ${statusFilter === 'DELIVERED' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Đang giao hàng</button>
-        <button onClick={() => setStatusFilter('SHIPPED')} className={`px-4 py-2 font-semibold ${statusFilter === 'SHIPPED' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Đã nhận hàng</button>
-        <button onClick={() => setStatusFilter('CANCELLED')} className={`px-4 py-2 font-semibold ${statusFilter === 'CANCELLED' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Đã hủy</button>
-        <button onClick={() => setStatusFilter('RETURNED')} className={`px-4 py-2 font-semibold ${statusFilter === 'RETURNED' ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}>Đã trả hàng</button>
-      </div>
+
       {/* Orders Table */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <div className="p-4 border-b border-gray-200">
@@ -340,6 +271,39 @@ const AdminOrder = () => {
             <h2 className="text-xl font-semibold">
               Tổng số đơn hàng: {currentOrders.length}/{filteredOrders.length}
             </h2>
+            {/* Pagination */}
+            <div className="flex justify-center items-center gap-4 p-4">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:bg-gray-400 hover:bg-blue-700 transition-colors"
+              >
+                {"<"}
+              </button>
+              <span className="text-gray-600">
+                Trang {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:bg-gray-400 hover:bg-blue-700 transition-colors"
+              >
+                {">"}
+              </button>
+              <select
+                value={itemsPerPage === orders.length ? 'all' : itemsPerPage}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setItemsPerPage(value === 'all' ? orders.length : parseInt(value));
+                }}
+                className="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="10">9</option>
+                <option value="30">18</option>
+                <option value="50">27</option>
+                <option value="all">Tất cả</option>
+              </select>
+            </div>
             <div className="flex gap-2">
               <button
                 onClick={addAllIdsToTxtABillIds}
@@ -364,84 +328,168 @@ const AdminOrder = () => {
         </div>
 
         <div>
-          <div id="order-list" className="print-container">
-            {/* Your orders rendering here */}
-            <div className="overflow-x-auto">
+          <div className="flex space-x-2 mb-4 overflow-x-auto bg-white justify-around border-gray-400 border rounded-t-lg">
+            {Object.keys(ORDER_STATUSES).map(status => (
+              <button
+                key={status}
+                onClick={() => setStatusFilter(status)}
+                className={`px-4 py-2 font-semibold ${statusFilter === status ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}
+              >
+                {ORDER_STATUSES[status as keyof typeof ORDER_STATUSES]}
+              </button>
+            ))}
+          </div>
+
+          {newOrderList.length > 0 && (
+            <>
+              <div className="relative">
+                <div className="mb-4 text-lg font-bold text-violet-700 text-center">Đơn hàng mới</div>
+                <button className="flex items-center bg-red-500 p-2 rounded-full text-white absolute top-0 right-2 mb-3" onClick={removeAllNewOrder}>
+                  <FiDelete size={20} />
+                  <span className="ml-2 text-sm font-medium">Xóa tất cả đơn hàng mới</span>
+                </button>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-3 md:grid-cols-1 gap-3 px-3">
+                {newOrderList.map(order => (
+                  <div key={order.id} className="mb-6 p-6 bg-yellow-500 shadow-lg rounded-xl border border-gray-200 hover:shadow-xl transition-shadow duration-300 ease-in-out">
+                    <div className="flex justify-between items-center border-b pb-3 mb-4">
+                      <h3 className="text-xl text-violet-700 font-semibold">ĐƠN HÀNG #{order.id}</h3>
+                      <span className={`text-sm font-medium py-1 px-2 rounded-full ${getStatusClassName(order.status)}`}>
+                        {order.status}
+                      </span>
+                    </div>
+
+                    <div className="mb-4 text-sm text-gray-700 space-y-2">
+                      <p><strong>Khách hàng:</strong> {order.user?.firstname} {order.user?.lastname}</p>
+                      <p><strong>Tổng tiền:</strong> {formatPrice(order.total_price)}</p>
+                      <p><strong>Ngày đặt:</strong> {formatDate(order.order_date)}</p>
+                      <div>
+                        <strong>Sách trong đơn hàng:</strong>
+                        <ul>
+                          {order.orderDetails.map(detail => (
+                            <li key={detail.id}>
+                              {detail.book.ISBN} -
+                              {" " + detail.book.title} - Số lượng: {detail.quantity}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+
+
+                    <div className="flex items-center justify-end space-x-3 mt-4">
+                      <button onClick={() => navigate(`/admin/order/${order.id}`)} className="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
+                        <BiDetail size={20} />
+                        <span className="ml-2 text-sm font-medium">Chi tiết</span>
+                      </button>
+                      {order.status === "PENDING" && (
+                        <button onClick={() => confirmOrd(order.id)} className="flex items-center text-green-600 hover:text-green-800 transition duration-200">
+                          <GiConfirmed size={20} />
+                          <span className="ml-2 text-sm font-medium">Xác nhận</span>
+                        </button>
+                      )}
+                      {order.status === "CONFIRMED" && (
+                        <button onClick={() => progress(order.id)} className="flex items-center text-purple-600 hover:text-purple-800 transition duration-200">
+                          <BiLoaderCircle size={20} />
+                          <span className="ml-2 text-sm font-medium">Xử lý</span>
+                        </button>
+                      )}
+                      {order.status === "PROCESSING" && (
+                        <button onClick={() => ship(order.id)} className="flex items-center text-orange-600 hover:text-orange-800 transition duration-200">
+                          <FaTruck size={20} />
+                          <span className="ml-2 text-sm font-medium">Giao hàng</span>
+                        </button>
+                      )}
+                      <button className="flex items-center bg-red-500 p-2 rounded-full text-white" onClick={() => removeOrderFromList(order.id)}>
+                        <FiDelete size={20} />
+                        <span className="ml-2 text-sm font-medium">Xử lý xong</span>
+                      </button>
+                    </div>
+                  </div>
+                ))}</div>
+              <div className="w-10/12 h-1 bg-gray-700 rounded-full m-auto mb-5"></div>
+            </>
+          )}
+
+          <div className="">
+            <div id="order-list" className="overflow-x-auto grid grid-cols-1 lg:grid-cols-3 md:grid-cols-1 gap-3 px-3 print-container">
               {currentOrders.length === 0 ? (
                 <p className="text-center text-gray-500">Không có đơn hàng nào.</p>
               ) : (
-                <div>
-                  {currentOrders.map(order => (
-                    <div key={order.id} className="mb-6 p-6 bg-white shadow-lg rounded-xl border border-gray-200 hover:shadow-xl transition-shadow duration-300 ease-in-out">
-                      <div className="flex justify-between items-center border-b pb-3 mb-4">
-                        <h3 className="text-xl text-violet-700 font-semibold">ĐƠN HÀNG #{order.id}</h3>
-                        <span className={`text-sm font-medium py-1 px-2 rounded-full ${getStatusClassName(order.status)}`}>
-                          {order.status}
-                        </span>
-                      </div>
-
-                      <div className="mb-4 text-sm text-gray-700 space-y-2">
-                        <p><strong>Khách hàng:</strong> {order.user?.firstname} {order.user?.lastname}</p>
-                        <p><strong>Tổng tiền:</strong> {formatPrice(order.total_price)}</p>
-                        <p><strong>Ngày đặt:</strong> {formatDate(order.order_date)}</p>
-                      </div>
-
-                      <div className="flex items-center justify-end space-x-3 mt-4">
-                        <button onClick={() => navigate(`/admin/order/${order.id}`)} className="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
-                          <BiDetail size={20} />
-                          <span className="ml-2 text-sm font-medium">Chi tiết</span>
-                        </button>
-
-                        {order.status === "PENDING" && (
-                          <button onClick={() => confirmOrd(order.id)} className="flex items-center text-green-600 hover:text-green-800 transition duration-200">
-                            <GiConfirmed size={20} />
-                            <span className="ml-2 text-sm font-medium">Xác nhận</span>
-                          </button>
-                        )}
-
-                        {order.status === "CONFIRMED" && (
-                          <button onClick={() => progress(order.id)} className="flex items-center text-purple-600 hover:text-purple-800 transition duration-200">
-                            <BiLoaderCircle size={20} />
-                            <span className="ml-2 text-sm font-medium">Xử lý</span>
-                          </button>
-                        )}
-
-                        {order.status === "PROCESSING" && (
-                          <button onClick={() => ship(order.id)} className="flex items-center text-orange-600 hover:text-orange-800 transition duration-200">
-                            <FaTruck size={20} />
-                            <span className="ml-2 text-sm font-medium">Giao hàng</span>
-                          </button>
-                        )}
-                      </div>
+                currentOrders.map(order => (
+                  <div
+                    key={order.id}
+                    className="order-item mb-6 p-6 bg-white shadow-lg rounded-xl border border-gray-200 hover:shadow-xl transition-shadow duration-300 ease-in-out"
+                  >
+                    <div className="flex justify-between items-center border-b pb-3 mb-4">
+                      <h3 className="text-xl text-violet-700 font-semibold">ĐƠN HÀNG #{order.id}</h3>
+                      <span className={`text-sm font-medium py-1 px-2 rounded-full ${getStatusClassName(order.status)}`}>
+                        {order.status}
+                      </span>
                     </div>
-                  ))}
-                </div>
+
+                    <div className="mb-4 text-sm text-gray-700 space-y-2">
+                      <p>
+                        <strong>Khách hàng:</strong> {order.user?.firstname} {order.user?.lastname}
+                      </p>
+                      <p>
+                        <strong>Tổng tiền:</strong> {formatPrice(order.total_price)}
+                      </p>
+                      <p>
+                        <strong>Ngày đặt:</strong> {formatDate(order.order_date)}
+                      </p>
+                      <strong>Sách trong đơn hàng:</strong>
+                      <ul>
+                        {order.orderDetails.map((detail) => (
+                          <li key={detail.id}>
+                            {detail.book.ISBN} - {detail.book.title} - Số lượng: {detail.quantity}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="flex items-center justify-end space-x-3 mt-4">
+                      <button
+                        onClick={() => navigate(`/admin/order/${order.id}`)}
+                        className="flex items-center text-blue-600 hover:text-blue-800 transition duration-200"
+                      >
+                        <BiDetail size={20} />
+                        <span className="ml-2 text-sm font-medium">Chi tiết</span>
+                      </button>
+                      {order.status === "PENDING" && (
+                        <button
+                          onClick={() => confirmOrd(order.id)}
+                          className="flex items-center text-green-600 hover:text-green-800 transition duration-200"
+                        >
+                          <GiConfirmed size={20} />
+                          <span className="ml-2 text-sm font-medium">Xác nhận</span>
+                        </button>
+                      )}
+                      {order.status === "CONFIRMED" && (
+                        <button
+                          onClick={() => progress(order.id)}
+                          className="flex items-center text-purple-600 hover:text-purple-800 transition duration-200"
+                        >
+                          <BiLoaderCircle size={20} />
+                          <span className="ml-2 text-sm font-medium">Xử lý</span>
+                        </button>
+                      )}
+                      {order.status === "PROCESSING" && (
+                        <button
+                          onClick={() => ship(order.id)}
+                          className="flex items-center text-orange-600 hover:text-orange-800 transition duration-200"
+                        >
+                          <FaTruck size={20} />
+                          <span className="ml-2 text-sm font-medium">Giao hàng</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                ))
               )}
             </div>
           </div>
-        </div>
-
-
-
-        {/* Pagination */}
-        <div className="flex justify-center items-center gap-4 p-4">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:bg-gray-400 hover:bg-blue-700 transition-colors"
-          >
-            Trang trước
-          </button>
-          <span className="text-gray-600">
-            Trang {currentPage} / {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:bg-gray-400 hover:bg-blue-700 transition-colors"
-          >
-            Trang sau
-          </button>
         </div>
       </div>
     </div>

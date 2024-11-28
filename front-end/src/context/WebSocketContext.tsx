@@ -5,6 +5,8 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { showToast } from '../utils/toastUtils';
 import order_coming from "../assets/audio/order_coming.mp3";
+import { useDispatch } from 'react-redux';
+import { setOrderId } from '../redux/reducers/newOrderSlice';
 
 interface WebSocketContextType {
   socket: WebSocket | null;
@@ -24,6 +26,7 @@ export const WebSocketProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
   const [notifications, setNotifications] = useState<NotificationMessage[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
 
   const playSound = debounce(() => {
     const audio = new Audio(order_coming);
@@ -51,8 +54,10 @@ export const WebSocketProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
       // console.log('Received message from WebSocket:', event.data);
       const newNotification: NotificationMessage = JSON.parse(event.data);
       const notification: NotificationMessage = typeof newNotification.message === 'object' ? newNotification.message : newNotification;
-      
-      // Log dữ liệu nhận được từ WebSocket
+      console.log(event.data)
+      // {"message":{"id":269,"user_id":1,"order_id":281,"message":"Có đơn hàng mới #281 cần xử lý từ khách hàng #6","type":"ORDER_UPDATE","createdAt":"2024-11-28T19:11:30.526Z","is_read":false}}
+
+      // Log dữ liệu nhận được từ WebSocket)
       // console.log('New notification from WebSocket:', notification);
       setNotifications((prevNotifications) => {
         const updatedNotifications = [notification, ...prevNotifications];
@@ -67,6 +72,8 @@ export const WebSocketProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
       ) {
         showToast(notification.message, 'info');
         playSound();
+        const orderid: number = JSON.parse(event.data).message.order_id;
+        dispatch(setOrderId(orderid));
       }
 
       // const unreadCount = [newNotification, ...notifications].filter(n => !n.is_read).length;
@@ -80,7 +87,7 @@ export const WebSocketProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
 
   const fetchNotifications = async (limit: number, offset: number) => {
     try {
-      const { notifications, unreadCount }  = await getNotifications(limit, offset);
+      const { notifications, unreadCount } = await getNotifications(limit, offset);
       localStorage.setItem('unreadCount', unreadCount.toString());
 
       if (notifications.length === 0) {
@@ -88,10 +95,10 @@ export const WebSocketProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
       }
 
       setNotifications((prevNotifications) => {
-        const newNotifications = notifications.filter((newNotification: any) => 
+        const newNotifications = notifications.filter((newNotification: any) =>
           !prevNotifications.some(notification => notification.id === newNotification.id)
         );
-        
+
         const updatedNotifications = [...prevNotifications, ...newNotifications];
         // Log danh sách thông báo sau khi gọi API
         // console.log('Updated notifications from API:', updatedNotifications);

@@ -221,6 +221,39 @@ const getAllOrders = async () => {
     throw new Error(error.message);
   }
 }
+
+const getOrderDetailById = async (orderId) => {
+  try {
+    const order = await Order.findByPk(orderId, {
+      include: [
+        {
+          model: Detail_Order,
+          as: 'orderDetails',
+          include: {
+            model: Book,
+            as: 'book',
+            include: {
+              model: Category,
+              as: 'category',
+              attributes: ['name']
+            }
+          },
+        },
+        {
+          model: User,
+          as: 'user'
+        }
+      ]
+    });
+    if (!order) {
+      throw new Error(`Order with ID ${orderId} not found`);
+    }
+    return order;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}
+
 const shipOrder = async (orderId) => {
   try {
     const order = await Order.findByPk(orderId);
@@ -688,5 +721,6 @@ module.exports = {
   updateOrder,
   updateMultipleOrderStatus,
   searchOrdersByUserId,
-  getDetailOrderByUser
+  getDetailOrderByUser,
+  getOrderDetailById
 };
