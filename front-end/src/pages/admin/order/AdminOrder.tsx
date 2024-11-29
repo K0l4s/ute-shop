@@ -10,7 +10,6 @@ import { BiDetail, BiLoaderCircle, BiPrinter } from "react-icons/bi";
 import { FaTruck } from "react-icons/fa";
 import { showToast } from "../../../utils/toastUtils";
 import { GiConfirmed } from "react-icons/gi";
-import { useNavigate } from "react-router-dom";
 import './AdminOrder.css';
 import { RootState } from "../../../redux/store";
 import { useSelector } from "react-redux";
