@@ -147,7 +147,7 @@ const AdminOrder = () => {
       ["Order ID", "User ID", "Total Price", "Order Date", "Address", "Ship Method", "Ship Fee", "Status", "Updated At"].join(",")
     ];
 
-    filteredOrders.forEach(order => {
+    currentOrders.forEach(order => {
       csvRows.push([
         order.id,
         order.user_id,
@@ -301,19 +301,13 @@ const AdminOrder = () => {
                 }}
                 className="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="10">9</option>
-                <option value="30">18</option>
-                <option value="50">27</option>
+                <option value="9">9</option>
+                <option value="18">18</option>
+                <option value="27">27</option>
                 <option value="all">Tất cả</option>
               </select>
             </div>
             <div className="flex gap-2">
-              {/* <button
-                onClick={addAllIdsToTxtABillIds}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-              >
-                <BiSelectMultiple className="mr-2" /> Chọn tất cả
-              </button> */}
               <button
                 onClick={exportTableToCsv}
                 className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
@@ -331,12 +325,12 @@ const AdminOrder = () => {
         </div>
 
         <div>
-          <div className="flex space-x-2 mb-4 overflow-x-auto bg-white justify-around border-gray-400 border rounded-t-lg">
+          <div className="flex mb-4 overflow-x-auto bg-white w-full border-gray-400 border rounded-t-lg">
             {Object.keys(ORDER_STATUSES).map(status => (
               <button
                 key={status}
                 onClick={() => setStatusFilter(status)}
-                className={`px-4 py-2 font-semibold ${statusFilter === status ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200' : ''}`}
+                className={`px-4 py-2 w-full font-semibold ${getStatusClassName(status)} ${statusFilter === status ? 'text-violet-700 border-b-4 border-violet-700 transition duration-200 ' : ''} `}
               >
                 {ORDER_STATUSES[status as keyof typeof ORDER_STATUSES]}
               </button>
@@ -381,7 +375,7 @@ const AdminOrder = () => {
 
 
                     <div className="flex items-center justify-end space-x-3 mt-4">
-                      <button onClick={() => {setCurrentOrder(order); setIsOpenDetail(true)}} className="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
+                      <button onClick={() => { setCurrentOrder(order); setIsOpenDetail(true) }} className="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
                         <BiDetail size={20} />
                         <span className="ml-2 text-sm font-medium">Chi tiết</span>
                       </button>
@@ -422,7 +416,9 @@ const AdminOrder = () => {
                 currentOrders.map(order => (
                   <div
                     key={order.id}
-                    className="order-item mb-6 p-6 bg-white shadow-lg rounded-xl border border-gray-200 hover:shadow-xl transition-shadow duration-300 ease-in-out"
+                    className=
+                    {`order-item mb-6 p-6 shadow-lg rounded-xl border border-gray-200 hover:shadow-xl 
+                      transition-shadow duration-300 ease-in-out ${getStatusClassName(order.status)}`}
                   >
                     <div className="flex justify-between items-center border-b pb-3 mb-4">
                       <h3 className="text-xl text-violet-700 font-semibold">ĐƠN HÀNG #{order.id}</h3>
@@ -452,7 +448,7 @@ const AdminOrder = () => {
                     </div>
 
                     <div className="flex items-center justify-end space-x-3 mt-4">
-                    <button onClick={() => {setCurrentOrder(order); setIsOpenDetail(true)}} className="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
+                      <button onClick={() => { setCurrentOrder(order); setIsOpenDetail(true) }} className="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
                         <BiDetail size={20} />
                         <span className="ml-2 text-sm font-medium">Chi tiết</span>
                       </button>
@@ -488,11 +484,44 @@ const AdminOrder = () => {
 
                 ))
               )}
+
+            </div>
+            <div className="flex justify-center items-center gap-4 p-4">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:bg-gray-400 hover:bg-blue-700 transition-colors"
+              >
+                {"<"}
+              </button>
+              <span className="text-gray-600">
+                Trang {currentPage} / {totalPages}
+              </span>
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:bg-gray-400 hover:bg-blue-700 transition-colors"
+              >
+                {">"}
+              </button>
+              <select
+                value={itemsPerPage === orders.length ? 'all' : itemsPerPage}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setItemsPerPage(value === 'all' ? orders.length : parseInt(value));
+                }}
+                className="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="9">9</option>
+                <option value="18">18</option>
+                <option value="27">27</option>
+                <option value="all">Tất cả</option>
+              </select>
             </div>
           </div>
         </div>
       </div>
-      <AdminDetailOrder isOpen={isOpenDetail} closeModal={onCloseDetail} order={currentOrder} updateOrderStatus={updateOrderStatus}/>
+      <AdminDetailOrder isOpen={isOpenDetail} closeModal={onCloseDetail} order={currentOrder} updateOrderStatus={updateOrderStatus} />
     </div>
   );
 };
