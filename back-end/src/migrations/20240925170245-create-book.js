@@ -53,13 +53,13 @@ module.exports = {
           key: 'id'
         }
       },
-      category_id: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Categories',
-          key: 'id'
-        }
-      }
+      // category_id: {
+      //   type: Sequelize.INTEGER,
+      //   references: {
+      //     model: 'Categories',
+      //     key: 'id'
+      //   }
+      // }
       
       
     });

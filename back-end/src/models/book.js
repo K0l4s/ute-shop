@@ -12,10 +12,10 @@ module.exports = (sequelize) => {
       Book.belongsTo(models.Author, {
         foreignKey: 'author_id'
       });
-      Book.belongsTo(models.Category, {
-        foreignKey: 'category_id',
-        as: 'category'
-      });
+      // Book.belongsTo(models.Category, {
+      //   foreignKey: 'category_id',
+      //   as: 'category'
+      // });
       Book.hasMany(models.Collection_Book, {
         foreignKey: 'book_id'
       });
@@ -63,13 +63,13 @@ module.exports = (sequelize) => {
         key: 'id'
       }
     },
-    category_id: {
-      type: DataTypes.INTEGER,
-      references: {
-        model: 'Categories',
-        key: 'id'
-      }
-    }
+    // category_id: {
+    //   type: DataTypes.INTEGER,
+    //   references: {
+    //     model: 'Categories',
+    //     key: 'id'
+    //   }
+    // }
   }, {
     sequelize,
     modelName: 'Book',
