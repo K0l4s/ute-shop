@@ -3,7 +3,7 @@ const Order = db.Order;
 const Detail_Order = db.Detail_Order;
 const OrderTracking = db.OrderTracking;
 const Book = db.Book;
-const Category = db.Category;
+// const Category = db.Category;
 const Payment = db.Payment;
 const User = db.User;
 const Discount = db.Discount;
@@ -173,11 +173,11 @@ const getOrdersByUserId = async (id, status, limit, offset) => {
           include: {
             model: Book,
             as: 'book',
-            include: {
-              model: Category,
-              as: 'category',
-              attributes: ['name']
-            }
+            // include: {
+            //   model: Category,
+            //   as: 'category',
+            //   attributes: ['name']
+            // }
           },
         }
       ],
@@ -232,11 +232,11 @@ const getOrderDetailById = async (orderId) => {
           include: {
             model: Book,
             as: 'book',
-            include: {
-              model: Category,
-              as: 'category',
-              attributes: ['name']
-            }
+            // include: {
+            //   model: Category,
+            //   as: 'category',
+            //   attributes: ['name']
+            // }
           },
         },
         {
@@ -592,11 +592,11 @@ const searchOrdersByUserId = async (userId, status, searchQuery) => {
                 [db.Sequelize.Op.like]: `%${searchQuery}%`
               }
             },
-            include: {
-              model: Category,
-              as: 'category',
-              attributes: ['name']
-            }
+            // include: {
+            //   model: Category,
+            //   as: 'category',
+            //   attributes: ['name']
+            // }
           },
         }
       ],
@@ -652,11 +652,11 @@ const getDetailOrderByUser = async (userId, orderId) => {
       include: {
         model: Book,
         as: 'book',
-        include: {
-          model: Category,
-          as: 'category',
-          attributes: ['name']
-        }
+        // include: {
+        //   model: Category,
+        //   as: 'category',
+        //   attributes: ['name']
+        // }
       }
     });
 

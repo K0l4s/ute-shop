@@ -26,7 +26,6 @@ const getTop10BooksByOrderQuantity = async () => {
         Books.cover_img_url, 
         Books.publisher_id, 
         Books.author_id, 
-        Books.category_id,
         (SELECT SUM(detail_orders.quantity)
          FROM detail_orders 
          INNER JOIN Orders ON detail_orders.order_id = Orders.id
