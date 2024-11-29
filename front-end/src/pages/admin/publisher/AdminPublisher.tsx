@@ -102,7 +102,7 @@ const AdminPublisher = () => {
   return (
     <div className="p-6 min-h-screen">
       <h1 className="text-3xl font-bold mb-6 text-white">Quản lý nhà xuất bản</h1>
-      <button 
+      <button
         onClick={openModal}
         className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 mb-5"
       >
@@ -134,152 +134,139 @@ const AdminPublisher = () => {
         <div className="mb-4">
           <label className="text-white font-medium mb-2 block">Số lượng sách:</label>
           <div className="flex items-center gap-4">
-            <div className="relative flex-1">
-              <span className="absolute -top-8 bg-blue-500 text-white rounded-full px-3 py-1 text-sm font-medium shadow-lg">
-                {filters.minBooks}
-              </span>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={filters.minBooks}
-                onChange={(e) => {
-                  const newMin = parseInt(e.target.value);
-                  setFilters((prev) => ({
-                    ...prev,
-                    minBooks: newMin,
-                    maxBooks: Math.max(newMin, prev.maxBooks)
-                  }));
-                }}
-                className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"
-              />
-              <span className="text-white font-medium">{filters.minBooks}</span>
-            </div>
-
+            <input
+              type="number"
+              min="0"
+              value={filters.minBooks}
+              onChange={(e) => {
+                const newMin = parseInt(e.target.value);
+                setFilters((prev) => ({
+                  ...prev,
+                  minBooks: newMin,
+                  maxBooks: Math.max(newMin, prev.maxBooks)
+                }));
+              }}
+              className="px-4 py-2 bg-gray-700 text-white border border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-300"
+            />
             <span className="text-white font-bold">-</span>
-
-            <div className="relative flex-1">
-              <span className="absolute -top-8 bg-blue-500 text-white rounded-full px-3 py-1 text-sm font-medium shadow-lg">
-                {filters.maxBooks}
-              </span>
-              <input
-                type="range"
-                min={filters.minBooks}
-                max="100"
-                value={filters.maxBooks}
-                onChange={(e) => {
-                  setFilters((prev) => ({
-                    ...prev,
-                    maxBooks: parseInt(e.target.value),
-                  }));
-                }}
-                className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer"
-              />
-              <span className="text-white font-medium">{filters.maxBooks}</span>
-            </div>
+            <input
+              type="number"
+              min={filters.minBooks}
+              value={filters.maxBooks}
+              onChange={(e) => {
+                setFilters((prev) => ({
+                  ...prev,
+                  maxBooks: parseInt(e.target.value),
+                }));
+              }}
+              className="px-4 py-2 bg-gray-700 text-white border border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-300"
+            />
+            <button
+              onClick={applyFilters}
+              className="w-full md:w-auto px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
+            >
+              Áp dụng bộ lọc
+            </button>
           </div>
-        </div>
 
-        <button 
-          onClick={applyFilters}
-          className="w-full md:w-auto px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
-        >
-          Áp dụng bộ lọc
-        </button>
+        </div>
       </div>
+
+
 
       {/* Bảng nhà xuất bản */}
       <div className="overflow-x-auto rounded-lg shadow-xl">
-        <table className="w-full bg-gray-800 border border-gray-700">
-          <thead>
-            <tr className="bg-gray-900 text-white">
-              <th className="py-3 px-4 text-left font-semibold">ID</th>
-              <th className="py-3 px-4 text-left font-semibold">Tên nhà xuất bản</th>
-              <th className="py-3 px-4 text-left font-semibold">Số lượng sách</th>
-              <th className="py-3 px-4 text-left font-semibold">Địa chỉ</th>
-              <th className="py-3 px-4 text-left font-semibold">Hành động</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentItems.map((publisher, index) => (
-              <tr key={publisher.id} className={`${index % 2 === 0 ? "bg-gray-800" : "bg-gray-700"} hover:bg-gray-600 transition-colors`}>
-                <td className="py-3 px-4 text-gray-200">{publisher.id}</td>
-                <td className="py-3 px-4 text-gray-200">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {currentItems.map((publisher) => (
+            <div
+              key={publisher.id}
+              className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300"
+            >
+              <h3 className="text-xl font-semibold mb-4">ID: {publisher.id}</h3>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm text-white">Tên nhà xuất bản:</label>
                   {editId === publisher.id ? (
                     <input
                       type="text"
                       value={editPublisherData.name || ""}
                       onChange={(e) => handleEditChange(e, "name")}
-                      className="w-full px-3 py-2 bg-gray-600 text-white border border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 bg-gray-700 text-white border border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-300"
                     />
                   ) : (
-                    publisher.name
+                    <p className="text-white">{publisher.name}</p>
                   )}
-                </td>
-                <td className="py-3 px-4 text-gray-200">{publisher.books?.length || 0}</td>
-                <td className="py-3 px-4 text-gray-200">
+                </div>
+
+                <div>
+                  <label className="block text-sm text-gray-300">Số lượng sách:</label>
+                  <p className="text-gray-200">{publisher.books?.length || 0}</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm text-gray-300">Địa chỉ:</label>
                   {editId === publisher.id ? (
                     <input
                       type="text"
                       value={editPublisherData.address || ""}
                       onChange={(e) => handleEditChange(e, "address")}
-                      className="w-full px-3 py-2 bg-gray-600 text-white border border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 bg-gray-700 text-white border border-gray-500 rounded-lg focus:ring-2 focus:ring-blue-300"
                     />
                   ) : (
-                    publisher.address
+                    <p className="text-gray-200">{publisher.address}</p>
                   )}
-                </td>
-                <td className="py-3 px-4">
-                  {editId === publisher.id ? (
-                    <button
-                      onClick={() => saveEdit(publisher.id)}
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
-                    >
-                      <FaCheck className="inline-block mr-2" />
-                      Lưu
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => startEdit(publisher)}
-                      className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-all duration-300 transform hover:scale-105"
-                    >
-                      <FaEdit className="inline-block mr-2" />
-                      Chỉnh sửa
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              </div>
+
+              <div className="mt-4 flex space-x-4">
+                {editId === publisher.id ? (
+                  <button
+                    onClick={() => saveEdit(publisher.id)}
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-all duration-300 transform hover:scale-105"
+                  >
+                    <FaCheck className="inline-block mr-2" />
+                    Lưu
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => startEdit(publisher)}
+                    className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition-all duration-300 transform hover:scale-105"
+                  >
+                    <FaEdit className="inline-block mr-2" />
+                    Chỉnh sửa
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
 
         {/* Phân trang */}
         <div className="flex justify-center items-center gap-6 mt-8 mb-4">
           <button
             onClick={() => paginate(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`px-6 py-3 rounded-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105 ${
-              currentPage === 1 
-              ? 'bg-gray-600 cursor-not-allowed opacity-50' 
+            className={`px-6 py-3 rounded-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105 ${currentPage === 1
+              ? 'bg-gray-600 cursor-not-allowed opacity-50'
               : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg'
-            }`}
+              }`}
           >
             <BiLeftArrow className="animate-pulse" />
             <span>Trước</span>
           </button>
-          
+
           <span className="text-white font-medium bg-blue-600/30 px-4 py-2 rounded-lg">
             Trang {currentPage} / {Math.ceil(filteredPublishers.length / itemsPerPage)}
           </span>
-          
+
           <button
             onClick={() => paginate(currentPage + 1)}
             disabled={currentPage === Math.ceil(filteredPublishers.length / itemsPerPage)}
-            className={`px-6 py-3 rounded-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105 ${
-              currentPage === Math.ceil(filteredPublishers.length / itemsPerPage)
+            className={`px-6 py-3 rounded-lg flex items-center gap-2 transition-all duration-300 transform hover:scale-105 ${currentPage === Math.ceil(filteredPublishers.length / itemsPerPage)
               ? 'bg-gray-600 cursor-not-allowed opacity-50'
               : 'bg-blue-600 hover:bg-blue-700 hover:shadow-lg'
-            }`}
+              }`}
           >
             <span>Tiếp</span>
             <BiRightArrow className="animate-pulse" />

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { createDiscountVoucher, getDiscountVouchers, updateDiscountVoucher } from "../../../apis/voucher";
-import { BiAddToQueue } from "react-icons/bi";
 import { FaEdit, FaToggleOn, FaToggleOff } from "react-icons/fa";
 
 interface Discount {
@@ -21,7 +20,6 @@ const AdminVoucher = () => {
   const [discounts, setDiscounts] = useState<Discount[]>([]);
   const [filteredDiscounts, setFilteredDiscounts] = useState<Discount[]>([]);
   const [isActiveFilter, setIsActiveFilter] = useState<string | null>(null);
-  const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingRow, setEditingRow] = useState<number | null>(null);
   const [newVoucher, setNewVoucher] = useState<Discount>({
@@ -62,31 +60,7 @@ const AdminVoucher = () => {
     setFilteredDiscounts(data);
   }, [isActiveFilter, discounts]);
 
-  const sortData = (key: keyof Discount) => {
-    let direction: "asc" | "desc" = "asc";
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
-
-    const sortedData = [...filteredDiscounts].sort((a, b) => {
-      const valueA = a[key] ?? "";
-      const valueB = b[key] ?? "";
-
-      if (typeof valueA === "string" && typeof valueB === "string") {
-        if (valueA < valueB) return direction === "asc" ? -1 : 1;
-        if (valueA > valueB) return direction === "asc" ? 1 : -1;
-      }
-
-      if (typeof valueA === "number" && typeof valueB === "number") {
-        return direction === "asc" ? valueA - valueB : valueB - valueA;
-      }
-
-      return 0;
-    });
-
-    setFilteredDiscounts(sortedData);
-  };
+ 
 
   const handleSave = async (discount: Discount) => {
     try {
@@ -178,31 +152,76 @@ const AdminVoucher = () => {
           </select>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead>
-              <tr className="bg-gray-50">
-                <th className="p-4 cursor-pointer" onClick={() => sortData("code")}>Mã</th>
-                <th className="p-4 cursor-pointer" onClick={() => sortData("name")}>Tên</th>
-                <th className="p-4 cursor-pointer" onClick={() => sortData("desc")}>Mô tả</th>
-                <th className="p-4 cursor-pointer" onClick={() => sortData("discount_perc")}>% Giảm</th>
-                <th className="p-4 cursor-pointer" onClick={() => sortData("discount_val")}>Giá trị giảm</th>
-                <th className="p-4 cursor-pointer" onClick={() => sortData("stock")}>Số lượng</th>
-                <th className="p-4 cursor-pointer" onClick={() => sortData("min_order_val")}>Đơn tối thiểu</th>
-                <th className="p-4 cursor-pointer" onClick={() => sortData("is_active")}>Trạng thái</th>
-                <th className="p-4">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              <tr className="bg-gray-50">
-                <td className="p-4"><input type="text" value={newVoucher.code} onChange={(e) => handleNewVoucherChange(e, "code")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                <td className="p-4"><input type="text" value={newVoucher.name} onChange={(e) => handleNewVoucherChange(e, "name")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                <td className="p-4"><input type="text" value={newVoucher.desc} onChange={(e) => handleNewVoucherChange(e, "desc")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                <td className="p-4"><input type="number" value={newVoucher.discount_perc} onChange={(e) => handleNewVoucherChange(e, "discount_perc")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                <td className="p-4"><input type="text" value={newVoucher.discount_val} onChange={(e) => handleNewVoucherChange(e, "discount_val")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                <td className="p-4"><input type="number" value={newVoucher.stock} onChange={(e) => handleNewVoucherChange(e, "stock")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                <td className="p-4"><input type="text" value={newVoucher.min_order_val} onChange={(e) => handleNewVoucherChange(e, "min_order_val")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                <td className="p-4">
+        <div className="overflow-x-auto ">
+          <div className="space-y-4  grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl-grid-cols-3 lg:grid-cols-3 gap-6 p-3">
+            {/* Add New Voucher Card */}
+            <div className="border p-6 rounded-lg shadow-md">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Mã</label>
+                  <input
+                    type="text"
+                    value={newVoucher.code}
+                    onChange={(e) => handleNewVoucherChange(e, "code")}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Tên</label>
+                  <input
+                    type="text"
+                    value={newVoucher.name}
+                    onChange={(e) => handleNewVoucherChange(e, "name")}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Mô tả</label>
+                  <input
+                    type="text"
+                    value={newVoucher.desc}
+                    onChange={(e) => handleNewVoucherChange(e, "desc")}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">% Giảm</label>
+                  <input
+                    type="number"
+                    value={newVoucher.discount_perc}
+                    onChange={(e) => handleNewVoucherChange(e, "discount_perc")}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Giá trị giảm</label>
+                  <input
+                    type="text"
+                    value={newVoucher.discount_val}
+                    onChange={(e) => handleNewVoucherChange(e, "discount_val")}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Số lượng</label>
+                  <input
+                    type="number"
+                    value={newVoucher.stock}
+                    onChange={(e) => handleNewVoucherChange(e, "stock")}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Đơn tối thiểu</label>
+                  <input
+                    type="text"
+                    value={newVoucher.min_order_val}
+                    onChange={(e) => handleNewVoucherChange(e, "min_order_val")}
+                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Trạng thái</label>
                   <select
                     value={newVoucher.is_active ? "active" : "inactive"}
                     onChange={(e) => handleNewVoucherChange(e, "is_active")}
@@ -211,51 +230,113 @@ const AdminVoucher = () => {
                     <option value="active">Hoạt động</option>
                     <option value="inactive">Ngừng</option>
                   </select>
-                </td>
-                <td className="p-4">
-                  <button onClick={handleAddVoucher} className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
-                    <BiAddToQueue className="mr-2" />
-                    Thêm mới
-                  </button>
-                </td>
-              </tr>
+                </div>
+              </div>
+              <button
+                onClick={handleAddVoucher}
+                className="mt-4 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
+              >
+                Thêm mới
+              </button>
+            </div>
 
-              {paginatedData.map((discount) => (
-                <tr key={discount.id} className={`${discount.is_active ? 'bg-white' : 'bg-red-50'} hover:bg-gray-50 transition`}>
-                  <td className="px-6 py-4">{discount.code}</td>
-                  <td className="px-6 py-4">
+            {/* Display Voucher Cards */}
+            {paginatedData.map((discount) => (
+              <div
+                key={discount.id}
+                className={`border p-6 rounded-lg shadow-md ${discount.is_active ? 'bg-white' : 'bg-red-100'}`}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center space-x-2">
+                    <strong className="text-gray-700">Mã:</strong>
+                    <span>{discount.code}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <strong className="text-gray-700">Tên:</strong>
                     {editingRow === discount.id ? (
-                      <input type="text" className="w-full px-3 py-2 border rounded-lg" value={discount.name} onChange={(e) => handleInputChange(e, discount.id, "name")} />
-                    ) : discount.name}
-                  </td>
-                  <td className="px-6 py-4">
+                      <input
+                        type="text"
+                        className="w-full px-3 py-2 border rounded-lg"
+                        value={discount.name}
+                        onChange={(e) => handleInputChange(e, discount.id, "name")}
+                      />
+                    ) : (
+                      <span>{discount.name}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <strong className="text-gray-700">Mô tả:</strong>
                     {editingRow === discount.id ? (
-                      <input type="text" className="w-full px-3 py-2 border rounded-lg" value={discount.desc} onChange={(e) => handleInputChange(e, discount.id, "desc")} />
-                    ) : discount.desc}
-                  </td>
-                  <td className="px-6 py-4">
+                      <input
+                        type="text"
+                        className="w-full px-3 py-2 border rounded-lg"
+                        value={discount.desc}
+                        onChange={(e) => handleInputChange(e, discount.id, "desc")}
+                      />
+                    ) : (
+                      <span>{discount.desc}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <strong className="text-gray-700">% Giảm:</strong>
                     {editingRow === discount.id ? (
-                      <input type="number" className="w-full px-3 py-2 border rounded-lg" value={discount.discount_perc} onChange={(e) => handleInputChange(e, discount.id, "discount_perc")} />
-                    ) : discount.discount_perc}
-                  </td>
-                  <td className="px-6 py-4">
+                      <input
+                        type="number"
+                        className="w-full px-3 py-2 border rounded-lg"
+                        value={discount.discount_perc}
+                        onChange={(e) => handleInputChange(e, discount.id, "discount_perc")}
+                      />
+                    ) : (
+                      <span>{discount.discount_perc}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <strong className="text-gray-700">Giá trị giảm:</strong>
                     {editingRow === discount.id ? (
-                      <input type="text" className="w-full px-3 py-2 border rounded-lg" value={discount.discount_val} onChange={(e) => handleInputChange(e, discount.id, "discount_val")} />
-                    ) : discount.discount_val}
-                  </td>
-                  <td className="px-6 py-4">
+                      <input
+                        type="text"
+                        className="w-full px-3 py-2 border rounded-lg"
+                        value={discount.discount_val}
+                        onChange={(e) => handleInputChange(e, discount.id, "discount_val")}
+                      />
+                    ) : (
+                      <span>{discount.discount_val}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <strong className="text-gray-700">Số lượng:</strong>
                     {editingRow === discount.id ? (
-                      <input type="number" className="w-full px-3 py-2 border rounded-lg" value={discount.stock} onChange={(e) => handleInputChange(e, discount.id, "stock")} />
-                    ) : discount.stock}
-                  </td>
-                  <td className="px-6 py-4">
+                      <input
+                        type="number"
+                        className="w-full px-3 py-2 border rounded-lg"
+                        value={discount.stock}
+                        onChange={(e) => handleInputChange(e, discount.id, "stock")}
+                      />
+                    ) : (
+                      <span>{discount.stock}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <strong className="text-gray-700">Đơn tối thiểu:</strong>
                     {editingRow === discount.id ? (
-                      <input type="text" className="w-full px-3 py-2 border rounded-lg" value={discount.min_order_val} onChange={(e) => handleInputChange(e, discount.id, "min_order_val")} />
-                    ) : discount.min_order_val}
-                  </td>
-                  <td className="px-6 py-4">
+                      <input
+                        type="text"
+                        className="w-full px-3 py-2 border rounded-lg"
+                        value={discount.min_order_val}
+                        onChange={(e) => handleInputChange(e, discount.id, "min_order_val")}
+                      />
+                    ) : (
+                      <span>{discount.min_order_val}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <strong className="text-gray-700">Trạng thái:</strong>
                     {editingRow === discount.id ? (
-                      <select className="w-full px-3 py-2 border rounded-lg" value={discount.is_active ? "active" : "inactive"} onChange={(e) => handleInputChange(e, discount.id, "is_active")}>
+                      <select
+                        className="w-full px-3 py-2 border rounded-lg"
+                        value={discount.is_active ? "active" : "inactive"}
+                        onChange={(e) => handleInputChange(e, discount.id, "is_active")}
+                      >
                         <option value="active">Hoạt động</option>
                         <option value="inactive">Ngừng</option>
                       </select>
@@ -264,27 +345,35 @@ const AdminVoucher = () => {
                         {discount.is_active ? 'Hoạt động' : 'Ngừng'}
                       </span>
                     )}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex space-x-2">
-                      {editingRow === discount.id ? (
-                        <button onClick={() => handleSave(discount)} className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                          <FaEdit className="w-5 h-5" />
-                        </button>
-                      ) : (
-                        <button onClick={() => setEditingRow(discount.id)} className="p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
-                          <FaEdit className="w-5 h-5" />
-                        </button>
-                      )}
-                      <button onClick={() => handleToggleActive(discount)} className={`p-2 rounded-lg transition ${discount.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white`}>
-                        {discount.is_active ? <FaToggleOff className="w-5 h-5" /> : <FaToggleOn className="w-5 h-5" />}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </div>
+                </div>
+                <div className="flex space-x-2 mt-4">
+                  {editingRow === discount.id ? (
+                    <button
+                      onClick={() => handleSave(discount)}
+                      className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                    >
+                      <FaEdit className="w-5 h-5" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setEditingRow(discount.id)}
+                      className="p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition"
+                    >
+                      <FaEdit className="w-5 h-5" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleToggleActive(discount)}
+                    className={`p-2 rounded-lg transition ${discount.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white`}
+                  >
+                    {discount.is_active ? <FaToggleOff className="w-5 h-5" /> : <FaToggleOn className="w-5 h-5" />}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
         </div>
 
         <div className="mt-6 flex justify-between items-center">

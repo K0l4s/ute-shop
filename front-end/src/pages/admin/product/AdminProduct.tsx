@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { searchBooks } from "../../../apis/book";
 // import { useLocation } from "react-router-dom";
-import { FaEdit, FaEye, FaTrash, FaSortUp, FaSortDown, FaPlus } from "react-icons/fa";
+import { FaEdit, FaEye, FaTrash, FaPlus } from "react-icons/fa";
 // import Pagination from "../../../components/pagination/Pagination";
 import ModalCreateBook from "../../../components/modals/ModalCreateBook";
-import Papa, { ParseResult } from 'papaparse';
-import * as XLSX from 'xlsx';
+
 interface Book {
     Author: { Id: number; name: string };
     ISBN: string;
@@ -29,13 +28,6 @@ interface Book {
     total_sold: string;
     year: number;
 }
-interface BookData {
-    isbn: string;
-    quantity: number;
-}
-
-type SortOrder = 'asc' | 'desc';
-
 const AdminProduct = () => {
     const [books, setBooks] = useState<Book[]>([]);
     // const location = useLocation();
@@ -54,8 +46,6 @@ const AdminProduct = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [isOpenCreateBook, setIsOpenCreateBook] = useState(false);
-    const [sortField, setSortField] = useState<keyof Book | null>(null);
-    const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -83,7 +73,7 @@ const AdminProduct = () => {
                     ...filters,
                     title: filters.title || "", // Default to empty string if undefined
                     page: currentPage,
-                    limit: 5,
+                    limit: 6,
                     minPrice: minPrice,
                     maxPrice: maxPrice,
                 };
@@ -98,7 +88,7 @@ const AdminProduct = () => {
         };
 
         fetchBooks();
-    }, [isOpenCreateBook,currentPage, filters]);
+    }, [isOpenCreateBook, currentPage, filters]);
 
     const formatMoney = (value: number) => {
         return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
@@ -112,86 +102,86 @@ const AdminProduct = () => {
         }));
     };
 
-    const handleSort = (field: keyof Book) => {
-        const order = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
-        setSortField(field);
-        setSortOrder(order);
+    // const handleSort = (field: keyof Book) => {
+    //     const order = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
+    //     setSortField(field);
+    //     setSortOrder(order);
 
-        // Sort books based on the selected field and order
-        const sortedBooks = [...books].sort((a, b) => {
-            if (field === 'price' || field === 'salePrice' || field === 'stock' || field === 'total_sold') {
-                return order === 'asc'
-                    ? Number(a[field]) - Number(b[field])
-                    : Number(b[field]) - Number(a[field]);
-            }
-            if (a[field] < b[field]) return order === 'asc' ? -1 : 1;
-            if (a[field] > b[field]) return order === 'asc' ? 1 : -1;
-            return 0;
-        });
-        setBooks(sortedBooks);
-    };
-    
+    //     // Sort books based on the selected field and order
+    //     const sortedBooks = [...books].sort((a, b) => {
+    //         if (field === 'price' || field === 'salePrice' || field === 'stock' || field === 'total_sold') {
+    //             return order === 'asc'
+    //                 ? Number(a[field]) - Number(b[field])
+    //                 : Number(b[field]) - Number(a[field]);
+    //         }
+    //         if (a[field] < b[field]) return order === 'asc' ? -1 : 1;
+    //         if (a[field] > b[field]) return order === 'asc' ? 1 : -1;
+    //         return 0;
+    //     });
+    //     setBooks(sortedBooks);
+    // };
+
     const openModal = () => {
         setIsOpenCreateBook(true);
     }
     const closeModal = () => {
         setIsOpenCreateBook(false);
     }
-    const importMultiBook = () => {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.csv, .xlsx';
-        
-        fileInput.onchange = (e: Event) => {
-            const file = (e.target as HTMLInputElement).files?.[0];
-            if (!file) return;
-    
-            const fileExtension = file.name.split('.').pop()?.toLowerCase();
-    
-            // Handle CSV files
-            if (fileExtension === 'csv') {
-                Papa.parse<BookData>(file, {
-                    header: true,
-                    complete: (results: ParseResult<BookData>) => {
-                        // Extract "isbn" and "quantity" columns
-                        results.data.forEach((row: BookData) => {
-                            console.log(`ISBN: ${row.isbn}, Quantity: ${row.quantity}`);
-                        });
-                    },
-                    error: (error: Error) => {
-                        console.error("Error parsing CSV:", error.message);
-                    }
-                });
-            }
-            // Handle XLSX files
-            else if (fileExtension === 'xlsx') {
-                const reader = new FileReader();
-    
-                reader.onload = (e) => {
-                    const data = new Uint8Array(e.target?.result as ArrayBuffer);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json<BookData>(firstSheet);
-    
-                    // Extract "isbn" and "quantity" columns
-                    jsonData.forEach((row: BookData) => {
-                        console.log(`ISBN: ${row.isbn}, Quantity: ${row.quantity}`);
-                    });
-                };
-    
-                reader.onerror = (ev: ProgressEvent<FileReader>) => {
-                    console.error("Error reading XLSX file:", ev.target?.error?.message);
-                };
-    
-                reader.readAsArrayBuffer(file);
-            } else {
-                console.error("Unsupported file format");
-            }
-        };
-    
-        // Trigger file input dialog
-        fileInput.click();
-    };
+    // const importMultiBook = () => {
+    //     const fileInput = document.createElement('input');
+    //     fileInput.type = 'file';
+    //     fileInput.accept = '.csv, .xlsx';
+
+    //     fileInput.onchange = (e: Event) => {
+    //         const file = (e.target as HTMLInputElement).files?.[0];
+    //         if (!file) return;
+
+    //         const fileExtension = file.name.split('.').pop()?.toLowerCase();
+
+    //         // Handle CSV files
+    //         if (fileExtension === 'csv') {
+    //             Papa.parse<BookData>(file, {
+    //                 header: true,
+    //                 complete: (results: ParseResult<BookData>) => {
+    //                     // Extract "isbn" and "quantity" columns
+    //                     results.data.forEach((row: BookData) => {
+    //                         console.log(`ISBN: ${row.isbn}, Quantity: ${row.quantity}`);
+    //                     });
+    //                 },
+    //                 error: (error: Error) => {
+    //                     console.error("Error parsing CSV:", error.message);
+    //                 }
+    //             });
+    //         }
+    //         // Handle XLSX files
+    //         else if (fileExtension === 'xlsx') {
+    //             const reader = new FileReader();
+
+    //             reader.onload = (e) => {
+    //                 const data = new Uint8Array(e.target?.result as ArrayBuffer);
+    //                 const workbook = XLSX.read(data, { type: 'array' });
+    //                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+    //                 const jsonData = XLSX.utils.sheet_to_json<BookData>(firstSheet);
+
+    //                 // Extract "isbn" and "quantity" columns
+    //                 jsonData.forEach((row: BookData) => {
+    //                     console.log(`ISBN: ${row.isbn}, Quantity: ${row.quantity}`);
+    //                 });
+    //             };
+
+    //             reader.onerror = (ev: ProgressEvent<FileReader>) => {
+    //                 console.error("Error reading XLSX file:", ev.target?.error?.message);
+    //             };
+
+    //             reader.readAsArrayBuffer(file);
+    //         } else {
+    //             console.error("Unsupported file format");
+    //         }
+    //     };
+
+    //     // Trigger file input dialog
+    //     fileInput.click();
+    // };
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -229,117 +219,65 @@ const AdminProduct = () => {
             <div className="mb-6">
                 <h2 className="text-lg font-semibold mb-3 text-white">Thao tác</h2>
                 <div className="flex flex-wrap gap-3">
-                    <button 
+                    <button
                         onClick={openModal}
                         className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg
                         hover:bg-blue-700 transition-all duration-300 transform hover:scale-105"
                     >
                         <FaPlus className="mr-2" />Thêm sách mới
                     </button>
-                    <button 
+                    {/* <button
                         onClick={importMultiBook}
                         className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg
                         hover:bg-green-700 transition-all duration-300 transform hover:scale-105"
                     >
                         <FaPlus className="mr-2" />Nhập hàng hàng loạt
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
             {/* Books Table */}
             <div className="bg-white/10 rounded-xl shadow-lg overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="min-w-full text-sm text-white">
-                        <thead className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-                            <tr>
-                                <th className="px-6 py-4 cursor-pointer hover:bg-blue-700/50 transition-colors group" onClick={() => handleSort('ISBN')}>
-                                    <div className="flex items-center justify-between">
-                                        ISBN
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {sortField === 'ISBN' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
-                                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {books.map((book) => (
+                            <div
+                                key={book.id}
+                                className="p-6 bg-white shadow-lg rounded-xl border border-gray-200 hover:shadow-xl transition-shadow duration-300 ease-in-out"
+                            >
+                                <div className="flex items-center mb-4">
+                                    <img
+                                        src={book.cover_img_url}
+                                        alt={book.title}
+                                        className="h-24 w-16 object-cover rounded-lg shadow-md"
+                                    />
+                                    <div className="ml-4">
+                                        <h3 className="text-xl font-semibold text-gray-800">{book.title}</h3>
+                                        <p className="text-sm text-gray-600">ISBN: #{book.ISBN}</p>
                                     </div>
-                                </th>
-                                <th className="px-6 py-4">Cover</th>
-                                <th className="px-6 py-4 cursor-pointer hover:bg-blue-700/50 transition-colors group" onClick={() => handleSort('title')}>
-                                    <div className="flex items-center justify-between">
-                                        Tiêu đề
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {sortField === 'title' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
-                                        </div>
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4 cursor-pointer hover:bg-blue-700/50 transition-colors group" onClick={() => handleSort('Author')}>
-                                    <div className="flex items-center justify-between">
-                                        Tác giả
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {sortField === 'Author' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
-                                        </div>
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4 cursor-pointer hover:bg-blue-700/50 transition-colors group" onClick={() => handleSort('Publisher')}>
-                                    <div className="flex items-center justify-between">
-                                        NXB
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {sortField === 'Publisher' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
-                                        </div>
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4 cursor-pointer hover:bg-blue-700/50 transition-colors group" onClick={() => handleSort('price')}>
-                                    <div className="flex items-center justify-between">
-                                        Giá
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {sortField === 'price' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
-                                        </div>
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4 cursor-pointer hover:bg-blue-700/50 transition-colors group" onClick={() => handleSort('salePrice')}>
-                                    <div className="flex items-center justify-between">
-                                        Giảm giá
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {sortField === 'salePrice' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
-                                        </div>
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4 cursor-pointer hover:bg-blue-700/50 transition-colors group" onClick={() => handleSort('total_sold')}>
-                                    <div className="flex items-center justify-between">
-                                        Đã bán
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {sortField === 'total_sold' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
-                                        </div>
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4 cursor-pointer hover:bg-blue-700/50 transition-colors group" onClick={() => handleSort('stock')}>
-                                    <div className="flex items-center justify-between">
-                                        Tồn kho
-                                        <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                                            {sortField === 'stock' && (sortOrder === 'asc' ? <FaSortUp /> : <FaSortDown />)}
-                                        </div>
-                                    </div>
-                                </th>
-                                <th className="px-6 py-4">Trạng thái</th>
-                                <th className="px-6 py-4">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {books.map((book) => (
-                                <tr key={book.id} className="border-b border-blue-400/20 hover:bg-blue-500/20 transition-all duration-300">
-                                    <td className="px-6 py-4">#{book.ISBN}</td>
-                                    <td className="px-6 py-4">
-                                        <img 
-                                            src={book.cover_img_url} 
-                                            alt={book.title} 
-                                            className="h-16 w-12 object-cover rounded-lg shadow-md hover:transform hover:scale-150 transition-transform duration-200"
-                                        />
-                                    </td>
-                                    <td className="px-6 py-4">{book.title}</td>
-                                    <td className="px-6 py-4">{book.Author?.name}</td>
-                                    <td className="px-6 py-4">{book.Publisher?.name}</td>
-                                    <td className="px-6 py-4">{formatMoney(Number(book.price))}</td>
-                                    <td className="px-6 py-4 text-red-400">{formatMoney(Number(book.salePrice))}</td>
-                                    <td className="px-6 py-4">{book.total_sold || "0"}</td>
-                                    <td className="px-6 py-4">{book.stock - Number(book.total_sold)}</td>
-                                    <td className="px-6 py-4">
+                                </div>
+
+                                <div className="text-sm text-gray-700 space-y-2">
+                                    <p>
+                                        <strong>Tác giả:</strong> {book.Author?.name || "N/A"}
+                                    </p>
+                                    <p>
+                                        <strong>NXB:</strong> {book.Publisher?.name || "N/A"}
+                                    </p>
+                                    <p>
+                                        <strong>Giá:</strong> {formatMoney(Number(book.price))}
+                                    </p>
+                                    <p className="text-red-500">
+                                        <strong>Giảm giá:</strong> {formatMoney(Number(book.salePrice))}
+                                    </p>
+                                    <p>
+                                        <strong>Đã bán:</strong> {book.total_sold || "0"}
+                                    </p>
+                                    <p>
+                                        <strong>Tồn kho:</strong> {book.stock - Number(book.total_sold)}
+                                    </p>
+                                    <p>
+                                        <strong>Trạng thái:</strong>{" "}
                                         {Number(book.total_sold) < book.stock ? (
                                             <span className="px-3 py-1 bg-green-500 text-white rounded-lg text-sm">
                                                 Còn hàng
@@ -349,24 +287,33 @@ const AdminProduct = () => {
                                                 Hết hàng
                                             </span>
                                         )}
-                                    </td>
-                                    <td className="px-6 py-4">
-                                        <div className="flex space-x-3">
-                                            <button className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300" title="Xem chi tiết">
-                                                <FaEye size={16} />
-                                            </button>
-                                            <button className="p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300" title="Chỉnh sửa">
-                                                <FaEdit size={16} />
-                                            </button>
-                                            <button className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300" title="Xóa">
-                                                <FaTrash size={16} />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                                    </p>
+                                </div>
+
+                                <div className="mt-4 flex space-x-3">
+                                    <button
+                                        className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                                        title="Xem chi tiết"
+                                    >
+                                        <FaEye size={16} />
+                                    </button>
+                                    <button
+                                        className="p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                                        title="Chỉnh sửa"
+                                    >
+                                        <FaEdit size={16} />
+                                    </button>
+                                    <button
+                                        className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                                        title="Xóa"
+                                    >
+                                        <FaTrash size={16} />
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
                 </div>
             </div>
 
@@ -376,11 +323,10 @@ const AdminProduct = () => {
                     <button
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
-                        className={`px-4 py-2 rounded-lg ${
-                            currentPage === 1
+                        className={`px-4 py-2 rounded-lg ${currentPage === 1
                                 ? 'bg-gray-300 cursor-not-allowed'
                                 : 'bg-blue-500 hover:bg-blue-600'
-                        } text-white transition-colors`}
+                            } text-white transition-colors`}
                     >
                         Previous
                     </button>
@@ -388,11 +334,10 @@ const AdminProduct = () => {
                         <button
                             key={index + 1}
                             onClick={() => handlePageChange(index + 1)}
-                            className={`px-4 py-2 rounded-lg ${
-                                currentPage === index + 1
+                            className={`px-4 py-2 rounded-lg ${currentPage === index + 1
                                     ? 'bg-blue-600'
                                     : 'bg-blue-500 hover:bg-blue-600'
-                            } text-white transition-colors`}
+                                } text-white transition-colors`}
                         >
                             {index + 1}
                         </button>
@@ -400,11 +345,10 @@ const AdminProduct = () => {
                     <button
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
-                        className={`px-4 py-2 rounded-lg ${
-                            currentPage === totalPages
+                        className={`px-4 py-2 rounded-lg ${currentPage === totalPages
                                 ? 'bg-gray-300 cursor-not-allowed'
                                 : 'bg-blue-500 hover:bg-blue-600'
-                        } text-white transition-colors`}
+                            } text-white transition-colors`}
                     >
                         Next
                     </button>

@@ -21,7 +21,6 @@ const AdminFreeship = () => {
   const [freeships, setFreeships] = useState<Freeship[]>([]);
   const [filteredFreeships, setFilteredFreeships] = useState<Freeship[]>([]);
   const [isActiveFilter, setIsActiveFilter] = useState<string | null>(null);
-  const [sortConfig, setSortConfig] = useState<{ key: string; direction: "asc" | "desc" } | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [editingRow, setEditingRow] = useState<number | null>(null);
   const [newFreeship, setNewFreeship] = useState<Freeship>({
@@ -62,31 +61,7 @@ const AdminFreeship = () => {
     setFilteredFreeships(data);
   }, [isActiveFilter, freeships]);
 
-  const sortData = (key: keyof Freeship) => {
-    let direction: "asc" | "desc" = "asc";
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
-
-    const sortedData = [...filteredFreeships].sort((a, b) => {
-      const valueA = a[key] ?? "";
-      const valueB = b[key] ?? "";
-
-      if (typeof valueA === "string" && typeof valueB === "string") {
-        if (valueA < valueB) return direction === "asc" ? -1 : 1;
-        if (valueA > valueB) return direction === "asc" ? 1 : -1;
-      }
-
-      if (typeof valueA === "number" && typeof valueB === "number") {
-        return direction === "asc" ? valueA - valueB : valueB - valueA;
-      }
-
-      return 0;
-    });
-
-    setFilteredFreeships(sortedData);
-  };
+ 
 
   const handleSave = async (freeship: Freeship) => {
     try {
@@ -178,30 +153,59 @@ const AdminFreeship = () => {
 
         <div className="bg-white rounded-xl shadow-lg overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white">
-                  <th className="px-6 py-4 cursor-pointer hover:bg-indigo-700 transition" onClick={() => sortData("code")}>Mã</th>
-                  <th className="px-6 py-4 cursor-pointer hover:bg-indigo-700 transition" onClick={() => sortData("name")}>Tên</th>
-                  <th className="px-6 py-4 cursor-pointer hover:bg-indigo-700 transition" onClick={() => sortData("desc")}>Mô tả</th>
-                  <th className="px-6 py-4 cursor-pointer hover:bg-indigo-700 transition" onClick={() => sortData("discount_perc")}>% Giảm</th>
-                  <th className="px-6 py-4 cursor-pointer hover:bg-indigo-700 transition" onClick={() => sortData("discount_val")}>Giá trị</th>
-                  <th className="px-6 py-4 cursor-pointer hover:bg-indigo-700 transition" onClick={() => sortData("stock")}>Số lượng</th>
-                  <th className="px-6 py-4 cursor-pointer hover:bg-indigo-700 transition" onClick={() => sortData("min_order_val")}>Đơn tối thiểu</th>
-                  <th className="px-6 py-4 cursor-pointer hover:bg-indigo-700 transition" onClick={() => sortData("is_active")}>Trạng thái</th>
-                  <th className="px-6 py-4">Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="bg-blue-50 hover:bg-blue-100 transition">
-                  <td className="p-4"><input type="text" value={newFreeship.code} onChange={(e) => handleNewFreeshipChange(e, "code")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                  <td className="p-4"><input type="text" value={newFreeship.name} onChange={(e) => handleNewFreeshipChange(e, "name")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                  <td className="p-4"><input type="text" value={newFreeship.desc} onChange={(e) => handleNewFreeshipChange(e, "desc")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                  <td className="p-4"><input type="number" value={newFreeship.discount_perc || ""} onChange={(e) => handleNewFreeshipChange(e, "discount_perc")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                  <td className="p-4"><input type="text" value={newFreeship.discount_val || ""} onChange={(e) => handleNewFreeshipChange(e, "discount_val")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                  <td className="p-4"><input type="number" value={newFreeship.stock} onChange={(e) => handleNewFreeshipChange(e, "stock")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                  <td className="p-4"><input type="text" value={newFreeship.min_order_val || ""} onChange={(e) => handleNewFreeshipChange(e, "min_order_val")} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" /></td>
-                  <td className="p-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 p-3">
+                {/* Add New Freeship Card */}
+                <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200">
+                  <div className="space-y-4">
+                    <input
+                      type="text"
+                      value={newFreeship.code}
+                      onChange={(e) => handleNewFreeshipChange(e, "code")}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="Mã"
+                    />
+                    <input
+                      type="text"
+                      value={newFreeship.name}
+                      onChange={(e) => handleNewFreeshipChange(e, "name")}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="Tên"
+                    />
+                    <input
+                      type="text"
+                      value={newFreeship.desc}
+                      onChange={(e) => handleNewFreeshipChange(e, "desc")}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="Mô tả"
+                    />
+                    <input
+                      type="number"
+                      value={newFreeship.discount_perc || ""}
+                      onChange={(e) => handleNewFreeshipChange(e, "discount_perc")}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="% Giảm"
+                    />
+                    <input
+                      type="text"
+                      value={newFreeship.discount_val || ""}
+                      onChange={(e) => handleNewFreeshipChange(e, "discount_val")}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="Giá trị"
+                    />
+                    <input
+                      type="number"
+                      value={newFreeship.stock}
+                      onChange={(e) => handleNewFreeshipChange(e, "stock")}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="Số lượng"
+                    />
+                    <input
+                      type="text"
+                      value={newFreeship.min_order_val || ""}
+                      onChange={(e) => handleNewFreeshipChange(e, "min_order_val")}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                      placeholder="Đơn tối thiểu"
+                    />
                     <select
                       value={newFreeship.is_active ? "active" : "inactive"}
                       onChange={(e) => handleNewFreeshipChange(e, "is_active")}
@@ -210,80 +214,119 @@ const AdminFreeship = () => {
                       <option value="active">Hoạt động</option>
                       <option value="inactive">Ngừng</option>
                     </select>
-                  </td>
-                  <td className="p-4">
-                    <button onClick={handleAddFreeship} className="flex items-center px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
+                    <button onClick={handleAddFreeship} className="w-full px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition">
                       <BiAddToQueue className="mr-2" />
                       Thêm mới
                     </button>
-                  </td>
-                </tr>
+                  </div>
+                </div>
 
+                {/* Existing Freeship Cards */}
                 {paginatedData.map((freeship) => (
-                  <tr key={freeship.id} className={`${freeship.is_active ? 'bg-white' : 'bg-red-50'} hover:bg-gray-50 transition`}>
-                    <td className="px-6 py-4">{freeship.code}</td>
-                    <td className="px-6 py-4">
-                      {editingRow === freeship.id ? (
-                        <input type="text" className="w-full px-3 py-2 border rounded-lg" value={freeship.name} onChange={(e) => handleInputChange(e, freeship.id, "name")} />
-                      ) : freeship.name}
-                    </td>
-                    <td className="px-6 py-4">
-                      {editingRow === freeship.id ? (
-                        <input type="text" className="w-full px-3 py-2 border rounded-lg" value={freeship.desc} onChange={(e) => handleInputChange(e, freeship.id, "desc")} />
-                      ) : freeship.desc}
-                    </td>
-                    <td className="px-6 py-4">
-                      {editingRow === freeship.id ? (
-                        <input type="number" className="w-full px-3 py-2 border rounded-lg" value={freeship.discount_perc || ''} onChange={(e) => handleInputChange(e, freeship.id, "discount_perc")} />
-                      ) : freeship.discount_perc}
-                    </td>
-                    <td className="px-6 py-4">
-                      {editingRow === freeship.id ? (
-                        <input type="text" className="w-full px-3 py-2 border rounded-lg" value={freeship.discount_val || ''} onChange={(e) => handleInputChange(e, freeship.id, "discount_val")} />
-                      ) : freeship.discount_val}
-                    </td>
-                    <td className="px-6 py-4">
-                      {editingRow === freeship.id ? (
-                        <input type="number" className="w-full px-3 py-2 border rounded-lg" value={freeship.stock} onChange={(e) => handleInputChange(e, freeship.id, "stock")} />
-                      ) : freeship.stock}
-                    </td>
-                    <td className="px-6 py-4">
-                      {editingRow === freeship.id ? (
-                        <input type="text" className="w-full px-3 py-2 border rounded-lg" value={freeship.min_order_val || ''} onChange={(e) => handleInputChange(e, freeship.id, "min_order_val")} />
-                      ) : freeship.min_order_val}
-                    </td>
-                    <td className="px-6 py-4">
-                      {editingRow === freeship.id ? (
-                        <select className="w-full px-3 py-2 border rounded-lg" value={freeship.is_active ? "active" : "inactive"} onChange={(e) => handleInputChange(e, freeship.id, "is_active")}>
-                          <option value="active">Hoạt động</option>
-                          <option value="inactive">Ngừng</option>
-                        </select>
-                      ) : (
-                        <span className={`px-3 py-1 rounded-full text-sm ${freeship.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                          {freeship.is_active ? 'Hoạt động' : 'Ngừng'}
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex space-x-2">
-                        {editingRow === freeship.id ? (
-                          <button onClick={() => handleSave(freeship)} className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                            <FaEdit className="w-5 h-5" />
-                          </button>
-                        ) : (
-                          <button onClick={() => setEditingRow(freeship.id)} className="p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
-                            <FaEdit className="w-5 h-5" />
-                          </button>
-                        )}
-                        <button onClick={() => handleToggleActive(freeship)} className={`p-2 rounded-lg transition ${freeship.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white`}>
-                          {freeship.is_active ? <FaToggleOff className="w-5 h-5" /> : <FaToggleOn className="w-5 h-5" />}
-                        </button>
+                  <div key={freeship.id} className={`bg-white p-6 rounded-lg shadow-lg border ${freeship.is_active ? 'border-gray-200' : 'border-red-200'} space-y-4`}>
+                    <div className="flex justify-between items-center">
+                      <div className="font-semibold text-lg">{freeship.code}</div>
+                      <div className={`px-3 py-1 rounded-full text-sm ${freeship.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        {freeship.is_active ? 'Hoạt động' : 'Ngừng'}
                       </div>
-                    </td>
-                  </tr>
+                    </div>
+
+                    <div>
+                      <span className="font-medium">Tên:</span> {editingRow === freeship.id ? (
+                        <input
+                          type="text"
+                          className="w-full px-3 py-2 border rounded-lg"
+                          value={freeship.name}
+                          onChange={(e) => handleInputChange(e, freeship.id, "name")}
+                        />
+                      ) : (
+                        freeship.name
+                      )}
+                    </div>
+
+                    <div>
+                      <span className="font-medium">Mô tả:</span> {editingRow === freeship.id ? (
+                        <input
+                          type="text"
+                          className="w-full px-3 py-2 border rounded-lg"
+                          value={freeship.desc}
+                          onChange={(e) => handleInputChange(e, freeship.id, "desc")}
+                        />
+                      ) : (
+                        freeship.desc
+                      )}
+                    </div>
+
+                    <div>
+                      <span className="font-medium">% Giảm:</span> {editingRow === freeship.id ? (
+                        <input
+                          type="number"
+                          className="w-full px-3 py-2 border rounded-lg"
+                          value={freeship.discount_perc || ''}
+                          onChange={(e) => handleInputChange(e, freeship.id, "discount_perc")}
+                        />
+                      ) : (
+                        freeship.discount_perc
+                      )}
+                    </div>
+
+                    <div>
+                      <span className="font-medium">Giá trị:</span> {editingRow === freeship.id ? (
+                        <input
+                          type="text"
+                          className="w-full px-3 py-2 border rounded-lg"
+                          value={freeship.discount_val || ''}
+                          onChange={(e) => handleInputChange(e, freeship.id, "discount_val")}
+                        />
+                      ) : (
+                        freeship.discount_val
+                      )}
+                    </div>
+
+                    <div>
+                      <span className="font-medium">Số lượng:</span> {editingRow === freeship.id ? (
+                        <input
+                          type="number"
+                          className="w-full px-3 py-2 border rounded-lg"
+                          value={freeship.stock}
+                          onChange={(e) => handleInputChange(e, freeship.id, "stock")}
+                        />
+                      ) : (
+                        freeship.stock
+                      )}
+                    </div>
+
+                    <div>
+                      <span className="font-medium">Đơn tối thiểu:</span> {editingRow === freeship.id ? (
+                        <input
+                          type="text"
+                          className="w-full px-3 py-2 border rounded-lg"
+                          value={freeship.min_order_val || ''}
+                          onChange={(e) => handleInputChange(e, freeship.id, "min_order_val")}
+                        />
+                      ) : (
+                        freeship.min_order_val
+                      )}
+                    </div>
+
+                    <div className="flex space-x-2">
+                      {editingRow === freeship.id ? (
+                        <button onClick={() => handleSave(freeship)} className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                          <FaEdit className="w-5 h-5" />
+                        </button>
+                      ) : (
+                        <button onClick={() => setEditingRow(freeship.id)} className="p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition">
+                          <FaEdit className="w-5 h-5" />
+                        </button>
+                      )}
+                      <button onClick={() => handleToggleActive(freeship)} className={`p-2 rounded-lg transition ${freeship.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'} text-white`}>
+                        {freeship.is_active ? <FaToggleOff className="w-5 h-5" /> : <FaToggleOn className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+
           </div>
         </div>
 

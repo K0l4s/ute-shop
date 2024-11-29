@@ -31,10 +31,10 @@ const AdminLeftBar: React.FC = () => {
     const user = useSelector((state: RootState) => state.auth.user);
 
     return (
-        <div className="bg-gradient-to-b from-indigo-800 via-blue-900 to-blue-950 min-h-screen fixed lg:w-64 w-16 md:w-48 transition-all duration-300 shadow-xl overflow-y-auto">
+        <div className="bg-gradient-to-b from-indigo-800 via-blue-900 to-blue-950 min-h-screen fixed lg:w-64  transition-all duration-300 shadow-xl overflow-y-auto">
             <div className="flex flex-col items-center justify-start h-full py-6">
                 {/* Admin Avatar */}
-                <div className="relative w-20 h-20 mb-4">
+                <div className="w-10 h-10 mb-4">
                     <img 
                         src={user?.avatar_url || "https://via.placeholder.com/150"} 
                         alt="Admin" 

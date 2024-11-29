@@ -3,11 +3,10 @@ import {
   getAllOrder,
   getOrderDetailByOrderId,
   updateCartStatus,
-  updateMultipleCartStatus,
 } from "../../../apis/order";
 import { PiFileCsvBold } from "react-icons/pi";
 import { BsSearch } from "react-icons/bs";
-import { BiDetail, BiLoaderCircle, BiPrinter, BiSelectMultiple } from "react-icons/bi";
+import { BiDetail, BiLoaderCircle, BiPrinter } from "react-icons/bi";
 import { FaTruck } from "react-icons/fa";
 import { showToast } from "../../../utils/toastUtils";
 import { GiConfirmed } from "react-icons/gi";
@@ -16,6 +15,9 @@ import './AdminOrder.css';
 import { RootState } from "../../../redux/store";
 import { useSelector } from "react-redux";
 import { FiDelete } from "react-icons/fi";
+import { useDispatch } from "react-redux";
+import { clearOrderId } from "../../../redux/reducers/newOrderSlice";
+import AdminDetailOrder from "./AdminDetailOrder";
 
 const ORDER_STATUSES = {
   ALL: "Tất cả",
@@ -74,7 +76,6 @@ interface Order {
 }
 
 const AdminOrder = () => {
-  const navigate = useNavigate();
   const [orders, setOrders] = useState<Order[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(9);
@@ -82,6 +83,29 @@ const AdminOrder = () => {
   const [statusFilter, setStatusFilter] = useState<string>("");
   const [userIdFilter, setUserIdFilter] = useState<string>("");
   const [orderIdFilter, setOrderIdFilter] = useState<string>("");
+  const [isOpenDetail, setIsOpenDetail] = useState(false);
+  const [currentOrder, setCurrentOrder] = useState<Order>({
+    id: 0,
+    user_id: 0,
+    discount_id: null,
+    freeship_id: null,
+    total_price: "",
+    order_date: "",
+    shipping_address: "",
+    shipping_method: "",
+    shipping_fee: "",
+    status: "",
+    updatedAt: "",
+    orderDetails: [],
+    user: {
+      id: 0,
+      firstname: "",
+      lastname: "",
+    },
+  });
+  const onCloseDetail = () => {
+    setIsOpenDetail(false);
+  }
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -151,14 +175,6 @@ const AdminOrder = () => {
     handleFilterChange();
   }, [statusFilter, userIdFilter, orderIdFilter]);
 
-  const addAllIdsToTxtABillIds = () => {
-    const txtABillIds = document.getElementById("txtABillIds") as HTMLTextAreaElement;
-    const allBillIds = currentOrders
-      .map(order => order.id)
-      .filter(id => !txtABillIds.value.includes(id.toString()))
-      .join(", ");
-    txtABillIds.value += allBillIds;
-  };
 
   const updateOrderStatus = async (orderId: number, status: string, successMessage: string) => {
     try {
@@ -174,20 +190,6 @@ const AdminOrder = () => {
   const confirmOrd = (orderId: number) => updateOrderStatus(orderId, 'CONFIRMED', "Đã xác nhận đơn hàng");
   const progress = (orderId: number) => updateOrderStatus(orderId, 'PROCESSING', "Đã xử lý đơn hàng");
   const ship = (orderId: number) => updateOrderStatus(orderId, 'DELIVERED', "Đã gửi hàng");
-
-  // const handleUpdateMultipleStatus = async () => {
-  //   const txtABillIds = document.getElementById("txtABillIds") as HTMLTextAreaElement;
-  //   const billIds = txtABillIds.value.split(",").map(id => parseInt(id.trim()));
-
-  //   try {
-  //     await updateMultipleCartStatus(billIds);
-  //     showToast("Đã xử lý hàng loạt đơn hàng", "success");
-  //     setFilteredOrders(prev => prev.map(order => billIds.includes(order.id) ? { ...order, status: "DELIVERED" } : order));
-  //   } catch (err: any) {
-  //     console.log(err);
-  //     showToast('Có lỗi xảy ra khi xử lý hàng loạt đơn hàng: ' + err.message, 'error');
-  //   }
-  // };
 
   const handlePrint = () => window.print();
 
@@ -205,6 +207,7 @@ const AdminOrder = () => {
   };
 
   const orderId = useSelector((state: RootState) => state.newOrder.orderId);
+  const dispatch = useDispatch();
   const [newOrderList, setNewOrderList] = useState<Order[]>([]);
 
   useEffect(() => {
@@ -212,6 +215,7 @@ const AdminOrder = () => {
       if (orderId) {
         const newOrder = await getOrderDetailByOrderId(orderId);
         setNewOrderList(prev => [...prev, newOrder]);
+        dispatch(clearOrderId());
       }
     };
     fetchNewOrder();
@@ -225,7 +229,7 @@ const AdminOrder = () => {
 
   return (
     <div className="p-6 min-h-screen">
-      <h1 className="text-3xl font-bold text-center mb-6 text-gray-800">Quản lý đơn hàng</h1>
+      <h1 className="text-3xl font-bold text-center mb-6 text-white">Quản lý đơn hàng</h1>
 
       {/* Search Filters */}
       <div className="bg-white p-4 rounded-lg shadow-md mb-6">
@@ -305,12 +309,12 @@ const AdminOrder = () => {
               </select>
             </div>
             <div className="flex gap-2">
-              <button
+              {/* <button
                 onClick={addAllIdsToTxtABillIds}
                 className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
               >
                 <BiSelectMultiple className="mr-2" /> Chọn tất cả
-              </button>
+              </button> */}
               <button
                 onClick={exportTableToCsv}
                 className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
@@ -319,7 +323,7 @@ const AdminOrder = () => {
               </button>
               <button
                 onClick={handlePrint}
-                className="flex items-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
               >
                 <BiPrinter className="mr-2" /> In Hóa đơn
               </button>
@@ -378,7 +382,7 @@ const AdminOrder = () => {
 
 
                     <div className="flex items-center justify-end space-x-3 mt-4">
-                      <button onClick={() => navigate(`/admin/order/${order.id}`)} className="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
+                      <button onClick={() => {setCurrentOrder(order); setIsOpenDetail(true)}} className="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
                         <BiDetail size={20} />
                         <span className="ml-2 text-sm font-medium">Chi tiết</span>
                       </button>
@@ -449,10 +453,7 @@ const AdminOrder = () => {
                     </div>
 
                     <div className="flex items-center justify-end space-x-3 mt-4">
-                      <button
-                        onClick={() => navigate(`/admin/order/${order.id}`)}
-                        className="flex items-center text-blue-600 hover:text-blue-800 transition duration-200"
-                      >
+                    <button onClick={() => {setCurrentOrder(order); setIsOpenDetail(true)}} className="flex items-center text-blue-600 hover:text-blue-800 transition duration-200">
                         <BiDetail size={20} />
                         <span className="ml-2 text-sm font-medium">Chi tiết</span>
                       </button>
@@ -492,6 +493,7 @@ const AdminOrder = () => {
           </div>
         </div>
       </div>
+      <AdminDetailOrder isOpen={isOpenDetail} closeModal={onCloseDetail} order={currentOrder} updateOrderStatus={updateOrderStatus}/>
     </div>
   );
 };

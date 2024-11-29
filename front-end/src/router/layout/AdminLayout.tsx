@@ -19,21 +19,21 @@ const AdminAccess = ({ children }: { children: JSX.Element }) => {
 const AdminLayout = () => {
     return (
         <AdminAccess>
-            <div className=" bg-gradient-to-br from-gray-50 to-gray-100">
-
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
                 <AdminNavbar />
-                <div className="grid grid-cols-7 lg:grid-cols-12 gap-4">
-                    <div className="col-span-1 lg:col-span-2 shadow-lg">
+                <div className="flex">
+                    {/* Left Sidebar */}
+                    <div className="xl:w-64 lg:w-64 md:w-0 w-0 hidden lg:block xl:block bg-gray-800 text-white min-h-screen">
                         <AdminLeftBar />
                     </div>
-                    <div className="col-span-6 lg:col-span-10 p-6 bg-white rounded-lg shadow-sm bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-                        <div className="max-w-7xl mx-auto">
-                            <Outlet />
-                        </div>
+
+                    {/* Main Content Area */}
+                    <div className="flex-1 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+                        <Outlet />
                     </div>
                 </div>
-
             </div>
+
         </AdminAccess>
     );
 };
