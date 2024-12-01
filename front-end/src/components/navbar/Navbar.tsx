@@ -5,7 +5,7 @@ import logo from '../../assets/images/logo.png'
 import { BiSearch } from 'react-icons/bi';
 import { BsMenuButtonWideFill } from 'react-icons/bs';
 import { RiCopperCoinLine } from "react-icons/ri";
-import { FaRegUserCircle } from 'react-icons/fa';
+import { FaQuestionCircle, FaRegUserCircle } from 'react-icons/fa';
 import { FiShoppingCart } from 'react-icons/fi';
 import { IoMdNotificationsOutline } from 'react-icons/io';
 import { useSelector } from 'react-redux';
@@ -21,6 +21,7 @@ import { fetchWallet } from '../../redux/reducers/walletSlice';
 import { LuWallet } from 'react-icons/lu';
 import { getUserCart } from '../../apis/cart';
 import { setItems } from '../../redux/reducers/cartSlice';
+import { CiCircleQuestion } from 'react-icons/ci';
 
 const Navbar = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -179,11 +180,13 @@ const Navbar = () => {
                         transition={{ duration: 0.2, ease: "easeOut" }}
                         className="absolute left-5 bg-white rounded-lg shadow-lg group-hover:block" 
                       >
-                        <div className="w-36 py-2 px-2 text-gray-800">
+                        <div className="w-48 py-2 px-2 text-gray-800">
                           Số dư: {walletBalance}
                           <RiCopperCoinLine className='inline-block mb-1 ml-1'/>
 
-                          <div className='text-rose-700 text-sm'>1 <RiCopperCoinLine className='inline-block mb-1' /> = 1000 VND </div>
+                          <div className='text-rose-700 text-sm'>1 <RiCopperCoinLine className='inline-block mb-1' /> = 100 VND </div>
+                          <hr className='my-2' />
+                          <div className='text-rose-700 text-sm'><FaQuestionCircle className='inline-block mb-1 mr-1' size={16} />20k VNĐ đã tiêu = 1 <RiCopperCoinLine className='inline-block mb-1' /></div>
                         </div>
                       </motion.div>
                     )}
