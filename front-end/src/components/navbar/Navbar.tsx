@@ -21,7 +21,6 @@ import { fetchWallet } from '../../redux/reducers/walletSlice';
 import { LuWallet } from 'react-icons/lu';
 import { getUserCart } from '../../apis/cart';
 import { setItems } from '../../redux/reducers/cartSlice';
-import { CiCircleQuestion } from 'react-icons/ci';
 
 const Navbar = () => {
   const dispatch: AppDispatch = useDispatch();
