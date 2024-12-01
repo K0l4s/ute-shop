@@ -82,11 +82,6 @@ module.exports = (sequelize) => {
       type: DataTypes.DECIMAL,
       allowNull: false
     },
-    coins_used: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0
-    },
     status: {
       // type: DataTypes.ENUM('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'),
       type: DataTypes.ENUM(orderStatus.PENDING,orderStatus.CONFIRMED, orderStatus.PROCESSING, orderStatus.SHIPPED, orderStatus.DELIVERED, orderStatus.CANCELLED,orderStatus.RETURNED),
@@ -102,7 +97,12 @@ module.exports = (sequelize) => {
       type: DataTypes.BOOLEAN,
       allowNull: false,
       defaultValue: false
-    }
+    },
+    coins_used: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
   }, {
     sequelize,
     modelName: 'Order',
