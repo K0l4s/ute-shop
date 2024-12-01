@@ -50,7 +50,7 @@ const AdminNavbar = () => {
         <nav className="sticky top-0 z-50 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 backdrop-blur-md border-b border-white/10 py-2 px-8 shadow-xl">
             <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-8">
-                    <Link to="/admin/dashboard" className="text-2xl font-bold text-white hover:text-blue-400 transition-colors">
+                    <Link to="#" className="text-2xl font-bold text-white hover:text-blue-400 transition-colors">
                         Admin Dashboard
                     </Link>
                 </div>
