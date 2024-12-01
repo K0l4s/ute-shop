@@ -80,7 +80,35 @@ const submitAllReviews = async ({ userId, reviews, orderId }) => {
   }
 };
 
+const getBookReviews = async ({ bookId, stars }) => {
+  try {
+    const whereClause = {
+      book_id: bookId
+    };
+
+    if (stars) {
+      whereClause.star = stars;
+    }
+
+    const reviews = await Review.findAll({
+      where: whereClause,
+      include: [
+        {
+          model: User,
+          attributes: ["firstName", "lastName"],
+        },
+      ],
+      order: [['id', 'DESC']]
+    });
+
+    return reviews;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   createReview,
   submitAllReviews,
+  getBookReviews
 };
