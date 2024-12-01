@@ -1,10 +1,10 @@
 import React from 'react';
-import { FaTachometerAlt, FaUser, FaBoxOpen, FaShoppingCart, FaTags, FaBookOpen, FaLayerGroup, FaBuilding } from 'react-icons/fa';
+import { FaTachometerAlt, FaUser, FaBoxOpen, FaShoppingCart, FaTags, FaBookOpen, FaBuilding } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import MenuGroup from './MenuGroup';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
-import { BiCalendarEvent } from 'react-icons/bi';
+// import { BiCalendarEvent } from 'react-icons/bi';
 import { MdLocalOffer } from 'react-icons/md';
 
 // Define the type for a submenu item
@@ -14,12 +14,12 @@ interface Submenu {
     icon: any;
 }
 
-const AdminLeftBar: React.FC = () => {
+const AdminLeftBar: React.FC = () => {  
     // Define the structure of the submenus with more appropriate icons
     const productSubmenus: Submenu[] = [
         { title: 'Sách', link: '/admin/products', icon: FaBookOpen },
         { title: 'Tác giả', link: '/admin/authors', icon: FaUser },
-        { title: 'Phân loại', link: '/admin/categories', icon: FaLayerGroup },
+        // { title: 'Phân loại', link: '/admin/categories', icon: FaLayerGroup },
         { title: 'Nhà xuất bản', link: '/admin/publishers', icon: FaBuilding },
     ];
 
@@ -87,7 +87,7 @@ const AdminLeftBar: React.FC = () => {
                         <MenuGroup title="Mã giảm giá" icon={FaTags} submenus={voucherSubmenus} />
 
                         {/* Event Management */}
-                        <li>
+                        {/* <li>
                             <Link 
                                 to="/admin/event" 
                                 className="flex items-center p-3 rounded-lg hover:bg-indigo-700/50 transition-all duration-300 hover:translate-x-1"
@@ -95,7 +95,7 @@ const AdminLeftBar: React.FC = () => {
                                 <BiCalendarEvent className="w-5 h-5 mr-3 text-fuchsia-400" />
                                 <span className="hidden lg:block font-semibold">Sự kiện</span>
                             </Link>
-                        </li>
+                        </li> */}
                     </ul>
                 </nav>
             </div>

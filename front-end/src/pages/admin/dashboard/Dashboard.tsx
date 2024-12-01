@@ -4,6 +4,7 @@ import { getReportAPI } from "../../../apis/report";
 import LineChart from "./LineChart";
 import useIntersectionObserver from "../../../hook/useIntersectionObserver";
 import PieChart from "./PieChart";
+import { useNavigate } from "react-router-dom";
 
 interface Book {
   id: number;
@@ -114,7 +115,7 @@ const Dashboard = () => {
   useEffect(() => {
     getReport(currentYear);
   }, [currentYear]);
-
+const navigate = useNavigate();
   return (
     <div className="p-8 space-y-8 min-h-screen">
       <h2 className="text-3xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
@@ -142,18 +143,19 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
         {[
-          { ref: totalUsersRef, title: 'NGƯỜI DÙNG', value: report.totalUsers, visible: isTotalUsersVisible, icon: '👥' },
-          { ref: revenueRef, title: 'DOANH THU', value: totalRevenue, visible: isRevenueVisible, icon: '💰' },
-          { ref: ordersRef, title: 'HÓA ĐƠN', value: report.totalOrders, visible: isOrdersVisible, icon: '📝' },
-          { ref: booksRef, title: 'SÁCH', value: report.totalBooks, visible: isBooksVisible, icon: '📚' },
-          { ref: soldBooksRef, title: 'SÁCH BÁN RA', value: totalSoldBooks, visible: isSoldBooksVisible, icon: '📈' },
+          { ref: totalUsersRef, title: 'NGƯỜI DÙNG', value: report.totalUsers, visible: isTotalUsersVisible, icon: '👥', navigate: '/admin/users' },
+          { ref: revenueRef, title: 'DOANH THU', value: totalRevenue, visible: isRevenueVisible, icon: '💰', navigate: '/admin/orders' },
+          { ref: ordersRef, title: 'HÓA ĐƠN', value: report.totalOrders, visible: isOrdersVisible, icon: '📝', navigate: '/admin/orders' },
+          { ref: booksRef, title: 'SÁCH', value: report.totalBooks, visible: isBooksVisible, icon: '📚' , navigate:'/admin/products'},
+          { ref: soldBooksRef, title: 'SÁCH BÁN RA', value: totalSoldBooks, visible: isSoldBooksVisible, icon: '📈' ,navigate:'/admin/products'},
         ].map((card, index) => (
           <div
             key={index}
             ref={card.ref}
-            className={`backdrop-blur-md bg-opacity-20 bg-white p-6 rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-300 ${
+            className={`backdrop-blur-md bg-opacity-20 bg-white p-6 rounded-2xl shadow-2xl transform hover:scale-105 transition-all cursor-pointer duration-300 ${
               card.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
+            onClick={()=>navigate(card.navigate)}
           >
             <div className="text-center space-y-3">
               <span className="text-3xl">{card.icon}</span>

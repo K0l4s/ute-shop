@@ -22,6 +22,7 @@ const analystRoutes = require('./routes/analystRoutes.js');
 const authorRoutes = require('./routes/authorRoutes.js');
 const notificationRoutes = require('./routes/notificationRoutes.js');
 const walletRoutes = require('./routes/walletRoute.js');
+const genreRoutes = require('./routes/genreRoutes.js');
 
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
@@ -74,6 +75,7 @@ app.use('/api/v1/analyst', analystRoutes);
 app.use('/api/v1/author', authorRoutes);
 app.use('/api/v1/notification', notificationRoutes);
 app.use('/api/v1/wallet', walletRoutes);
+app.use('/api/v1/genre', genreRoutes);
 
 app.get('/api/distance', async (req, res) => {
   const { origins, destinations } = req.query;

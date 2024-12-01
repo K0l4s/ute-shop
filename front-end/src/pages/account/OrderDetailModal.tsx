@@ -157,7 +157,7 @@ const OrderDetailModal = ({ orderId, isOpen, onClose }: { orderId: number; onClo
                     />
                     <div>
                       <p className='font-semibold'>{detail.book.title}</p>
-                      <p className='text-gray-700'>Phân loại: {detail.book.category.name}</p>
+                      {/* <p className='text-gray-700'>Phân loại: {detail.book.category.name}</p> */}
                       <p className='text-gray-700'>Số lượng: {detail.quantity}</p>
                       <p className='text-gray-700'>
                         Đơn giá:
