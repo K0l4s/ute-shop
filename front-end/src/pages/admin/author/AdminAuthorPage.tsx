@@ -17,14 +17,14 @@ interface Author extends basicAuthor {
 
 
 
-type SortOrder = 'asc' | 'desc';
+// type SortOrder = 'asc' | 'desc';
 
 const AdminAuthorPage: React.FC = () => {
     const [authors, setAuthors] = useState<Author[]>([]);
     const [filteredAuthors, setFilteredAuthors] = useState<Author[]>([]); // Trạng thái cho danh sách tác giả đã lọc
     const [searchTerm, setSearchTerm] = useState<string>(''); // Trạng thái tìm kiếm
-    const [sortField, setSortField] = useState<keyof Author | null>(null);
-    const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+    // const [sortField, setSortField] = useState<keyof Author | null>(null);
+    // const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
     const [currentPage, setCurrentPage] = useState(1);
     const [authorsPerPage] = useState(8);
 
@@ -93,13 +93,27 @@ const AdminAuthorPage: React.FC = () => {
     //     const order = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
     //     setSortField(field);
     //     setSortOrder(order);
+    // const handleSort = (field: keyof Author) => {
+    //     const order = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
+    //     setSortField(field);
+    //     setSortOrder(order);
 
+    //     const sortedAuthors = [...filteredAuthors].sort((a, b) => {
+    //         const aValue = a[field];
+    //         const bValue = b[field];
     //     const sortedAuthors = [...filteredAuthors].sort((a, b) => {
     //         const aValue = a[field];
     //         const bValue = b[field];
 
     //         if (aValue === undefined || bValue === undefined) return 0;
+    //         if (aValue === undefined || bValue === undefined) return 0;
 
+    //         if (aValue < bValue) return order === 'asc' ? -1 : 1;
+    //         if (aValue > bValue) return order === 'asc' ? 1 : -1;
+    //         return 0;
+    //     });
+    //     setFilteredAuthors(sortedAuthors);
+    // };
     //         if (aValue < bValue) return order === 'asc' ? -1 : 1;
     //         if (aValue > bValue) return order === 'asc' ? 1 : -1;
     //         return 0;

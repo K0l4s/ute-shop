@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { AppDispatch, RootState } from '../../redux/store';
 import DiscountCode from '../../components/voucher/DiscountCode';
 import { IoWarning } from 'react-icons/io5';
 import { Link, useNavigate } from 'react-router-dom';
@@ -12,6 +12,7 @@ import { useDispatch } from 'react-redux';
 import { deselectVoucher } from '../../redux/reducers/voucherSlice';
 import TermOfUseModal from '../../components/modals/TermOfUseModal';
 import { removeItemsByIds } from '../../redux/reducers/cartSlice';
+import { fetchWallet } from '../../redux/reducers/walletSlice';
 
 const Checkout: React.FC = () => {
   interface Product {
@@ -24,7 +25,7 @@ const Checkout: React.FC = () => {
     publisher: string;
   }
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const dispatch : AppDispatch = useDispatch();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productsToCheckout, setProductsToCheckout] = useState<Product[]>([]);
   const [shippingFee, setShippingFee] = useState<number>(20000);
@@ -35,8 +36,8 @@ const Checkout: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [amount, setAmount] = useState<number>(0);
   const [totalAmount, setTotalAmount] = useState<number>(0);
-  // const [discountVoucher, setDiscountVoucher] = useState<any>(null);
-  // const [freeshipVoucher, setFreeshipVoucher] = useState<any>(null);
+  const [coinsToUse, setCoinsToUse] = useState<number>(0);
+  const [coinDiscount, setCoinDiscount] = useState<number>(0);
 
   const [lastEncodedData, setLastEncodedData] = useState<string | null>(null);
   
@@ -45,6 +46,7 @@ const Checkout: React.FC = () => {
   const selectedDiscountVoucherId = useSelector((state: RootState) => state.voucher.selectedDiscountVoucherId);
   const selectedFreeshipVoucherId = useSelector((state: RootState) => state.voucher.selectedFreeshipVoucherId);
 
+  const walletBalance = useSelector((state: RootState) => state.wallet.balance);
   // Lấy thông tin người dùng từ Redux store
   const user = useSelector((state: RootState) => state.auth.user);
 
@@ -199,11 +201,14 @@ const Checkout: React.FC = () => {
     const shippingFeeAmount = selectedFreeshipVoucher ? (selectedFreeshipVoucher.discount_val || (selectedFreeshipVoucher.discount_perc / 100) * shippingFee) : 0;
     setFreeship(shippingFeeAmount);
 
+    const coinDiscountAmount = coinsToUse * 100;
+    setCoinDiscount(coinDiscountAmount);
+
     // Cập nhật thành tiền cuối cùng
-    const finalTotalAmount = totalPrice + shippingFee - discountAmount - shippingFeeAmount;
+    const finalTotalAmount = totalPrice + shippingFee - discountAmount - shippingFeeAmount - coinDiscountAmount;
     setTotalAmount(finalTotalAmount);
 
-  }, [productsToCheckout, selectedDiscountVoucher, selectedFreeshipVoucher, shippingFee]);
+  }, [productsToCheckout, selectedDiscountVoucher, selectedFreeshipVoucher, shippingFee, coinsToUse]);
   
   // useEffect(() => {
   //   return () => {
@@ -230,6 +235,7 @@ const Checkout: React.FC = () => {
       orderItems,
       discount_id: selectedDiscountVoucherId,
       freeship_id: selectedFreeshipVoucherId,
+      coins_used: coinsToUse,
     };
 
     try {
@@ -247,6 +253,7 @@ const Checkout: React.FC = () => {
         dispatch(deselectVoucher('freeship'));
         const orderedItemIds = productsToCheckout.map(item => item.id);
         dispatch(removeItemsByIds(orderedItemIds));
+        dispatch(fetchWallet());
         navigate("/account/orders");
         window.scrollTo(0, 0);
       }
@@ -260,6 +267,12 @@ const Checkout: React.FC = () => {
       console.error('Thất bại: ', error.response?.data.message);
       showToast(error.response?.data.message, "error");
     }
+  };
+
+  const handleCoinsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const coins = Math.min(parseInt(e.target.value, 10) || 0, walletBalance);
+    const maxCoins = Math.floor((amount / 2) / 100); // discount does not exceed 50% of the total order value
+    setCoinsToUse(Math.min(coins, maxCoins));
   };
 
   useEffect(() => {
@@ -302,7 +315,7 @@ const Checkout: React.FC = () => {
       </div>
 
       {/* Phương Thức Vận Chuyển */}
-      <div className="border-2 border-black p-4 rounded mb-6">
+      <div className="border-2 border-black p-4 rounded mb-6 bg-white">
         <h3 className="text-lg text-violet-700 font-bold mb-2 border-b border-black pb-2">PHƯƠNG THỨC VẬN CHUYỂN</h3>
         <input type="radio" name="fee" id="fee" defaultChecked/>
         <label htmlFor="fee" className="ml-2 font-semibold">
@@ -315,7 +328,7 @@ const Checkout: React.FC = () => {
       </div>
 
       {/* Phương Thức Thanh Toán */}
-      <div className="border-2 border-black p-4 rounded mb-6">
+      <div className="border-2 border-black p-4 rounded mb-6 bg-white">
         <h2 className="text-lg text-violet-700 font-bold mb-2 border-b border-black pb-2">PHƯƠNG THỨC THANH TOÁN</h2>
         <input 
           type="radio" 
@@ -340,9 +353,39 @@ const Checkout: React.FC = () => {
       <div className='border-2 border-black rounded overflow-hidden'>
         <DiscountCode />
       </div>
+          
+      {/* Dùng xu */}
+      <div className="border-2 border-black p-4 rounded mt-6 mb-6 bg-white">
+        <h2 className="text-lg text-violet-700 font-bold mb-2 border-b border-black pb-2">SỬ DỤNG UTE COIN</h2>
+        <div className="flex items-center">
+          <input
+            type="number"
+            value={coinsToUse}
+            onChange={handleCoinsChange}
+            onBlur={(e) => {
+              const coins = Math.min(parseInt(e.target.value, 10) || 0, walletBalance);
+              const maxCoins = Math.floor((amount / 2) / 100);
+              if (coins > maxCoins) {
+                setCoinsToUse(maxCoins);
+                console.log(maxCoins);
+              } else {
+                setCoinsToUse(coins);
+              }
+            }}
+            className="w-20 p-2 border rounded mr-2"
+            min="0"
+            max={Math.min(walletBalance, Math.floor((amount / 2) / 100))}
+          />
+          <span className="font-semibold">coins (Số dư: {walletBalance} coins)</span>
+        </div>
+        <div className="flex justify-between">
+          <p className="text-sm text-gray-600 mt-2">Mỗi 1 coin sẽ giảm 100 đ</p>
+          <p className="text-sm text-red-600 mt-2">Không thể áp dụng coin nếu đã vượt quá 50% giá trị tổng tiền</p>
+        </div>
+      </div>
 
       {/* Kiểm Tra Đơn Hàng */}
-      <div className="border-2 border-black p-4 rounded mt-6 mb-6">
+      <div className="border-2 border-black p-4 rounded mt-6 mb-6 bg-white">
         <h2 className="text-lg text-violet-700 font-bold mb-2 border-b border-black pb-2">KIỂM TRA ĐƠN HÀNG</h2>
         <div className="space-y-4">
           {productsToCheckout.length > 0 ? (
@@ -368,7 +411,7 @@ const Checkout: React.FC = () => {
       </div>
 
       {/* Tổng kết đơn hàng */}
-      <div className="border-2 border-black p-4 rounded mb-6">
+      <div className="border-2 border-black p-4 rounded mb-6 bg-white">
         <div className="space-y-2">
           <div className="flex justify-between">
             <span>Tổng tiền:</span>
@@ -385,6 +428,10 @@ const Checkout: React.FC = () => {
           <div className="flex justify-between">
             <span>Voucher giảm giá:</span>
             <span>- {discount} đ</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Giảm giá từ UTE Coin:</span>
+            <span>- {coinDiscount.toLocaleString()} đ</span>
           </div>
           <div className="flex justify-between font-bold">
             <span>Thành tiền:</span>

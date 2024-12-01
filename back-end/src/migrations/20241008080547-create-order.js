@@ -75,7 +75,12 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false
-      }
+      },
+      coins_used: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
     }, {
       timestamps: false
     });
