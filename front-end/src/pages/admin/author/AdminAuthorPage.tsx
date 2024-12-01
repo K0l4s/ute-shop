@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaEdit, FaTrash, FaCheck, FaTimes, FaPlus } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaCheck, FaTimes,  FaPlus } from 'react-icons/fa';
 import { createAuthor, getAllAuthors, updateAuthor } from '../../../apis/author';
 import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 
@@ -93,13 +93,27 @@ const AdminAuthorPage: React.FC = () => {
     //     const order = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
     //     setSortField(field);
     //     setSortOrder(order);
+    // const handleSort = (field: keyof Author) => {
+    //     const order = sortField === field && sortOrder === 'asc' ? 'desc' : 'asc';
+    //     setSortField(field);
+    //     setSortOrder(order);
 
+    //     const sortedAuthors = [...filteredAuthors].sort((a, b) => {
+    //         const aValue = a[field];
+    //         const bValue = b[field];
     //     const sortedAuthors = [...filteredAuthors].sort((a, b) => {
     //         const aValue = a[field];
     //         const bValue = b[field];
 
     //         if (aValue === undefined || bValue === undefined) return 0;
+    //         if (aValue === undefined || bValue === undefined) return 0;
 
+    //         if (aValue < bValue) return order === 'asc' ? -1 : 1;
+    //         if (aValue > bValue) return order === 'asc' ? 1 : -1;
+    //         return 0;
+    //     });
+    //     setFilteredAuthors(sortedAuthors);
+    // };
     //         if (aValue < bValue) return order === 'asc' ? -1 : 1;
     //         if (aValue > bValue) return order === 'asc' ? 1 : -1;
     //         return 0;

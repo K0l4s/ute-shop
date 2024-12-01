@@ -38,3 +38,20 @@ export const submitAllReviews = async ({ userId, reviews, orderId }: { userId: n
     throw err;
   }
 };
+
+export const getReviewsByStars = async (bookId: number, stars?: number) => {
+  try {
+    const response = await axios.get(
+      BASE_URL + `/review/book/${bookId}`,
+      {
+        params: { stars },
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true
+      }
+    );
+    return response.data;
+  } catch (err) {
+    console.error('Có lỗi xảy ra: ', err);
+    throw err;
+  }
+};

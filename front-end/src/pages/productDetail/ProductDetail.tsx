@@ -58,6 +58,8 @@ const ProductDetail: React.FC = () => {
   const [showLoginRequired, setShowLoginRequired] = useState(false);
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const [reviewList, setReviewList] = useState<Reviews[]>([]); // Review list
+  const [filteredReviews, setFilteredReviews] = useState<Reviews[]>([]);
+  const [selectedStar, setSelectedStar] = useState<number | null>(null);
   // user address from redux
   const userAddress = useSelector((state: RootState) => state.auth.user?.address + ', ' + state.auth.user?.ward + ', ' + state.auth.user?.district + ', ' + state.auth.user?.province);
   const { id } = useParams<{ id: string }>();  // Get the book ID from route params
@@ -79,6 +81,7 @@ const ProductDetail: React.FC = () => {
         const data = await response.json();
         setBook(data.data);
         setReviewList(data.data.Reviews);
+        setFilteredReviews(data.data.Reviews);
 
         // Calculate average rating
         const totalRating = data.data.Reviews.reduce((acc: number, review: Reviews) => acc + review.star, 0) || 0;
@@ -101,6 +104,15 @@ const ProductDetail: React.FC = () => {
       }
     }
   }, [book]);
+
+  useEffect(() => {
+    if (selectedStar === null) {
+      setFilteredReviews(reviewList);
+    } else {
+      const filtered = reviewList.filter(review => review.star === selectedStar);
+      setFilteredReviews(filtered);
+    }
+  }, [selectedStar, reviewList]);
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -274,14 +286,31 @@ const ProductDetail: React.FC = () => {
         </div>
         {/* Review Section */}
         <div className='section rounded-xl bg-white p-10 mb-8 mt-8'>
-          <div className="flex justify-between items-center">
+          <div>
             <h2 className="section__title text-2xl font-semibold mb-4">Chi tiết đánh giá</h2>
+            <div className="flex gap-2 mb-6">
+              <button 
+                onClick={() => setSelectedStar(null)}
+                className={`px-4 py-2 rounded ${selectedStar === null ? 'bg-violet-600 text-white' : 'bg-gray-200'}`}
+              >
+                Tất cả
+              </button>
+              {[5, 4, 3, 2, 1].map((star) => (
+                <button
+                  key={star}
+                  onClick={() => setSelectedStar(star)}
+                  className={`px-4 py-2 rounded ${selectedStar === star ? 'bg-violet-600 text-white' : 'bg-gray-200'}`}
+                >
+                  {star} sao
+                </button>
+              ))}
+            </div>
           </div>
-          {reviewList.length === 0 ? (
+          {filteredReviews.length === 0 ? (
             <p>Chưa có đánh giá nào cho sản phẩm này.</p>
           ): (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
-              {reviewList.map((review, index) => (
+              {filteredReviews.map((review, index) => (
                 <div key={index} className="bg-gray-100 rounded-lg p-4">
                   <p className="font-bold">{review.User ? (review.User.lastName + " " + review.User.firstName) : "Khách truy cập"}</p>
                   <p className="text-2xl flex">{formatStar(review.star || 0)}</p>

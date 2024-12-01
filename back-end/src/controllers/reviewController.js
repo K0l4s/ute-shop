@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-const { createReview, submitAllReviews } = require('../services/reviewService');
+const { createReview, submitAllReviews, getBookReviews } = require('../services/reviewService');
 const createReviewController = async (req,res) => {
     try {
         const userId = req.user.id;
@@ -32,7 +32,24 @@ const createReviewsMultipleItemsController = async (req, res) => {
     }
 };
 
+const getBookReviewsController = async (req, res) => {
+    try {
+        const { bookId } = req.params;
+        const { stars } = req.query;
+        
+        const reviews = await getBookReviews({ bookId, stars });
+        
+        return res.status(200).json({
+            message: "success",
+            data: reviews
+        });
+    } catch (error) {
+        return res.status(400).json({ message: error.message });
+    }
+};
+
 module.exports = {
     createReviewController,
-    createReviewsMultipleItemsController
+    createReviewsMultipleItemsController,
+    getBookReviewsController
 }
