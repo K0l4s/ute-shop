@@ -251,8 +251,7 @@ const ProductDetail: React.FC = () => {
               </div>
               {book.stock > book.sold_count + 1 ?
                 <div className='cursor-pointer text-base'>
-                  <button className={`${book.stock > book.sold_count + 1 ? 'bg-green-600' : 'bg-gray-200'}  w-44 font-semibold border-green-600 border-2 text-white px-4 py-2 rounded-lg mr-5 hover:bg-green-700`} >Mua ngay</button>
-                  <button className={`${book.stock > book.sold_count + 1 ? 'border-violet-700 border-2' : 'bg-gray-200'}  w-44 font-semibold text-violet-700 px-4 py-2 rounded-lg hover:bg-violet-700 hover:text-white`} onClick={handleAddToCart}>Thêm vào giỏ hàng</button>
+                  <button className={`${book.stock > book.sold_count + 1 ? 'border-violet-700 border-2' : 'bg-gray-200'}  w-44 font-semibold text-violet-700 px-4 py-2 rounded-lg hover:bg-violet-700 hover:text-white transition-colors`} onClick={handleAddToCart}>Thêm vào giỏ hàng</button>
                 </div>
                 : <button className="w-44 bg-gray-300 font-semibold text-black px-4 py-2 rounded-lg mr-5 cursor-not-allowed">Hết hàng</button>}
             </div>

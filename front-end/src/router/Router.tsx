@@ -29,6 +29,8 @@ import AdminEvent from '../pages/admin/eventPage/AdminEvent'
 import AdminCategory from '../pages/admin/category/AdminCategory'
 import AdminFreeship from '../pages/admin/voucher/AdminFreeship'
 import RedirectIfAuthenticated from './layout/RedirectIfAuthenticated'
+import BookPage from '../pages/BookPage'
+import PublisherPage from '../pages/PublisherPage'
 // import OrderDetailModal from '../components/modals/OrderDetailModal'
 
 
@@ -97,6 +99,8 @@ const Router = () => {
           {/* <Route path="/orders" element={<Order />} /> */}
           {/* <Route path="/orders/:id" element={<OrderDetailModal />} /> */}
           <Route path="/search/" element={<SearchResults />} />
+          <Route path="/book" element={<BookPage />}/>
+          <Route path="/publisher" element={<PublisherPage />}/>
           <Route path="/order/vnpay_return" element={<RequireAuth><PaymentSuccess/></RequireAuth>} />
         </Route>
 

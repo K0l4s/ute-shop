@@ -10,6 +10,8 @@ import { searchBooks } from '../../apis/book';
 import { getPublisher } from '../../apis/publisher';
 import { addToCart } from '../../apis/cart';
 import { showToast } from '../../utils/toastUtils';
+import { useDispatch } from 'react-redux';
+import { addItem } from '../../redux/reducers/cartSlice';
 
 type Publisher = {
   id: number;
@@ -21,8 +23,8 @@ type Book = {
   id: number;
   title: string;
   desc: string;
-  price: string;
-  salePrice: string;
+  price: number;
+  salePrice: number;
   year: string;
   stock: number;
   cover_img_url: string;
@@ -119,34 +121,33 @@ const SearchResults: React.FC = () => {
     fetchPublishers();
   }, []);
 
-  // const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
   const handleAddToCart = async (book: Book) => {
     try {
       await addToCart(book.id, 1);
-      // const cartItem = {
-      //     id: book.id,
-      //     title: book.title,
-      //     price: book.price,
-      //     salePrice: book.salePrice,
-      //     image: book.cover_img_url,
-      //     stars: book.avgRating,
-      //     age: book.age,
-      //     publisher: book.publisher,
-      //     quantity: 1, //Mặc định thêm 1 sản phẩm vào giỏ
-      //     stock: book.stock,
-      //     checked: true, // Mặc định là đã chọn sản phẩm
-      // };
-      // dispatch(addItem(cartItem));
+      const cartItem = {
+          id: book.id,
+          title: book.title,
+          price: book.price,
+          salePrice: book.salePrice,
+          image: book.cover_img_url,
+          stars: book.avgRating,
+          age: book.age,
+          quantity: 1, //Mặc định thêm 1 sản phẩm vào giỏ
+          stock: book.stock,
+          checked: true, // Mặc định là đã chọn sản phẩm
+      };
+      dispatch(addItem(cartItem));
       showToast('Đã thêm thành công', 'success');
     } catch(error){
       showToast('Đã xảy ra lỗi', 'error');
     }  
   };
 
-  const handleBuyNow = (id: number) => {
-    console.log(`Book ${id} bought now`);
-  };
+  // const handleBuyNow = (id: number) => {
+  //   console.log(`Book ${id} bought now`);
+  // };
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prevFilters) => {
@@ -221,14 +222,13 @@ const SearchResults: React.FC = () => {
               key={book.id}
               id={book.id}
               title={book.title}
-              price={book.price}
-              salePrice={book.salePrice}
+              price={book.price.toString()}
+              salePrice={book.salePrice.toString()}
               cover_img_url={book.cover_img_url}
               avgRating={book.avgRating}
               reviewCount={book.reviewCount}
               totalSold={book.total_sold}
               onAddToCart={() => handleAddToCart(book)}
-              onBuyNow={() => handleBuyNow(book.id)}
             />
           ))}
           

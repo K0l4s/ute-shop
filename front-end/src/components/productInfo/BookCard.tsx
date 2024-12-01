@@ -15,10 +15,9 @@ type BookCardProps = {
   reviewCount: number;
   totalSold: number;
   onAddToCart: () => void;
-  onBuyNow: () => void;
 };
 
-const BookCard: React.FC<BookCardProps> = ({ id, title, price, salePrice, cover_img_url, avgRating, reviewCount, totalSold, onAddToCart, onBuyNow }) => {
+const BookCard: React.FC<BookCardProps> = ({ id, title, price, salePrice, cover_img_url, avgRating, reviewCount, totalSold, onAddToCart }) => {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
   const [showLoginRequired, setShowLoginRequired] = useState(false);
 
@@ -30,13 +29,13 @@ const BookCard: React.FC<BookCardProps> = ({ id, title, price, salePrice, cover_
     }
   };
 
-  const handleBuyNow = () => {
-    if (!isAuthenticated) {
-      setShowLoginRequired(true);
-    } else {
-      onBuyNow();
-    }
-  };
+  // const handleBuyNow = () => {
+  //   if (!isAuthenticated) {
+  //     setShowLoginRequired(true);
+  //   } else {
+  //     onBuyNow();
+  //   }
+  // };
 
   return (
     <>
@@ -58,9 +57,8 @@ const BookCard: React.FC<BookCardProps> = ({ id, title, price, salePrice, cover_
         <h3 className="text-base font-semibold my-2">Đã bán {totalSold > 1 ? totalSold : 0}</h3>
 
         </Link>
-        <div className="flex justify-evenly">
-          <button onClick={handleAddToCart} className="bg-violet-600 hover:bg-violet-700 text-white px-6 py-2 font-semibold rounded mr-2 transition duration-300">Thêm giỏ</button>
-          <button onClick={handleBuyNow} className="border border-rose-600 hover:bg-rose-700 hover:text-white text-rose-700 px-6 py-2 font-semibold rounded transition duration-300">Mua ngay</button>
+        <div className="flex">
+          <button onClick={handleAddToCart} className="bg-violet-600 hover:bg-violet-700 text-white w-full px-6 py-2 font-semibold rounded mr-2 transition duration-300">Thêm vào giỏ hàng</button>
         </div>
 
       </div>
