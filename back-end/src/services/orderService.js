@@ -9,13 +9,14 @@ const User = db.User;
 const Discount = db.Discount;
 const Freeship = db.Freeship;
 const Cart = db.Cart;
+const Wallet = db.Wallet;
 const orderStatus = require('../enums/orderStatus');
 const { createAndSendOrderNotification, sendOrderNotificationToAdmins } = require('./notificationService');
 const { sendOrderDetailsEmail } = require('./emailService');
 
 const createOrder = async (userId, orderData, transaction, wss) => {
   try {
-    const { total_price, shipping_address, shipping_method, shipping_fee, payment_method, orderItems, discount_id, freeship_id } = orderData;
+    const { total_price, shipping_address, shipping_method, shipping_fee, payment_method, orderItems, discount_id, freeship_id, coins_used } = orderData;
 
     const newOrder = await Order.create({
       user_id: userId,
@@ -25,7 +26,8 @@ const createOrder = async (userId, orderData, transaction, wss) => {
       shipping_fee: shipping_fee,
       status: 'PENDING', // Đơn hàng mới tạo sẽ có trạng thái mặc định là PENDING
       discount_id: discount_id,
-      freeship_id: freeship_id
+      freeship_id: freeship_id,
+      coins_used: coins_used
     }, { transaction });
 
     const newOrderTracking = await OrderTracking.create({
@@ -106,8 +108,17 @@ const createOrder = async (userId, orderData, transaction, wss) => {
       }
     }
     
-    // Tạo một thông báo mới trong database
+    // Trừ coins từ ví của người dùng
+    if (coins_used > 0) {
+      const wallet = await Wallet.findOne({ where: { userId } });
+      if (!wallet) {
+        throw new Error('Wallet not found');
+      }
+      wallet.coins -= coins_used;
+      await wallet.save({ transaction });
+    }
 
+    // Tạo một thông báo mới trong database
     if (payment_method === "COD") {
       const message = `Đơn hàng #${newOrder.id} của bạn đã được đặt thành công và đang chờ xử lý.`;
       await createAndSendOrderNotification(wss, userId, newOrder.id, message);

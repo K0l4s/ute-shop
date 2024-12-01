@@ -60,6 +60,7 @@ export interface Book {
     payment: Payment;
     discount: Discount;
     freeship: Freeship;
+    coins_used: number;
     isReviewed: boolean;
   }
   

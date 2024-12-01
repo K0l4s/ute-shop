@@ -60,6 +60,11 @@ module.exports = {
         type: Sequelize.DECIMAL,
         allowNull: false
       },
+      coins_used: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
+      },
       status: {
         // type: Sequelize.ENUM('PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'),
         type: Sequelize.ENUM(orderStatus.PENDING,orderStatus.CONFIRMED, orderStatus.PROCESSING, orderStatus.SHIPPED, orderStatus.DELIVERED, orderStatus.CANCELLED,orderStatus.RETURNED),
