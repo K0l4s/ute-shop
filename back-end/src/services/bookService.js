@@ -311,6 +311,7 @@ const createNewBook = async ({ ISBN,
       publisher_id
     }
     const newBook = await Book.create(book);
+    console.log(newBook);
     return newBook;
   } catch (error) {
     throw error;

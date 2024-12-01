@@ -17,11 +17,11 @@ export interface Pub {
     name: string;
 }
 const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-    const [categoryList] = useState<Category[]>([]);
+    // const [categoryList] = useState<Category[]>([]);
     const [authorList, setAuthorList] = useState<Author[]>([]);
     const [publisherList, setPublisherList] = useState<Pub[]>([]);
     const [selectedAuthor, setSelectedAuthor] = useState<number | null>(null);
-    const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+    // const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
     const [selectedPublisher, setSelectedPublisher] = useState<number | null>(null);
 
     const [ISBN, setISBN] = useState('');
@@ -216,7 +216,7 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                     ))}
                                 </select>
                             </div>
-                            <div className="space-y-2">
+                            {/* <div className="space-y-2">
                                 <label className="text-sm font-semibold text-gray-700">Category</label>
                                 <select
                                     value={selectedCategory || ''}
@@ -228,7 +228,7 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                                         <option key={category.id} value={category.id}>{category.name}</option>
                                     ))}
                                 </select>
-                            </div>
+                            </div> */}
                             <div className="space-y-2">
                                 <label className="text-sm font-semibold text-gray-700">Publisher</label>
                                 <select
