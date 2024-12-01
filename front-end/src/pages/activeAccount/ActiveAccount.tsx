@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { activeAccountApis } from '../../apis/auth';
 import { useNavigate } from 'react-router-dom';
+import { showToast } from '../../utils/toastUtils';
 
 const ActiveAccount = () => {
   const navigate = useNavigate();
@@ -33,11 +34,13 @@ const ActiveAccount = () => {
       const response = await activeAccountApis(email, code.join(''));
       console.log('Data:', response);
       if (response.ok) {
-        alert('Vertify complete!');
+        // alert('Vertify complete!');
+        showToast('Vertify complete!', 'success');
         navigate("/login");
       } else {
         const msg = await response.json();
-        alert('Error:' + msg.error);
+        // alert('Error:' + msg.error);
+        showToast('Error:' + msg.error, 'error');
       }
     } catch (err) {
       console.error('Có lỗi xảy ra: ', err);
@@ -104,7 +107,7 @@ const ActiveAccount = () => {
 
           {/* Resend Code */}
           <p className="mt-4 text-center">
-            Don’t receive code? <a href="#" className="text-blue-500 font-semibold">Resend it!</a>
+            Kiểm tra hộp thư SPAM nếu không thấy mã code nhé!
           </p>
         </div>
       </div>

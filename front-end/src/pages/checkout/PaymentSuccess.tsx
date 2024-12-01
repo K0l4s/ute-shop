@@ -4,6 +4,9 @@ import { getDataReturnVNPay, getOrder } from "../../apis/order";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { VscError } from "react-icons/vsc";
 import { Link } from "react-router-dom";
+import { AppDispatch } from "../../redux/store";
+import { useDispatch } from "react-redux";
+import { fetchWallet } from "../../redux/reducers/walletSlice";
 // import { releaseStockAndVouchers } from "../../apis/cart";
 
 interface Order {
@@ -15,6 +18,7 @@ interface Order {
 
 const PaymentSuccess: React.FC = () => {
   const location = useLocation();
+  const dispatch: AppDispatch = useDispatch();
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,6 +58,7 @@ const PaymentSuccess: React.FC = () => {
     if (vnp_TxnRef) {
       fetchOrderDetails();
     }
+    dispatch(fetchWallet());
 
     // Check if the notification has already been sent
     const notificationSent = sessionStorage.getItem('notificationSent');
@@ -129,7 +134,7 @@ const PaymentSuccess: React.FC = () => {
           </div>
         ) : (
           <>
-          <p className="text-red-600 text-center">Payment failed or incomplete. Please try again.</p>
+          <p className="text-red-600 text-center">Thanh toán thất bại, vui lòng thử lại.</p>
             <div className="flex justify-end gap-4 mt-8">
               <button>
                 <Link to="/" className="p-2 text-red-600 border border-red-600 rounded hover:bg-red-600 hover:text-white transition duration-300">Về trang chủ</Link>

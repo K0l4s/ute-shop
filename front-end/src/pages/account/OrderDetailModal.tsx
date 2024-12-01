@@ -157,7 +157,7 @@ const OrderDetailModal = ({ orderId, isOpen, onClose }: { orderId: number; onClo
                     />
                     <div>
                       <p className='font-semibold'>{detail.book.title}</p>
-                      <p className='text-gray-700'>Phân loại: {detail.book.category.name}</p>
+                      {/* <p className='text-gray-700'>Phân loại: {detail.book.category.name}</p> */}
                       <p className='text-gray-700'>Số lượng: {detail.quantity}</p>
                       <p className='text-gray-700'>
                         Đơn giá:
@@ -194,11 +194,15 @@ const OrderDetailModal = ({ orderId, isOpen, onClose }: { orderId: number; onClo
               </tr>
               <tr>
                 <td className='border border-gray-400 px-4 py-2 font-semibold text-right'>Miễn vận chuyển</td>
-                <td className='border border-gray-400 px-4 py-2 text-right'>- {order.freeship ? `${(order.freeship.discount_val) || calculateDiscountPercent(order.discount.discount_perc, orderDetails)}` : '0'} đ</td>
+                <td className='border border-gray-400 px-4 py-2 text-right'>- {order.freeship ? `${(order.freeship.discount_val) || calculateDiscountPercent(order.freeship.discount_perc, orderDetails)}` : '0'} đ</td>
               </tr>
               <tr>
                 <td className='border border-gray-400 px-4 py-2 font-semibold text-right'>Giảm giá</td>
                 <td className='border border-gray-400 px-4 py-2 text-right'>- {order.discount ? `${(order.discount.discount_val) || calculateDiscountPercent(order.discount.discount_perc, orderDetails)}` : '0'} đ</td>
+              </tr>
+              <tr>
+                <td className='border border-gray-400 px-4 py-2 font-semibold text-right'>Giảm giá từ UTE Coin</td>
+                <td className='border border-gray-400 px-4 py-2 text-right'>- {order.coins_used ? `${formatPriceToVND(order.coins_used * 100)}` : '0'} đ</td>
               </tr>
               <tr>
                 <td className='border border-gray-400 px-4 py-2 font-semibold text-right'>Thành tiền</td>

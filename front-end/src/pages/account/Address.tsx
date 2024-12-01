@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/store";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../redux/reducers/authSlice";
+import { showToast } from "../../utils/toastUtils";
 
 interface Province {
   code: number;
@@ -105,10 +106,12 @@ const Address: React.FC = () => {
         ward: ward,
         address: specificAddress
       }));
-      alert("Địa chỉ đã được cập nhật thành công!");
+      // alert("Địa chỉ đã được cập nhật thành công!");
+      showToast("Địa chỉ đã được cập nhật thành công!", "success");
     } catch (err) {
       console.error("Error updating location:", err);
-      alert("Có lỗi xảy ra khi cập nhật địa chỉ!");
+      // alert("Có lỗi xảy ra khi cập nhật địa chỉ!");
+      showToast("Có lỗi xảy ra khi cập nhật địa chỉ!", "error");
     }
   };
 

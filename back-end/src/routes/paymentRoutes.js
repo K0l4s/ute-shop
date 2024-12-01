@@ -15,6 +15,7 @@ const OrderTracking = db.OrderTracking;
 const Discount = db.Discount;
 const FreeShip = db.Freeship;
 const Cart = db.Cart;
+const Wallet = db.Wallet;
 const querystring = require('qs');
 const crypto = require('crypto');
 const { sendNotificationToClient, sendOrderNotificationToAdmins } = require('../services/notificationService');
@@ -178,6 +179,16 @@ router.get('/vnpay_ipn', async function (req, res, next) {
                 await Order.destroy({ where: { id: orderId }, transaction: t });
                 await Payment.destroy({ where: { order_id: orderId }, transaction: t });
                 await Notification.destroy({ where: { order_id: orderId }});
+                
+                // Hoàn trả coins lại cho wallet của user
+                if (order.coins_used > 0) {
+                  const wallet = await Wallet.findOne({ where: { userId: userId }, transaction: t });
+                  if (wallet) {
+                    wallet.coins += order.coins_used;
+                    await wallet.save({ transaction: t });
+                  }
+                }
+
                 await t.commit();
                 res.status(200).json({ RspCode: '24', Message: 'Payment cancelled or failed, rolled back order and payment' });
                 // res.status(200).json({RspCode: '00', Message: 'Success'})
