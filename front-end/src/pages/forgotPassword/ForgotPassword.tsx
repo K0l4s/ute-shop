@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { forgotPasswordApis } from "../../apis/auth";
 import { useNavigate } from "react-router-dom";
+import { showToast } from "../../utils/toastUtils";
 
 const ForgotPassword = () => {
     const [email, setEmail] = useState('');
@@ -13,12 +14,14 @@ const ForgotPassword = () => {
         const response = await forgotPasswordApis(email);
         console.log('Data:', response);
         if(response.ok){
-          alert('Email sent successfully!');
+          // alert('Email sent successfully!');
+          showToast('Email sent successfully!', 'success');
           navigate("/reset/password");
         }
         else{
             const msg = await response.json();
-          alert('Email sent failed! Error message:' + msg.error);
+          // alert('Email sent failed! Error message:' + msg.error);
+          showToast('Email sent failed! Error message:' + msg.error, 'error');
         }
     }catch(err){
         console.error('Có lỗi xảy ra: ', err);
