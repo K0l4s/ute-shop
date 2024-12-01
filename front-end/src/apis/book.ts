@@ -36,46 +36,6 @@ export const getTop10BooksAPI = async () => {
   }
 }
 
-// export const updateProfileApis = async (
-//   firstname: string, 
-//   lastname: string, 
-//   phone: string, 
-//   gender: boolean, 
-//   birthday: Date | null, 
-//   avatar: File | null
-// ) => {
-//   const formData = new FormData(); 
-
-//   formData.append('firstname', firstname);
-//   formData.append('lastname', lastname);
-//   formData.append('phone', phone);
-//   formData.append('gender', gender.toString()); // Append gender as a string
-
-//   if (birthday) {
-//     formData.append('birthday', birthday.toISOString()); // If have birthday, append it
-//   }
-
-//   if (avatar) {
-//     formData.append('avatar_url', avatar); // Append avatar file if it exists
-//   }
-
-//   try {
-//     const response = await axios.put(
-//       BASE_URL + '/user/profile/edit', 
-//       formData,
-//       {
-//         withCredentials: true,
-//         headers: { 'Content-Type': 'multipart/form-data' } 
-//       }
-//     );
-
-//     return response.data;
-//   } catch (err) {
-//     console.error('Something went wrong: ', err);
-//   }
-// };
-
-
 export const createBook = async (
   ISBN: string,
   title: string,

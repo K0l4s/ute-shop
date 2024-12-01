@@ -155,8 +155,6 @@ const Navbar = () => {
               <li><Link to="/" className="text-white hover:text-violet-700">Trang chủ</Link></li>
               <li><Link to="/book" className="text-white hover:text-violet-700">Sách</Link></li>
               <li><Link to="/publisher" className="text-white hover:text-violet-700">Nhà xuất bản</Link></li>
-              <li><Link to="/about" className="text-white hover:text-violet-700">Về chúng tôi</Link></li>
-              <li><Link to="/contact"className="text-white hover:text-violet-700">Voucher</Link></li>
             </ul>
           </div>
           <div>
