@@ -9,7 +9,7 @@ type BookCardProps = {
   id: number;
   title: string;
   price: string;
-  salePrice: string;
+  salePrice?: string;
   cover_img_url: string;
   avgRating: number;
   reviewCount: number;

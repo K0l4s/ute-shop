@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { createBook } from '../../apis/book';
 import { getAllAuthors } from '../../apis/author';
 import { getPublisher } from '../../apis/publisher';
+import { showToast } from '../../utils/toastUtils';
 // import { getAllCategories } from '../../apis/category'; // Giả sử hàm lấy danh sách thể loại
 
 export interface Author {
@@ -95,11 +96,13 @@ const ModalCreateBook: React.FC<{ onClose: () => void }> = ({ onClose }) => {
                 selectedPublisher || 0
             );
             console.log('Book created:', newBook);
-            alert('Book created successfully!');
+            // alert('Book created successfully!');
+            showToast('Book created successfully!', 'success');
             onClose();
         } catch (error) {
             console.error('Error creating book:', error);
-            alert('Failed to create book');
+            // alert('Failed to create book');
+            showToast('Failed to create book', 'error');
         } finally {
             setUploading(false);
         }
