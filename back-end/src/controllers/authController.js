@@ -1,4 +1,4 @@
-const { registerUser, loginUser, confirmRegister, forgotPassword, resetPassword } = require('../services/authService.js');
+const { registerUser, loginUser, confirmRegister, forgotPassword, resetPassword, changePassword } = require('../services/authService.js');
 
 // Đăng ký người dùng
 const register = async (req, res) => {
@@ -78,6 +78,17 @@ const resetPsswd = async (req, res) => {
   }
 };
 
+const changePwd = async (req, res) => {
+  const userId = req.user.id;
+  const { oldPassword, newPassword } = req.body;
+  try {
+    const response = await changePassword({ userId, oldPassword, newPassword });
+    res.status(200).json(response);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   register,
   login,
@@ -85,5 +96,6 @@ module.exports = {
   confirm,
   checkAuth,
   forgotPsswd,
-  resetPsswd
+  resetPsswd,
+  changePwd
 };

@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const db = require('../models');
 const Token = db.Token;
 const User = db.User;
+const Wallet = db.Wallet;
 const { sendEmail, generateVerificationCode } = require('./emailService.js');
 
 // Register a new user
@@ -128,6 +129,11 @@ const confirmRegister = async ({ email, code }) => {
       { where: { email } }
     );
 
+    await Wallet.create({
+      userId: user.id,
+      coins: 0,
+    })
+
     return { message: "Verification successfully" };
   } catch (err) {
     throw new Error("Error confirming user: " + err.message);
@@ -190,10 +196,38 @@ const resetPassword = async ({ email, code, password }) => {
   }
 };
 
+const changePassword = async ({ userId, oldPassword, newPassword }) => {
+  try {
+    console.log(oldPassword, newPassword);
+    const user = await User.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
+    if (!isPasswordValid) {
+      throw new Error("Invalid password");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await User.update(
+      { password: hashedPassword },
+      { where: { id: userId } }
+    );
+
+    return { message: "Password changed successfully" };
+  } catch (err) {
+    throw new Error("Error changing password: " + err.message);
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   confirmRegister,
   forgotPassword,
-  resetPassword
+  resetPassword,
+  changePassword
 };
