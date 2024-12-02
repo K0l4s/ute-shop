@@ -77,18 +77,18 @@ const AdminDetailOrder: React.FC<OrderModalProps> = ({ order, isOpen, closeModal
         updateOrderStatus(orderId, 'DELIVERED', "Đã gửi hàng")
         setOrderStatus('DELIVERED')
     };
-    const getStatusClassName = (status: string) => {
-        const statusClasses: Record<string, string> = {
-          PENDING: 'bg-yellow-100 text-yellow-800',
-          CONFIRMED: 'bg-blue-100 text-blue-800',
-          PROCESSING: 'bg-purple-100 text-purple-800',
-          SHIPPED: 'bg-indigo-100 text-indigo-800',
-          DELIVERED: 'bg-green-100 text-green-800',
-          CANCELLED: 'bg-red-100 text-red-800',
-          RETURNED: 'bg-gray-100 text-gray-800',
-        };
-        return statusClasses[status] || 'bg-gray-200 text-gray-600';
-      };
+    // const getStatusClassName = (status: string) => {
+    //     const statusClasses: Record<string, string> = {
+    //       PENDING: 'bg-yellow-100 text-yellow-800',
+    //       CONFIRMED: 'bg-blue-100 text-blue-800',
+    //       PROCESSING: 'bg-purple-100 text-purple-800',
+    //       SHIPPED: 'bg-indigo-100 text-indigo-800',
+    //       DELIVERED: 'bg-green-100 text-green-800',
+    //       CANCELLED: 'bg-red-100 text-red-800',
+    //       RETURNED: 'bg-gray-100 text-gray-800',
+    //     };
+    //     return statusClasses[status] || 'bg-gray-200 text-gray-600';
+    //   };
       const convertToVNTime = (time: string) => {
           const date = new Date(time);
           return date.toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh' });
@@ -121,7 +121,7 @@ const AdminDetailOrder: React.FC<OrderModalProps> = ({ order, isOpen, closeModal
                                 <p><strong>Tên khách hàng:</strong> {order.user.firstname} {order.user.lastname}</p>
                                 <p><strong>Thời gian đặt hàng:</strong> {convertToVNTime(order.order_date)}</p>
                                 <div className='flex items-center gap-2'>
-                                    <span className='flex'><strong>Trạng thái đơn:</strong> <p className={`rounded-full p-1 px-2 ${getStatusClassName(orderStatus)}`}>{orderStatus}</p></span>
+                                    {/* <span className='flex'><strong>Trạng thái đơn:</strong> <p className={`rounded-full p-1 px-2 ${getStatusClassName(orderStatus)}`}>{orderStatus}</p></span> */}
                                     {/* Conditionally Render Buttons Based on Status */}
                                     <div className={`flex justify-between`}>
                                         {orderStatus === "PENDING" && (

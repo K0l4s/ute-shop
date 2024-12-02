@@ -20,13 +20,13 @@ import AdminDetailOrder from "./AdminDetailOrder";
 
 const ORDER_STATUSES = {
   ALL: "Tất cả",
-  PENDING: "PENDING",
-  CONFIRMED: "CONFIRMED",
-  PROCESSING: "PROCESSING",
-  SHIPPED: "SHIPPED",
-  DELIVERED: "DELIVERED",
-  CANCELLED: "CANCELLED",
-  RETURNED: "RETURNED",
+  PENDING: "ĐANG CHỜ",
+  CONFIRMED: "ĐÃ XÁC NHẬN",
+  PROCESSING: "ĐANG XỬ LÝ",
+  DELIVERED: "ĐÃ GIAO HÀNG",
+  SHIPPED: "ĐÃ NHẬN HÀNG",
+  CANCELLED: "ĐÃ HỦY",
+  RETURNED: "ĐÃ TRẢ HÀNG",
 };
 
 interface OrderDetail {
