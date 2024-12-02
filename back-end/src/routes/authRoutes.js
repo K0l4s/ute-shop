@@ -1,5 +1,5 @@
 const express = require("express");
-const { register, login, confirm, logout, checkAuth, forgotPsswd, resetPsswd } = require("../controllers/authController");
+const { register, login, confirm, logout, checkAuth, forgotPsswd, resetPsswd, changePwd } = require("../controllers/authController");
 const { authenticateJWT } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
@@ -11,6 +11,7 @@ router.post('/logout', logout);
 router.post('/forgot-password', forgotPsswd);
 router.post('/reset-password', resetPsswd);
 router.get('/check', authenticateJWT, checkAuth);
+router.put('/change-password', authenticateJWT, changePwd);
 router.get('/protected', authenticateJWT, (req, res) => {
   res.json({ message: 'This is a protected route', user: req.user });
 });

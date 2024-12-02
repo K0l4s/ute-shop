@@ -1,4 +1,4 @@
-const { getWallet, addBalance } = require("../services/walletService");
+const { getWallet, addBalance, createWallet } = require("../services/walletService");
 
 const getUserWallet = async (req, res) => {
   const userId = req.user.id;
@@ -28,7 +28,21 @@ const addBalanceToWallet = async (req, res) => {
   }
 };
 
+const createNewWallet = async (req, res) => {
+  const userId = req.user.id;
+  try {
+    const wallet = await createWallet(userId);
+    res.status(200).json({
+      message: "Success",
+      data: wallet
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getUserWallet,
-  addBalanceToWallet
+  addBalanceToWallet,
+  createNewWallet
 }

@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import { useNavigate } from 'react-router-dom';
+import { changePasswordApi } from '../../apis/auth';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../redux/reducers/authSlice';
+import { useWebSocket } from '../../context/WebSocketContext';
+import { showToast } from '../../utils/toastUtils';
 
 interface ChangePasswordProps {
   onClose: () => void;
@@ -13,10 +18,14 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onClose }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [counter, setCounter] = useState(10);
-  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
 
+  const { clearNotifications } = useWebSocket()
+  
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   // Hàm xử lý thay đổi mật khẩu
-  const handleChangePassword = (e: React.FormEvent) => {
+  const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault(); // Ngăn chặn form submit trên Account.tsx
 
     setError('');
@@ -29,8 +38,16 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onClose }) => {
       return;
     }
 
-    // Giả lập thay đổi mật khẩu thành công
-    setSuccess(true);
+    setLoading(true);
+    try {
+      await changePasswordApi(currentPassword, newPassword);
+      setSuccess(true);
+      showToast('Đổi mật khẩu thành công!', 'success');
+    } catch (err) {
+      setError('Có lỗi xảy ra khi đổi mật khẩu.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -49,10 +66,24 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onClose }) => {
     }
   }, [success, counter]);
 
-  const handleLogout = () => {
-    // Call logout API
-    console.log('User logged out');
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('http://localhost:8080/api/v1/auth/logout', {
+        method: 'POST',
+        credentials: 'include', // Gửi cookie kèm theo
+      });
+
+      if (response.ok) {
+        dispatch(logout());
+        localStorage.clear();
+        clearNotifications();
+        navigate('/login');
+      } else {
+        showToast('Đăng xuất thất bại!', 'error');
+      }
+    } catch (err) {
+      console.error('Có lỗi xảy ra khi đăng xuất:', err);
+    }
   };
 
   return (
@@ -110,8 +141,9 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onClose }) => {
             <button
               onClick={handleChangePassword}
               className="bg-violet-600 text-white px-4 py-2 rounded hover:bg-violet-700 w-full"
+              disabled={loading}
             >
-              Xác nhận
+              {loading ? <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> : 'Xác nhận'}
             </button>
           </>
         ) : (

@@ -13,6 +13,7 @@ const Register: React.FC<RegisterProps> = () => {
   const [birthday, setBirthday] = useState('');
   const [address, setAddress] = useState('');
   const [repeat_psswd, setRepeat_psswd] = useState('');
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -22,6 +23,8 @@ const Register: React.FC<RegisterProps> = () => {
       showToast('Mật khẩu và xác nhận mật khẩu không khớp!', 'error');
       return;
     }
+
+    setLoading(true);
 
     try {
       const response = await fetch('http://localhost:8080/api/v1/auth/register', {
@@ -50,6 +53,8 @@ const Register: React.FC<RegisterProps> = () => {
     } catch (err) {
       console.error('Có lỗi xảy ra: ', err);
       showToast('Đăng ký thất bại!', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -137,12 +142,13 @@ const Register: React.FC<RegisterProps> = () => {
             />
           </div>
           <div className="flex justify-center">
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-24 rounded focus:outline-none focus:shadow-outline"
-            >
-              Register
-            </button>
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-24 rounded focus:outline-none focus:shadow-outline"
+            disabled={loading}
+          >
+            {loading ? <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> : 'Đăng ký'}
+          </button>
           </div>
         </form>
         <p className="text-center text-xs text-gray-500 mt-4">

@@ -90,3 +90,17 @@ export const activeAccountApis = async (email: String, code: String) => {
   // console.log('Data:', data);
   return response;
 };
+
+export const changePasswordApi = async (oldPassword: string, newPassword: string) => {
+  try {
+    const response = await axios.put(
+      BASE_URL + '/auth/change-password',
+      { oldPassword, newPassword },
+      { headers: { 'Content-Type': 'application/json' }, withCredentials: true }
+    );
+    return response.data;
+  } catch (err) {
+    console.error('Có lỗi xảy ra: ', err);
+    throw err;
+  }
+};

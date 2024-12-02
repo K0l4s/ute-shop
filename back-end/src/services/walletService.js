@@ -29,7 +29,21 @@ const addBalance = async (userId, amount) => {
   }
 };
 
+const createWallet = async (userId) => {
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const wallet = await Wallet.create({ userId });
+    return wallet;
+  } catch (error) {
+    throw new Error(`Failed to create wallet: ${error.message}`);
+  }
+};
+
 module.exports = {
   getWallet,
-  addBalance
+  addBalance,
+  createWallet
 }
