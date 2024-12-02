@@ -160,7 +160,7 @@ const FavoriteBooks: React.FC = () => {
                 )}
                 
                 <button onClick={(e) => { e.stopPropagation(); handleRemoveFromFavorite(book.id) }} 
-                  className="w-24 border-2 border-rose-600 hover:bg-rose-600 
+                  className="w-20 border-2 border-rose-600 hover:bg-rose-600 
                     text-black hover:text-white font-semibold px-6 py-2 rounded transition duration-4000">Xóa</button>
               </div>
             </div>

@@ -209,13 +209,15 @@ const ProductDetail: React.FC = () => {
               <div className="relative">
                 <h1 className="text-3xl font-bold">{book.title}</h1>
                 <div className="relative group">
-                  <div
-                    className={`absolute -top-20 -right-14 p-2 border-2 border-black hover:border-rose-500 
-                      hover:text-rose-500 rounded-full cursor-pointer transition duration-200 ${isFavorite ? 'text-rose-500 border-rose-500' : ''}`}
-                    onClick={handleFavoriteClick}
-                  >
-                    {isFavorite ? <FaHeart size={32} /> : <FaRegHeart size={32} />}
-                  </div>
+                  {isAuthenticated && (
+                    <div
+                      className={`absolute -top-20 -right-14 p-2 border-2 border-black hover:border-rose-500 
+                        hover:text-rose-500 rounded-full cursor-pointer transition duration-200 ${isFavorite ? 'text-rose-500 border-rose-500' : ''}`}
+                      onClick={handleFavoriteClick}
+                    >
+                      {isFavorite ? <FaHeart size={32} /> : <FaRegHeart size={32} />}
+                    </div>
+                  )}
                   <span className="tooltip opacity-0 group-hover:opacity-100 absolute -top-8 -right-44
                     transform -translate-x-1/2 bg-gray-700 text-white text-sm rounded py-1 px-2 transition-opacity duration-300 whitespace-nowrap">
                     {isFavorite ? 'Remove from favorites' : 'Add to favorites'}

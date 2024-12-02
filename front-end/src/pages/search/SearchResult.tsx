@@ -24,7 +24,7 @@ type Book = {
   title: string;
   desc: string;
   price: number;
-  salePrice: number;
+  salePrice?: number;
   year: string;
   stock: number;
   cover_img_url: string;
@@ -223,7 +223,7 @@ const SearchResults: React.FC = () => {
               id={book.id}
               title={book.title}
               price={book.price.toString()}
-              salePrice={book.salePrice.toString()}
+              salePrice={book.salePrice?.toString()}
               cover_img_url={book.cover_img_url}
               avgRating={book.avgRating}
               reviewCount={book.reviewCount}
