@@ -9,6 +9,7 @@ import { useWebSocket } from '../../context/WebSocketContext';
 import { IoMdNotificationsOutline } from 'react-icons/io';
 import { AnimatePresence, motion } from 'framer-motion';
 import Notification from '../socket/Notification';
+import { BASE_URL } from '../../apis/base';
 
 const AdminNavbar = () => {
     const dispatch = useDispatch();
@@ -23,7 +24,7 @@ const AdminNavbar = () => {
 
     const handleLogout = async () => {
         try {
-            const response = await fetch('http://localhost:8080/api/v1/auth/logout', {
+            const response = await fetch(BASE_URL + '/auth/logout', {
                 method: 'POST',
                 credentials: 'include',
             });

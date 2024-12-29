@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '../../utils/toastUtils';
+import { BASE_URL } from '../../apis/base';
 
 interface RegisterProps {}
 
@@ -27,7 +28,7 @@ const Register: React.FC<RegisterProps> = () => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8080/api/v1/auth/register', {
+      const response = await fetch(BASE_URL + '/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

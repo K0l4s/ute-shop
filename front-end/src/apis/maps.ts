@@ -1,11 +1,12 @@
 import axios from 'axios';
+import { BASE_URL } from './base';
 
 const shopAddress = '01 Võ Vân Ngân, phường Linh Chiểu, Thủ Đức, Thành phố Hồ Chí Minh';
 
 // Function to get distance from Google Distance Matrix API
 export const getDistance = async (destination: string) => {
   try {
-    const response = await axios.get('http://localhost:8080/api/distance', {
+    const response = await axios.get(BASE_URL + '/distance', {
       params: {
         origins: shopAddress,
         destinations: destination,

@@ -1,5 +1,7 @@
+import { BASE_URL } from "./base";
+
 export const getBookById = async (id?: String) => {
-    const response = await fetch('http://localhost:8080/api/v1/book/'+id, {
+    const response = await fetch(BASE_URL + '/book/'+id, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

@@ -1,8 +1,9 @@
 import axios from "axios";
+import { BASE_URL } from "./base";
 
 export const getPublisher = async () => {
   try {
-    const response = await axios.get("http://localhost:8080/api/v1/publisher/all");
+    const response = await axios.get(BASE_URL + "/publisher/all");
     return response.data;
   }
   catch (error) {
@@ -18,7 +19,7 @@ export const createPublisher = async (
   publisher: Publisher
 ) => {
   try {
-    const response = await axios.post("http://localhost:8080/api/v1/publisher", publisher);
+    const response = await axios.post(BASE_URL + "/publisher", publisher);
     return response.data;
   }
   catch (error) {
@@ -33,7 +34,7 @@ export const updatePublisher = async (
   address: string
 ) => {
   try {
-    const response = await axios.put(`http://localhost:8080/api/v1/publisher`, {id, name, address });
+    const response = await axios.put(BASE_URL + `/publisher`, {id, name, address });
     return response.data;
   }
   catch (error) {
