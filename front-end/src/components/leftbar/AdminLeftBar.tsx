@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 // import { BiCalendarEvent } from 'react-icons/bi';
 import { MdLocalOffer } from 'react-icons/md';
+import defaultAvatar from '../../assets/images/defaultAvatar.jpg';
 
 // Define the type for a submenu item
 interface Submenu {
@@ -36,7 +37,7 @@ const AdminLeftBar: React.FC = () => {
                 {/* Admin Avatar */}
                 <div className="w-10 h-10 mb-4">
                     <img 
-                        src={user?.avatar_url || "https://via.placeholder.com/150"} 
+                        src={user?.avatar_url || defaultAvatar} 
                         alt="Admin" 
                         className="w-full h-full rounded-full object-cover border-3 border-white shadow-lg hover:scale-105 transition-transform duration-300"
                     />

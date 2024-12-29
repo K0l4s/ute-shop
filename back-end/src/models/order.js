@@ -106,6 +106,7 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'Order',
+    tableName: 'Orders',
     timestamps: false
   });
   return Order;

@@ -15,7 +15,7 @@ interface SearchBooksParams {
 
 export const searchBooks = async ({ title, minPrice, maxPrice, publisher, minAge, maxAge, sortByPrice, page, limit }: SearchBooksParams) => {
   try {
-    const response = await axios.get('http://localhost:8080/api/v1/book/search', {
+    const response = await axios.get(BASE_URL + '/book/search', {
       params: { title, minPrice, maxPrice, publisher, minAge, maxAge, sortByPrice, page, limit },
     });
     return response.data;
@@ -27,7 +27,7 @@ export const searchBooks = async ({ title, minPrice, maxPrice, publisher, minAge
 
 export const getTop10BooksAPI = async () => {
   try {
-    const response = await axios.get('http://localhost:8080/api/v1/book/top/10');
+    const response = await axios.get(BASE_URL + '/book/top/10');
     console.log(response.data);
     return response.data;
   } catch (error) {

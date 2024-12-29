@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux';
 import { logout } from '../../redux/reducers/authSlice';
 import { useWebSocket } from '../../context/WebSocketContext';
 import { showToast } from '../../utils/toastUtils';
+import { BASE_URL } from '../../apis/base';
 
 interface ChangePasswordProps {
   onClose: () => void;
@@ -68,7 +69,7 @@ const ChangePassword: React.FC<ChangePasswordProps> = ({ onClose }) => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/v1/auth/logout', {
+      const response = await fetch(BASE_URL + '/auth/logout', {
         method: 'POST',
         credentials: 'include', // Gửi cookie kèm theo
       });

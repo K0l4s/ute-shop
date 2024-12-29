@@ -77,7 +77,7 @@ app.use('/api/v1/notification', notificationRoutes);
 app.use('/api/v1/wallet', walletRoutes);
 app.use('/api/v1/genre', genreRoutes);
 
-app.get('/api/distance', async (req, res) => {
+app.get('/api/v1/distance', async (req, res) => {
   const { origins, destinations } = req.query;
 
   try {

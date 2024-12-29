@@ -7,6 +7,7 @@ module.exports = (sequelize, DataTypes) => {
   UserFreeship.init({}, {
     sequelize,
     modelName: 'UserFreeship',
+    tableName: 'UserFreeships',
     timestamps: false,
   });
   return UserFreeship;
