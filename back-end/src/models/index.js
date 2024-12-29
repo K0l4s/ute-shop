@@ -13,8 +13,13 @@ const sequelize = new Sequelize(
   configEnv.password,
   {
     host: configEnv.host,
+    port: configEnv.port,
     dialect: configEnv.dialect,
-    logging: false
+    logging: false,
+    define: {
+      underscored: false,
+      freezeTableName: true,
+    }
   }
 );
 

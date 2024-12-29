@@ -48,6 +48,7 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'Detail_Order',
+    tableName: 'Detail_Orders',
     timestamps: false
   });
   return Detail_Order;

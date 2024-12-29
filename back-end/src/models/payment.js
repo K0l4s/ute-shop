@@ -32,6 +32,7 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'Payment',
+    tableName: 'Payments',
     timestamps: false
   });
   return Payment;
