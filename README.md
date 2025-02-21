@@ -116,3 +116,13 @@ Feel free to extend the structure as needed for your project requirements.
 
 # [More](https://github.com/K0l4s/ute-shop/wiki)
 
+![image](https://github.com/user-attachments/assets/2d2971a5-6f0e-4922-9282-ef067a393283)
+![image](https://github.com/user-attachments/assets/acbfe036-b4e4-403c-be58-1f250ad62c22)
+![image](https://github.com/user-attachments/assets/104aa482-29fa-46cf-b3ad-4737535cf11b)
+![image](https://github.com/user-attachments/assets/bd709678-41bd-4739-89b0-8ec6c8273d0f)
+![image](https://github.com/user-attachments/assets/e622ad8e-abda-448c-be35-babcb52d434a)
+![image](https://github.com/user-attachments/assets/8604f267-717a-4c6b-b572-2704e1124660)
+
+
+
+
