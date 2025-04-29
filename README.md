@@ -1,6 +1,8 @@
 # UTE SHOP  
 
 **UTE Shop** is an e-commerce website specializing in selling economics books, offering users an intuitive shopping experience and a rich collection of resources.  
+![image](https://github.com/user-attachments/assets/511f3e34-8b5e-4216-8a34-d209c0382077)
+(SEO website for Google Search)
 ## Collobrations
 #### Size: 3 Members
 
