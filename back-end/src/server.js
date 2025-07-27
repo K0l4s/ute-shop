@@ -28,6 +28,9 @@ const genreRoutes = require('./routes/genreRoutes.js');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const setupWebSocket = require('./config/websocketConfig.js');
+const { job } = require('../cron.js');
+
+job.start();
 
 const port = process.env.PORT || 8080;
 
