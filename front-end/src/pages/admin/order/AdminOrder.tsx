@@ -358,8 +358,10 @@ const AdminOrder = () => {
 
                     <div className="mb-4 text-sm text-gray-700 space-y-2">
                       <p><strong>Khách hàng:</strong> {order.user?.firstname} {order.user?.lastname}</p>
+                      
                       <p><strong>Tổng tiền:</strong> {formatPrice(order.total_price)}</p>
                       <p><strong>Ngày đặt:</strong> {formatDate(order.order_date)}</p>
+                      <p><strong>Địa chỉ:</strong> {order.shipping_address}</p>
                       <div>
                         <strong>Sách trong đơn hàng:</strong>
                         <ul>
@@ -436,6 +438,9 @@ const AdminOrder = () => {
                       </p>
                       <p>
                         <strong>Ngày đặt:</strong> {formatDate(order.order_date)}
+                      </p>
+                      <p>
+                        <strong>Địa chỉ:</strong> {order.shipping_address}
                       </p>
                       <strong>Sách trong đơn hàng:</strong>
                       <ul>

@@ -291,13 +291,13 @@ const AdminProduct = () => {
                                 </div>
 
                                 <div className="mt-4 flex space-x-3">
-                                    <button
+                                    {/* <button
                                         className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300"
                                         title="Xem chi tiết"
                                     >
                                         <FaEye size={16} />
-                                    </button>
-                                    <button
+                                    </button> */}
+                                    {/* <button
                                         className="p-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300"
                                         title="Chỉnh sửa"
                                     >
@@ -308,7 +308,7 @@ const AdminProduct = () => {
                                         title="Xóa"
                                     >
                                         <FaTrash size={16} />
-                                    </button>
+                                    </button> */}
                                 </div>
                             </div>
                         ))}

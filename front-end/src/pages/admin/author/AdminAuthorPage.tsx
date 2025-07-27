@@ -165,10 +165,10 @@ const AdminAuthorPage: React.FC = () => {
     };
 
 
-    const handleDelete = (id: number) => {
-        setAuthors(authors.filter((author) => author.id !== id));
-        setFilteredAuthors(filteredAuthors.filter((author) => author.id !== id));
-    };
+    // const handleDelete = (id: number) => {
+    //     setAuthors(authors.filter((author) => author.id !== id));
+    //     setFilteredAuthors(filteredAuthors.filter((author) => author.id !== id));
+    // };
 
     const indexOfLastAuthor = currentPage * authorsPerPage;
     const indexOfFirstAuthor = indexOfLastAuthor - authorsPerPage;
@@ -268,12 +268,12 @@ const AdminAuthorPage: React.FC = () => {
                                         >
                                             <FaEdit size={16} />
                                         </button>
-                                        <button
+                                        {/* <button
                                             onClick={() => handleDelete(author.id)}
                                             className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 hover:shadow-lg transform hover:scale-105 transition-all duration-300"
                                         >
                                             <FaTrash size={16} />
-                                        </button>
+                                        </button> */}
                                     </>
                                 )}
                             </div>
