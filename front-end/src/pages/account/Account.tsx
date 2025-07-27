@@ -8,7 +8,7 @@ import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { BsKey } from 'react-icons/bs';
 import ChangePassword from '../../components/modals/ChangePassword';
 import { showToast } from '../../utils/toastUtils';
-import defaultAvatar from '../../assets/images/defaultAvatar.jpg';
+import defaultAvatar from '../../assets/images/default_avatar.jpg';
 
 const Account = () => {
   const dispatch = useDispatch();
