@@ -8,6 +8,7 @@ import { AiOutlineLoading3Quarters } from 'react-icons/ai';
 import { BsKey } from 'react-icons/bs';
 import ChangePassword from '../../components/modals/ChangePassword';
 import { showToast } from '../../utils/toastUtils';
+import defaultAvatar from '../../assets/images/default_avatar.jpg';
 
 const Account = () => {
   const dispatch = useDispatch();
@@ -132,7 +133,7 @@ const Account = () => {
         <div className="flex flex-col items-center mb-8">
           <img
             className="rounded-full h-48 w-48 object-cover"
-            src={avatarUrl || user?.avatar_url || 'https://via.placeholder.com/150'}
+            src={avatarUrl || user?.avatar_url || defaultAvatar}
             alt="Avatar"
           />
 

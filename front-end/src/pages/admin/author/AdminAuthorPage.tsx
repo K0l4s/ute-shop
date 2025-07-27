@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FaEdit, FaTrash, FaCheck, FaTimes,  FaPlus } from 'react-icons/fa';
+import { FaEdit, FaCheck, FaTimes,  FaPlus } from 'react-icons/fa';
 import { createAuthor, getAllAuthors, updateAuthor } from '../../../apis/author';
 import { BiLeftArrow, BiRightArrow } from 'react-icons/bi';
 

@@ -1,8 +1,14 @@
 const express = require("express");
-const { register, login, confirm, logout, checkAuth, forgotPsswd, resetPsswd, changePwd } = require("../controllers/authController");
+const { register, login, confirm, logout, checkAuth, forgotPsswd, resetPsswd, changePwd, googleAuth, googleCallback, linkGoogle, unlinkGoogle } = require("../controllers/authController");
 const { authenticateJWT } = require("../middlewares/authMiddleware");
 
 const router = express.Router();
+
+// Google OAuth routes
+router.get('/google', googleAuth);
+router.get('/google/callback', googleCallback);
+router.post('/link-google', authenticateJWT, linkGoogle);
+router.delete('/unlink-google', authenticateJWT, unlinkGoogle);
 
 router.post('/register', register);
 router.post('/login', login);

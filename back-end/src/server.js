@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const axios = require('axios');
 const db = require('./models/index.js');
+const passport = require('./config/oAuth2Config.js');
 const authRoutes = require('./routes/authRoutes.js');
 const userRoutes = require('./routes/userRoutes.js');
 const bookRoutes = require('./routes/bookRoutes.js');

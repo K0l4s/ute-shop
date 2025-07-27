@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { searchBooks } from "../../../apis/book";
 // import { useLocation } from "react-router-dom";
-import { FaEdit, FaEye, FaTrash, FaPlus } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 // import Pagination from "../../../components/pagination/Pagination";
 import ModalCreateBook from "../../../components/modals/ModalCreateBook";
 
