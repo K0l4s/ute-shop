@@ -26,10 +26,10 @@ const getTop10BooksByOrderQuantity = async () => {
         Books.cover_img_url, 
         Books.publisher_id, 
         Books.author_id, 
-        (SELECT SUM(detail_orders.quantity)
-         FROM detail_orders 
-         INNER JOIN Orders ON detail_orders.order_id = Orders.id
-         WHERE detail_orders.book_id = Books.id 
+        (SELECT SUM(Detail_Orders.quantity)
+         FROM Detail_Orders 
+         INNER JOIN Orders ON Detail_Orders.order_id = Orders.id
+         WHERE Detail_Orders.book_id = Books.id 
            AND Orders.status NOT IN ('CANCELLED', 'RETURNED')
         ) AS totalSell, 
         AVG(Reviews.star) AS avgRating,
@@ -169,9 +169,9 @@ const getBooks = async (filters, page = 1, limit = 16) => {
           ],
           [
             sequelize.literal(`(
-              SELECT SUM(detail_orders.quantity)
-              FROM detail_orders
-              WHERE detail_orders.book_id = Book.id
+              SELECT SUM(Detail_Orders.quantity)
+              FROM Detail_Orders
+              WHERE Detail_Orders.book_id = Book.id
             )`),
             'total_sold'
           ],

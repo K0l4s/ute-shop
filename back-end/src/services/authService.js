@@ -48,7 +48,7 @@ const registerUser = async ({ firstname, lastname, address, birthday, phone, ema
 // Login
 const loginUser = async ({ email, password, res }) => {
   try {
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email }, logging: console.log });
     if (!user) {
       throw new Error('User not found');
     }
@@ -64,7 +64,7 @@ const loginUser = async ({ email, password, res }) => {
 
     await Token.update(
       { revoked: true, expired: true },
-      { where: { userId: user.id } }
+      { where: { userId: user.id }, logging: console.log }
     );
 
     const token = jwt.sign(

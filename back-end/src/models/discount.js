@@ -30,6 +30,7 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'Discount',
+    tableName: 'Discounts',
   });
   return Discount;
 };

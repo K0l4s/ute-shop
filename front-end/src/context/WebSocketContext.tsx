@@ -7,6 +7,7 @@ import { showToast } from '../utils/toastUtils';
 import order_coming from "../assets/audio/order_coming.mp3";
 import { useDispatch } from 'react-redux';
 import { setOrderId } from '../redux/reducers/newOrderSlice';
+import { BASE_HOSTNAME } from '../apis/base';
 
 interface WebSocketContextType {
   socket: WebSocket | null;
@@ -39,7 +40,9 @@ export const WebSocketProvider: React.FC<React.PropsWithChildren<{}>> = ({ child
       return;
     }
 
-    const newSocket = new WebSocket(`ws://localhost:8080?userId=${user?.id}`);
+    // const newSocket = new WebSocket(`ws://${BASE_HOSTNAME}?userId=${user?.id}`);
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const newSocket = new WebSocket(`${protocol}://${BASE_HOSTNAME}?userId=${user?.id}`);
     setSocket(newSocket);
 
     newSocket.onopen = () => {

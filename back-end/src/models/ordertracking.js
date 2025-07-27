@@ -44,6 +44,7 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'OrderTracking',
+    tableName: 'OrderTrackings',
     timestamps: false
   });
   return OrderTracking;

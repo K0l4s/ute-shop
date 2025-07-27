@@ -18,6 +18,7 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'Genre',
+    tableName: 'Genres',
     timestamps: false
   });
 

@@ -26,6 +26,7 @@ module.exports = (sequelize) => {
     {
       sequelize,
       modelName: 'Image',
+      tableName: 'Images',
       timestamps: false
     });
   return Image;

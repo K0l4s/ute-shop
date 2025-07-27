@@ -35,6 +35,7 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'Collection_Book',
+    tableName: 'Collection_Books',
     timestamps: false
   });
 

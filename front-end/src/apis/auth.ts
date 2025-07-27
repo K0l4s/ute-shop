@@ -46,7 +46,7 @@ export const checkAuthStatusApi = async () => {
 
 export const forgotPasswordApis = async (email: String) => {
     // Call API to send reset password email
-    const response = await fetch('http://localhost:8080/api/v1/auth/forgot-password', {
+    const response = await fetch(BASE_URL + '/auth/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +63,7 @@ export const forgotPasswordApis = async (email: String) => {
 
 export const resetPasswordApis = async (email: String, password: String, code: String) => {
     // Call API to reset password
-    const response = await fetch('http://localhost:8080/api/v1/auth/reset-password', {
+    const response = await fetch(BASE_URL + '/auth/reset-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ export const resetPasswordApis = async (email: String, password: String, code: S
 
 export const activeAccountApis = async (email: String, code: String) => {
     // Call API to reset password
-    const response = await fetch('http://localhost:8080/api/v1/auth/confirm', {
+    const response = await fetch(BASE_URL + '/auth/confirm', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

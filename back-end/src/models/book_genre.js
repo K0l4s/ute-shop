@@ -33,6 +33,7 @@ module.exports = (sequelize) => {
   }, {
     sequelize,
     modelName: 'Book_Genre',
+    tableName: 'Book_Genres',
     timestamps: false
   });
 
