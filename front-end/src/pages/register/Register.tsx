@@ -1,11 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { showToast } from '../../utils/toastUtils';
-<<<<<<< HEAD
 import { HiArrowSmLeft } from 'react-icons/hi';
-=======
 import { BASE_URL } from '../../apis/base';
->>>>>>> a0aa70a00fc8778dc1f1227988c9beb85c932990
 
 interface RegisterProps {}
 
