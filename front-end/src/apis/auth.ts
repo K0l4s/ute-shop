@@ -28,7 +28,14 @@ export const checkAuthStatusApi = async () => {
   try {
     const response = await axios.get(
       BASE_URL + '/auth/check', 
-      { withCredentials: true });
+      { 
+        withCredentials: true,
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0'
+        }
+      });
 
     return response.data;
   } catch (err) {
@@ -101,6 +108,57 @@ export const changePasswordApi = async (oldPassword: string, newPassword: string
     return response.data;
   } catch (err) {
     console.error('Có lỗi xảy ra: ', err);
+    throw err;
+  }
+};
+
+// Function to initiate Google OAuth login
+export const loginWithGoogleApi = () => {
+  window.location.href = `${BASE_URL}/auth/google`;
+};
+
+// Function to handle Google OAuth callback response
+export const handleGoogleCallbackApi = async () => {
+  try {
+    const response = await axios.get(
+      BASE_URL + '/auth/check',
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (err) {
+    console.error('Error handling Google callback:', err);
+    throw err;
+  }
+};
+
+// Function to link Google account to existing user
+export const linkGoogleAccountApi = async () => {
+  try {
+    const response = await axios.post(
+      BASE_URL + '/auth/link-google',
+      {},
+      { 
+        headers: { 'Content-Type': 'application/json' }, 
+        withCredentials: true 
+      }
+    );
+    return response.data;
+  } catch (err) {
+    console.error('Error linking Google account:', err);
+    throw err;
+  }
+};
+
+// Function to unlink Google account
+export const unlinkGoogleAccountApi = async () => {
+  try {
+    const response = await axios.delete(
+      BASE_URL + '/auth/unlink-google',
+      { withCredentials: true }
+    );
+    return response.data;
+  } catch (err) {
+    console.error('Error unlinking Google account:', err);
     throw err;
   }
 };

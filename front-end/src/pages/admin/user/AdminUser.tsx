@@ -205,11 +205,11 @@ const AdminUser = () => {
                   </div>
                 </div>
 
-                <div className="mt-6 text-center">
+                {/* <div className="mt-6 text-center">
                   <button className="px-4 py-2 bg-blue-500 text-white text-sm rounded-lg hover:bg-blue-600 transition-all duration-200 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
                     Chi tiết
                   </button>
-                </div>
+                </div> */}
               </div>
             );
           })}

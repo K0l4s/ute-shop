@@ -223,11 +223,122 @@ const changePassword = async ({ userId, oldPassword, newPassword }) => {
   }
 };
 
+const googleAuthCallback = async (user, res) => {
+  try {
+    // Revoke existing tokens
+    await Token.update(
+      { revoked: true, expired: true },
+      { where: { userId: user.id } }
+    );
+
+    // Create new JWT token
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '8h' }
+    );
+
+    // Save token to database
+    await Token.create({
+      token,
+      revoked: false,
+      expired: false,
+      userId: user.id,
+      role: user.role,
+    });
+
+    // Set cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'development',
+      maxAge: 8 * 60 * 60 * 1000,
+      sameSite: 'None'
+    });
+
+    const returnData = {
+      id: user.id,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      province: user.province,
+      district: user.district,
+      ward: user.ward,
+      address: user.address,
+      birthday: user.birthday,
+      gender: user.gender,
+      avatar_url: user.avatar_url,
+      phone: user.phone,
+      email: user.email,
+      role: user.role,
+      google_id: user.google_id
+    };
+    console.log("Google login successful", returnData);
+    return { message: "Google login successful", data: returnData };
+  } catch (err) {
+    throw new Error("Error processing Google login: " + err.message);
+  }
+};
+
+// Link existing account with Google
+const linkGoogleAccount = async (userId, googleProfile) => {
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Check if Google account is already linked to another user
+    const existingGoogleUser = await User.findOne({
+      where: { google_id: googleProfile.id }
+    });
+
+    if (existingGoogleUser && existingGoogleUser.id !== userId) {
+      throw new Error("This Google account is already linked to another user");
+    }
+
+    // Update user with Google ID
+    await user.update({
+      google_id: googleProfile.id,
+      avatar_url: googleProfile.photos[0]?.value || user.avatar_url
+    });
+
+    return { message: "Google account linked successfully" };
+  } catch (err) {
+    throw new Error("Error linking Google account: " + err.message);
+  }
+};
+
+// Unlink Google account
+const unlinkGoogleAccount = async (userId) => {
+  try {
+    const user = await User.findByPk(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    if (!user.google_id) {
+      throw new Error("No Google account linked");
+    }
+
+    if (!user.password) {
+      throw new Error("Cannot unlink Google account. Please set a password first");
+    }
+
+    await user.update({ google_id: null });
+    return { message: "Google account unlinked successfully" };
+  } catch (err) {
+    throw new Error("Error unlinking Google account: " + err.message);
+  }
+};
+
+
 module.exports = {
   registerUser,
   loginUser,
   confirmRegister,
   forgotPassword,
   resetPassword,
-  changePassword
+  changePassword,
+  googleAuthCallback,
+  linkGoogleAccount,
+  unlinkGoogleAccount
 };

@@ -30,6 +30,11 @@ module.exports = (sequelize) => {
     password: DataTypes.STRING,
     is_active: DataTypes.BOOLEAN,
     code: DataTypes.INTEGER,
+    google_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true
+    },
     role: {
       type: DataTypes.ENUM(Role.CUSTOMER, Role.ADMIN),
       allowNull: false,
