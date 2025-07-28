@@ -11,12 +11,9 @@ const config = {
     port: process.env.DB_PORT
   },
   test: {
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    database: 'database_test',
-    host: process.env.DB_HOST,
-    dialect: process.env.DB_DIALECT,
-    port: process.env.DB_PORT
+    dialect: 'sqlite',
+    storage: ':memory:', // in-memory database
+    logging: false
   },
   production: {
     username: process.env.DB_USERNAME,
